@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace GodsEye
+namespace GodsEye.ConsoleApp
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
         }
