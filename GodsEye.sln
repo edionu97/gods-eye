@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.ConsoleApp", "GodsEye.ConsoleApp\GodsEye.ConsoleApp.csproj", "{A3DC293D-38A6-46AC-9345-B71943ADFB07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.ConsoleApp", "GodsEye.ConsoleApp\GodsEye.ConsoleApp.csproj", "{A3DC293D-38A6-46AC-9345-B71943ADFB07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.ImageStreaming", "GodsEye.ImageStreaming\GodsEye.ImageStreaming.csproj", "{8ED0D703-991F-489E-8630-22F2F1051854}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.ImageStreaming", "GodsEye.ImageStreaming\GodsEye.ImageStreaming.csproj", "{8ED0D703-991F-489E-8630-22F2F1051854}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.ImageStreaming.Camera", "GodsEye.ImageStreaming.Camera\GodsEye.ImageStreaming.Camera.csproj", "{4A2D184D-F947-4B61-9E2F-3C613EDB6910}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.Utility.Configuration", "GodsEye.Utility.Configuration\GodsEye.Utility.Configuration.csproj", "{1F621FF3-AFA7-4719-9DFD-A7828D9B1487}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{8ED0D703-991F-489E-8630-22F2F1051854}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ED0D703-991F-489E-8630-22F2F1051854}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ED0D703-991F-489E-8630-22F2F1051854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A2D184D-F947-4B61-9E2F-3C613EDB6910}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A2D184D-F947-4B61-9E2F-3C613EDB6910}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A2D184D-F947-4B61-9E2F-3C613EDB6910}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A2D184D-F947-4B61-9E2F-3C613EDB6910}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F621FF3-AFA7-4719-9DFD-A7828D9B1487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F621FF3-AFA7-4719-9DFD-A7828D9B1487}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F621FF3-AFA7-4719-9DFD-A7828D9B1487}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F621FF3-AFA7-4719-9DFD-A7828D9B1487}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
