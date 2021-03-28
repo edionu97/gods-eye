@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GodsEye.ImageStreaming.ImageSource.ImageStream
+namespace GodsEye.ImageStreaming.ImageSource.ImageProvider
 {
     public interface IImageProvider
     {

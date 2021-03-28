@@ -4,4 +4,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Manager\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GodsEye.ImageStreaming.ImageSource\GodsEye.ImageStreaming.ImageSource.csproj" />
+  </ItemGroup>
+
 </Project>

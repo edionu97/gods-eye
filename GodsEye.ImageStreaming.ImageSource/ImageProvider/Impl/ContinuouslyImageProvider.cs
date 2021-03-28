@@ -1,16 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SixLabors.ImageSharp;
-using GodsEye.Utility.Enums;
-using System.Collections.Generic;
+using GodsEye.ImageStreaming.ImageSource.ImageLocator;
 using GodsEye.Utility.Configuration;
+using GodsEye.Utility.Enums;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.PixelFormats;
-using GodsEye.ImageStreaming.ImageSource.ImageProvider;
+using SixLabors.ImageSharp.Processing;
 
-namespace GodsEye.ImageStreaming.ImageSource.ImageStream.Impl
+namespace GodsEye.ImageStreaming.ImageSource.ImageProvider.Impl
 {
     public class ContinuouslyImageProvider : IImageProvider
     {
@@ -62,7 +62,7 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageStream.Impl
                 _applicationSettings.Camera.ImageOptions.ImageResolution;
 
             //get the image type
-            var (imageType, _) = _applicationSettings.Camera.Network;
+            var (imageType, _, _) = _applicationSettings.Camera.Network;
 
             //iterate through all the image files from the location
             foreach (var imageFile in _imageLocator.LocateImages(imageLocation))

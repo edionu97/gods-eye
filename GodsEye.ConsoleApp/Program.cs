@@ -2,9 +2,9 @@
 using SixLabors.ImageSharp;
 using System.Threading.Tasks;
 using GodsEye.ConsoleApp.Config;
+using GodsEye.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using GodsEye.ImageStreaming.ImageSource.ImageStream;
 
 namespace GodsEye.ConsoleApp
 {

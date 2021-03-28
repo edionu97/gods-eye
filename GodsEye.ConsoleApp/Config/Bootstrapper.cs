@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
+using GodsEye.ImageStreaming.ImageSource.ImageLocator;
+using GodsEye.ImageStreaming.ImageSource.ImageLocator.Impl;
 using GodsEye.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.ImageStreaming.ImageSource.ImageProvider.Impl;
-using GodsEye.ImageStreaming.ImageSource.ImageStream;
-using GodsEye.ImageStreaming.ImageSource.ImageStream.Impl;
 using GodsEye.Utility.Configuration;
 using GodsEye.Utility.Configuration.Impl;
 using Microsoft.Extensions.Hosting;

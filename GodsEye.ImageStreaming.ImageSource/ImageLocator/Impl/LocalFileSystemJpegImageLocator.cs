@@ -1,9 +1,9 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using GodsEye.Utility.Configuration;
 using GodsEye.Utility.ExtensionMethods.PrimitivesExtensions;
 
-namespace GodsEye.ImageStreaming.ImageSource.ImageProvider.Impl
+namespace GodsEye.ImageStreaming.ImageSource.ImageLocator.Impl
 {
     public class LocalFileSystemJpegImageLocator : IImageLocator
     {
