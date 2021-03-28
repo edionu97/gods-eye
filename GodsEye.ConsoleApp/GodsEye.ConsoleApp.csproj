@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GodsEye.Utility.Configuration\GodsEye.Utility.Configuration.csproj" />
+    <ProjectReference Include="..\GodsEye.ImageStreaming.ImageSource\GodsEye.ImageStreaming.ImageSource.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility\GodsEye.Utility.csproj" />
   </ItemGroup>
 
   <ItemGroup>
