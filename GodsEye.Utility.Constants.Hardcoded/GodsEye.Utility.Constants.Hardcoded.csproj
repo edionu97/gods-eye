@@ -4,8 +4,4 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\GodsEye.Utility.Helpers.Files\GodsEye.Utility.Helpers.Files.csproj" />
-  </ItemGroup>
-
 </Project>

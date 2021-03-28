@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GodsEye.Utility.Constants.Hardcoded\GodsEye.Utility.Constants.Hardcoded.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility.Exceptions\GodsEye.Utility.Exceptions.csproj" />
+  </ItemGroup>
+
+</Project>

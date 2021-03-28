@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GodsEye.ConsoleApp.Config;
+using GodsEye.Utility.Configuration.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GodsEye.ConsoleApp
 {
@@ -6,7 +8,13 @@ namespace GodsEye.ConsoleApp
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            //load the service provider
+            var serviceProvider = Bootstrapper.Load();
+
+            var configuration =
+                serviceProvider.GetService<IApplicationSettings>();
+
+
         }
     }
 }
