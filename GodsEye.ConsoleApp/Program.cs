@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using System;
+using SixLabors.ImageSharp;
 using System.Threading.Tasks;
 using GodsEye.ConsoleApp.Config;
 using GodsEye.Utility.Configuration;
@@ -18,9 +19,9 @@ namespace GodsEye.ConsoleApp
                 serviceProvider.GetService<IApplicationSettings>();
 
             var imageStreamer =
-                serviceProvider.GetService<IImageStreamer>();
+                serviceProvider.GetService<IImageProvider>();
 
-            await foreach (var (imageName, imageBytes) in imageStreamer?.StreamImages("Camera0"))
+            await foreach (var (imageName, imageBytes) in imageStreamer?.ProvideImages("Camera0"))
             {
                 await Task.Delay(100);
                 var image = Image.Load(imageBytes);
