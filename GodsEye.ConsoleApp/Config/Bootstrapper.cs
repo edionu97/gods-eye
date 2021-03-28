@@ -37,10 +37,10 @@ namespace GodsEye.ConsoleApp.Config
                         context.Configuration.Get<ApplicationSettings>());
 
                     //register the image provider as transient (new instance every time)
-                    services.AddSingleton<IImageProvider, LocalFileImageJpegProvider>();
+                    services.AddSingleton<IImageLocator, LocalFileSystemJpegImageLocator>();
 
                     //register the image provider as transient (new instance every time)
-                    services.AddTransient<IImageStreamer, ContinuouslyImageStreamer>();
+                    services.AddTransient<IImageProvider, ContinuouslyImageProvider>();
                 })
                 .Build()
                 .Services;

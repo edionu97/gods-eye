@@ -12,19 +12,19 @@ using GodsEye.ImageStreaming.ImageSource.ImageProvider;
 
 namespace GodsEye.ImageStreaming.ImageSource.ImageStream.Impl
 {
-    public class ContinuouslyImageStreamer : IImageStreamer
+    public class ContinuouslyImageProvider : IImageProvider
     {
-        private readonly IImageProvider _imageProvider;
+        private readonly IImageLocator _imageLocator;
         private readonly IApplicationSettings _applicationSettings;
 
-        public ContinuouslyImageStreamer(
-            IImageProvider imageProvider, IApplicationSettings applicationSettings)
+        public ContinuouslyImageProvider(
+            IImageLocator imageLocator, IApplicationSettings applicationSettings)
         {
-            _imageProvider = imageProvider;
+            _imageLocator = imageLocator;
             _applicationSettings = applicationSettings;
         }
 
-        public async IAsyncEnumerable<(string ImageName, byte[] ImageBytes)> StreamImages(string locationId)
+        public async IAsyncEnumerable<Tuple<string, byte[]>> ProvideImages(string locationId)
         {
             //create a dictionary for items
             var byteImageDictionary = new Dictionary<string, byte[]>();
@@ -41,7 +41,8 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageStream.Impl
                 var fileName = fileNames.Dequeue();
 
                 //return the image bytes
-                yield return (fileName, byteImageDictionary[fileName]);
+                yield return Tuple
+                    .Create(fileName, byteImageDictionary[fileName]);
 
                 //enqueue the file info back
                 //so it will create a never ending cycle
@@ -61,7 +62,7 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageStream.Impl
                 = _applicationSettings.Camera.ImageOptions;
             
             //iterate through all the image files from the location
-            foreach (var imageFile in _imageProvider.GetImages(imageLocation))
+            foreach (var imageFile in _imageLocator.LocateImages(imageLocation))
             {
                 //load the image in memory
                 var loadedImage = 

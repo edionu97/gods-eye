@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace GodsEye.ImageStreaming.ImageSource.ImageProvider
 {
-    public interface IImageProvider
+    public interface IImageLocator
     {
-        public IEnumerable<FileInfo> ProvideImagesFromSource(string locationId);
+        public IEnumerable<FileInfo> LocateImages(string locationId);
     }
 }

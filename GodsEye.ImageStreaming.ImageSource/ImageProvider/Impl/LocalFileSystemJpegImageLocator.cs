@@ -5,16 +5,16 @@ using GodsEye.Utility.ExtensionMethods.PrimitivesExtensions;
 
 namespace GodsEye.ImageStreaming.ImageSource.ImageProvider.Impl
 {
-    public class LocalFileImageJpegProvider : IImageProvider
+    public class LocalFileSystemJpegImageLocator : IImageLocator
     {
         private readonly IApplicationSettings _appSettings;
 
-        public LocalFileImageJpegProvider(IApplicationSettings appSettings)
+        public LocalFileSystemJpegImageLocator(IApplicationSettings appSettings)
         {
             _appSettings = appSettings;
         }
 
-        public IEnumerable<FileInfo> ProvideImagesFromSource(string locationId)
+        public IEnumerable<FileInfo> LocateImages(string locationId)
         {
             //get the directory path
             var directoryPath = Path
