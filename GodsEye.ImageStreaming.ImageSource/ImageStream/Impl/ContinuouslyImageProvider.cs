@@ -57,15 +57,18 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageStream.Impl
         /// <returns>a tuple of items that represent the image bytes and the name of the file image</returns>
         private async IAsyncEnumerable<Tuple<byte[], string>> GetImages(string imageLocation)
         {
-            //deconstruct the object in properties
-            var ((width, height), useResizeImages, imageType) 
-                = _applicationSettings.Camera.ImageOptions;
-            
+            //deconstruct the object for getting the resolution
+            var (width, height) = 
+                _applicationSettings.Camera.ImageOptions.ImageResolution;
+
+            //get the image type
+            var (imageType, _) = _applicationSettings.Camera.Network;
+
             //iterate through all the image files from the location
             foreach (var imageFile in _imageLocator.LocateImages(imageLocation))
             {
                 //load the image in memory
-                var loadedImage = 
+                var loadedImage =
                     await Image.LoadAsync<Rgba32>(imageFile.FullName);
 
                 //get the proper encoder
@@ -77,22 +80,19 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageStream.Impl
                 //create the memory stream
                 await using var memoryStream = new MemoryStream();
 
-                //resize the image if needed
-                if (useResizeImages)
-                {
-                    loadedImage.Mutate(context => 
-                        context.Resize(width, height, KnownResamplers.Lanczos8));
-                }
+                //resize the image to desired resolution
+                loadedImage.Mutate(context =>
+                    context.Resize(width, height, KnownResamplers.Lanczos8));
 
                 //save the image in the memory using the encoder
                 await loadedImage.SaveAsync(memoryStream, imageEncoder);
 
                 //create a tuple of elements
-                var newFileName = 
+                var newFileName =
                     $"{Path.GetFileNameWithoutExtension(imageFile.Name)}.{imageType.ToString().ToLower()}";
                 yield return Tuple.Create(memoryStream.ToArray(), newFileName);
             }
-        } 
+        }
 
     }
 }
