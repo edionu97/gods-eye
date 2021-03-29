@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GodsEye.Camera.ImageStreaming.ImageSource\GodsEye.Camera.ImageStreaming.ImageSource.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility.Application.Items\GodsEye.Utility.Application.Items.csproj" />
+  </ItemGroup>
+
+</Project>

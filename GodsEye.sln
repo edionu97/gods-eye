@@ -3,15 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.ConsoleApp", "GodsEye.ConsoleApp\GodsEye.ConsoleApp.csproj", "{A3DC293D-38A6-46AC-9345-B71943ADFB07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Camera.Startup", "GodsEye.Camera.Startup\GodsEye.Camera.Startup.csproj", "{A3DC293D-38A6-46AC-9345-B71943ADFB07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.ImageStreaming.ImageSource", "GodsEye.ImageStreaming.ImageSource\GodsEye.ImageStreaming.ImageSource.csproj", "{4A2D184D-F947-4B61-9E2F-3C613EDB6910}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Camera.ImageStreaming.ImageSource", "GodsEye.Camera.ImageStreaming.ImageSource\GodsEye.Camera.ImageStreaming.ImageSource.csproj", "{4A2D184D-F947-4B61-9E2F-3C613EDB6910}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility", "GodsEye.Utility\GodsEye.Utility.csproj", "{1F621FF3-AFA7-4719-9DFD-A7828D9B1487}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility.Application.Items", "GodsEye.Utility.Application.Items\GodsEye.Utility.Application.Items.csproj", "{1F621FF3-AFA7-4719-9DFD-A7828D9B1487}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.ImageStreaming.Camera", "GodsEye.ImageStreaming.Camera\GodsEye.ImageStreaming.Camera.csproj", "{71C3AF37-FA09-4776-BC63-4827BC0A52CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Camera.ImageStreaming", "GodsEye.Camera.ImageStreaming\GodsEye.Camera.ImageStreaming.csproj", "{71C3AF37-FA09-4776-BC63-4827BC0A52CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{CEF20814-4FA3-4581-97BB-CA50059F993E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{CEF20814-4FA3-4581-97BB-CA50059F993E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility.Application.Helpers", "GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj", "{74F1D801-5D3A-4AAE-BAFA-92E980E9C62D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility.Application.Config", "GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj", "{35C87C1D-1F13-454E-9089-6CBC3EEF4D0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.Application.Resources", "GodsEye.Application.Resources\GodsEye.Application.Resources.csproj", "{B1E5935E-1335-4522-8F4E-033976911979}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +45,18 @@ Global
 		{CEF20814-4FA3-4581-97BB-CA50059F993E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEF20814-4FA3-4581-97BB-CA50059F993E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEF20814-4FA3-4581-97BB-CA50059F993E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74F1D801-5D3A-4AAE-BAFA-92E980E9C62D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74F1D801-5D3A-4AAE-BAFA-92E980E9C62D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74F1D801-5D3A-4AAE-BAFA-92E980E9C62D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74F1D801-5D3A-4AAE-BAFA-92E980E9C62D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35C87C1D-1F13-454E-9089-6CBC3EEF4D0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35C87C1D-1F13-454E-9089-6CBC3EEF4D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35C87C1D-1F13-454E-9089-6CBC3EEF4D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35C87C1D-1F13-454E-9089-6CBC3EEF4D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1E5935E-1335-4522-8F4E-033976911979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1E5935E-1335-4522-8F4E-033976911979}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1E5935E-1335-4522-8F4E-033976911979}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1E5935E-1335-4522-8F4E-033976911979}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

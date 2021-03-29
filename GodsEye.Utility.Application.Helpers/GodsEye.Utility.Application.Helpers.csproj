@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GodsEye.Utility.Application.Items\GodsEye.Utility.Application.Items.csproj" />
+  </ItemGroup>
+
+</Project>

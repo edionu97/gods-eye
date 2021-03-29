@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using GodsEye.ImageStreaming.Camera.Messages;
-using GodsEye.Utility.Helpers.Network;
-using GodsEye.Utility.Helpers.Serializers.JsonSerializer;
+using GodsEye.Camera.ImageStreaming.Messages;
+using GodsEye.Utility.Application.Helpers.Helpers.Network;
 
 namespace ConsoleApp1
 {
@@ -12,16 +10,14 @@ namespace ConsoleApp1
     {
         public static void Main(string[] args)
         {
-
             //get the address and the port
             var cameraIpAddress = IPAddress.Parse("192.168.0.101");
-            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, 5000);
+            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, 5001);
 
             using var s = new Socket(cameraIpEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
             {
                 Blocking = true
             };
-
 
             s.Connect(cameraIpEndPoint);
 
