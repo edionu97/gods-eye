@@ -4,6 +4,6 @@ namespace GodsEye.ImageStreaming.Camera.Camera
 {
     public interface ICameraDevice
     {
-        public Task StartTackingShots(string deviceId, int devicePort);
+        public Task StartSendingImageFrames(string deviceId, int devicePort);
     }
 }

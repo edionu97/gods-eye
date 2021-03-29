@@ -3,5 +3,7 @@
     public class ImageOptionsSection
     {
         public ImageResolutionSection ImageResolution { get; set; }
+
+        public int FramesPerSecond { get; set; }
     }
 }

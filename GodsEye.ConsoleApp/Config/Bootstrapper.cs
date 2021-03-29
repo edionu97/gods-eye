@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using GodsEye.ImageStreaming.Camera.Camera;
+using GodsEye.ImageStreaming.Camera.Camera.Impl;
 using GodsEye.ImageStreaming.ImageSource.ImageLocator;
 using GodsEye.ImageStreaming.ImageSource.ImageLocator.Impl;
 using GodsEye.ImageStreaming.ImageSource.ImageProvider;
@@ -41,6 +43,9 @@ namespace GodsEye.ConsoleApp.Config
 
                     //register the image provider as transient (new instance every time)
                     services.AddTransient<IImageProvider, ContinuouslyImageProvider>();
+
+                    //register the camera as transient (new instance every time)
+                    services.AddTransient<ICameraDevice, SingleConnectionCameraDevice>();
                 })
                 .Build()
                 .Services;

@@ -1,7 +1,9 @@
-﻿using System;
-using SixLabors.ImageSharp;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GodsEye.ConsoleApp.Config;
+using GodsEye.ImageStreaming.Camera.Camera;
 using GodsEye.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +12,7 @@ namespace GodsEye.ConsoleApp
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             //load the service provider
             var serviceProvider = Bootstrapper.Load();
@@ -18,15 +20,26 @@ namespace GodsEye.ConsoleApp
             var configuration =
                 serviceProvider.GetService<IApplicationSettings>();
 
-            var imageStreamer =
-                serviceProvider.GetService<IImageProvider>();
+            var onCameras = new List<Task>();
 
-            await foreach (var (imageName, imageBytes) in imageStreamer?.ProvideImages("Camera0"))
+            //iterate the image directory
+            var imageDirectory
+                = new DirectoryInfo(configuration?.Resources.ImageDirectoryPath ?? string.Empty);
+
+            //get the index of the camera
+            var cameraIdx = configuration?.Camera.Network.StreamsOnPort ?? 0;
+            foreach (var subDirectory in imageDirectory.GetDirectories(configuration?.Camera.CameraId ?? string.Empty))
             {
-                await Task.Delay(100);
-                var image = Image.Load(imageBytes);
-                await image.SaveAsync(@$"C:\Users\Eduard\Desktop\Images\{imageName}");
+                //get the camera device
+                var cameraDevice = 
+                    serviceProvider.GetService<ICameraDevice>();
+
+                //start the image streaming
+                onCameras.Add(cameraDevice?.StartSendingImageFrames(subDirectory.Name, cameraIdx++));
             }
+
+            //wait all the tasks to complete
+            Task.WaitAll(onCameras.Where(x => x != null).ToArray());
         }
     }
 }
