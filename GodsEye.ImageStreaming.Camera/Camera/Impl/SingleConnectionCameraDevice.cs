@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Net.WebSockets;
-using System.Threading;
 using System.Threading.Tasks;
 using GodsEye.Utility.Exceptions;
 using GodsEye.Utility.Configuration;
+using GodsEye.Utility.Helpers.Network;
+using GodsEye.ImageStreaming.Camera.Messages;
 using GodsEye.ImageStreaming.ImageSource.ImageProvider;
 using LocalConstants = GodsEye.Utility.Constants.Message.MessageConstants.CameraDevice;
 
@@ -84,7 +84,16 @@ namespace GodsEye.ImageStreaming.Camera.Camera.Impl
             //deconstruct the object
             var (frameName, frameBytes) = imageFrame;
 
-            Console.WriteLine(imageFrame.Item1);
+            //create the message that will be framed
+            var imageFrameMessage = new ImageFrameMessage
+            {
+                FrameName = frameName,
+                ImageBase64EncodedBytes = Convert.ToBase64String(frameBytes),
+                ImageType = _applicationSettings.Camera.Network.ImageStreamingFormat
+            };
+
+            //send the message to the client
+            SendHelpers.SendMessage<ImageFrameMessage>(imageFrameMessage, client);
         }
     }
 }
