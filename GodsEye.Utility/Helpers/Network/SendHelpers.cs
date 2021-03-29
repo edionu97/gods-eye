@@ -8,7 +8,6 @@ namespace GodsEye.Utility.Helpers.Network
 {
     public class SendHelpers
     {
-
         /// <summary>
         /// This method it is used for converting a message into a byte buffer and send it over the network
         ///     The first 4 bytes represents the message length and the others represents the message
@@ -53,8 +52,8 @@ namespace GodsEye.Utility.Helpers.Network
         public static T ReceiveMessage<T>(Socket fromSocket) where T : class, INetworkMessage
         {
             //get the number of bytes
-            var lenByteArray = new byte[4];
-            fromSocket.Receive(lenByteArray);
+            var lenByteArray 
+                = ReceiveExactNumberOfBytes(4, fromSocket);
 
             //convert to machine endian
             if (BitConverter.IsLittleEndian)
@@ -67,14 +66,43 @@ namespace GodsEye.Utility.Helpers.Network
                 .ToInt32(lenByteArray, 0);
 
             //receive the message bytes
-            var messageBytes = new byte[length];
-            fromSocket.Receive(messageBytes);
+            var messageBytes = 
+                ReceiveExactNumberOfBytes(length, fromSocket);
 
             //convert the array of bytes into a string
             var frameInfoBytes = Encoding.ASCII.GetString(messageBytes);
 
             //get the object
             return JsonSerializerDeserializer<T>.Deserialize(frameInfoBytes);
+        }
+
+        /// <summary>
+        /// This function it is used for receiving an fixed number of bytes from a socket
+        /// </summary>
+        /// <param name="bytesToReceive">the number of bytes that is required to be received</param>
+        /// <param name="client">the client socket</param>
+        /// <returns>a byte buffer that represents the data to be read</returns>
+        private static byte[] ReceiveExactNumberOfBytes(int bytesToReceive, Socket client)
+        {
+            //allocate the size in bytes
+            var byteBuffer = new byte[bytesToReceive];
+
+            //try to read the number of bytes in one shot
+            var receivedBytes = 
+                client.Receive(byteBuffer, 0, bytesToReceive, SocketFlags.None);
+
+            //if there are no items to read
+            while (receivedBytes != bytesToReceive)
+            {
+                receivedBytes += client.Receive(
+                    byteBuffer, 
+                    receivedBytes, 
+                    bytesToReceive - receivedBytes, 
+                    SocketFlags.None);
+            }
+
+            //return the bytes
+            return byteBuffer;
         }
     }
 }

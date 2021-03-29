@@ -5,6 +5,7 @@ using System.Linq;
 using GodsEye.ImageStreaming.ImageSource.ImageLocator;
 using GodsEye.Utility.Configuration;
 using GodsEye.Utility.Enums;
+using GodsEye.Utility.Settings;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
@@ -15,13 +16,13 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageProvider.Impl
     public class ContinuouslyImageProvider : IImageProvider
     {
         private readonly IImageLocator _imageLocator;
-        private readonly IApplicationSettings _applicationSettings;
+        private readonly ICameraSettings _cameraSettings;
 
         public ContinuouslyImageProvider(
-            IImageLocator imageLocator, IApplicationSettings applicationSettings)
+            IImageLocator imageLocator, ICameraSettings generalAppSettings)
         {
             _imageLocator = imageLocator;
-            _applicationSettings = applicationSettings;
+            _cameraSettings = generalAppSettings;
         }
 
         public async IAsyncEnumerable<Tuple<string, byte[]>> ProvideImages(string locationId)
@@ -57,13 +58,6 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageProvider.Impl
         /// <returns>a tuple of items that represent the image bytes and the name of the file image</returns>
         private async IAsyncEnumerable<Tuple<byte[], string>> GetImages(string imageLocation)
         {
-            //deconstruct the object for getting the resolution
-            var (width, height) = 
-                _applicationSettings.Camera.ImageOptions.ImageResolution;
-
-            //get the image type
-            var (imageType, _, _) = _applicationSettings.Camera.Network;
-
             //iterate through all the image files from the location
             foreach (var imageFile in _imageLocator.LocateImages(imageLocation))
             {
@@ -75,21 +69,23 @@ namespace GodsEye.ImageStreaming.ImageSource.ImageProvider.Impl
                 var imageEncoder = loadedImage
                     .GetConfiguration()
                     .ImageFormatsManager
-                    .FindEncoder(imageType.ToFormat());
+                    .FindEncoder(_cameraSettings.StreamingImageType.ToFormat());
 
                 //create the memory stream
                 await using var memoryStream = new MemoryStream();
 
                 //resize the image to desired resolution
                 loadedImage.Mutate(context =>
-                    context.Resize(width, height, KnownResamplers.Lanczos8));
+                    context.Resize(
+                        _cameraSettings.StreamingWidth, 
+                        _cameraSettings.StreamingHeight, KnownResamplers.Lanczos8));
 
                 //save the image in the memory using the encoder
                 await loadedImage.SaveAsync(memoryStream, imageEncoder);
 
                 //create a tuple of elements
                 var newFileName =
-                    $"{Path.GetFileNameWithoutExtension(imageFile.Name)}.{imageType.ToString().ToLower()}";
+                    $"{Path.GetFileNameWithoutExtension(imageFile.Name)}.{_cameraSettings.StreamingImageType.ToString().ToLower()}";
                 yield return Tuple.Create(memoryStream.ToArray(), newFileName);
             }
         }

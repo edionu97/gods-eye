@@ -1,8 +1,9 @@
-﻿using GodsEye.Utility.Helpers.Paths;
+﻿using GodsEye.Utility.Configuration.Base;
+using GodsEye.Utility.Helpers.Paths;
 
-namespace GodsEye.Utility.Configuration.Sections.Resources
+namespace GodsEye.Utility.Configuration.Sections.Camera
 {
-    public class ResourcesSection
+    public class CameraSectionConfig : IConfig
     {
         private string _imageDirectoryPath;
         public string ImageDirectoryPath
@@ -13,12 +14,16 @@ namespace GodsEye.Utility.Configuration.Sections.Resources
                 //resolve the path if possible
                 if (!string.IsNullOrEmpty((_imageDirectoryPath)))
                 {
-                    _imageDirectoryPath = 
+                    _imageDirectoryPath =
                         PathHelpers.ResolvePath(_imageDirectoryPath);
                 }
 
                 return _imageDirectoryPath;
             }
         }
+
+        public string CameraId { get; set; }
+        public NetworkSectionConfig Network { get; set; }
+        public ImageOptionsSectionConfig ImageOptions { get; set; }
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace GodsEye.Utility.Configuration.Sections.Camera
+﻿using GodsEye.Utility.Configuration.Base;
+
+namespace GodsEye.Utility.Configuration.Sections.Camera
 {
-    public class ImageResolutionSection
+    public class ImageResolutionSectionConfig : IConfig
     {
         public int Width { get; set; }
 

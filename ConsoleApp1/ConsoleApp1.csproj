@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GodsEye.ImageStreaming.Camera\GodsEye.ImageStreaming.Camera.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility\GodsEye.Utility.csproj" />
+  </ItemGroup>
+
+</Project>

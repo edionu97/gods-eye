@@ -1,24 +1,24 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using GodsEye.Utility.Configuration;
+﻿using System.IO;
+using GodsEye.Utility.Settings;
+using System.Collections.Generic;
 using GodsEye.Utility.ExtensionMethods.PrimitivesExtensions;
 
 namespace GodsEye.ImageStreaming.ImageSource.ImageLocator.Impl
 {
     public class LocalFileSystemJpegImageLocator : IImageLocator
     {
-        private readonly IApplicationSettings _appSettings;
+        private readonly ICameraSettings _cameraSettings;
 
-        public LocalFileSystemJpegImageLocator(IApplicationSettings appSettings)
+        public LocalFileSystemJpegImageLocator(ICameraSettings cameraSettings)
         {
-            _appSettings = appSettings;
+            _cameraSettings = cameraSettings;
         }
 
         public IEnumerable<FileInfo> LocateImages(string locationId)
         {
             //get the directory path
             var directoryPath = Path
-                .Combine(_appSettings.Resources.ImageDirectoryPath, locationId)
+                .Combine(_cameraSettings.ImageDirectoryPath, locationId)
                 .AsFileSystemInfo<DirectoryInfo>();
 
             //break if the directory does not exist

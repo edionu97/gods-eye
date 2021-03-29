@@ -9,7 +9,9 @@
 
         public static class CameraDevice
         {
-            public static string CameraIsStreamingMessage => "Camera '{0}' is streaming images on port '{1}'...";
+            public static string CameraIsStreamingMessage => "Camera '{0}' is ready for streaming images on port '{1}'...";
+
+            public static string CameraIsStreamingImagesMessage => "Streaming location found, started streaming images.\n Camera details: {0}";
         }
 
     }
