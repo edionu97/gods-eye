@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Text;
+using System.Net.Sockets;
+using System.Threading.Tasks;
+using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Helpers.Helpers.Network.Message;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 
@@ -15,18 +17,26 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
         /// </summary>
         /// <param name="message">the message that will be send</param>
         /// <param name="toSocket">the destination</param>
-        public static void SendMessage<T>(
-            INetworkMessage message, Socket toSocket) where T : class, INetworkMessage
+        /// <param name="encryptor">if specified this will be used for encrypting the message</param>
+        /// <param name="key">the key used to encrypt the message</param>
+        public static async Task SendMessageAsync<T>(
+            INetworkMessage message,
+            Socket toSocket,
+            IEncryptorDecryptor encryptor = null,
+            string key = null) where T : class, INetworkMessage
         {
             //serialize the object
             var serializedObject =
                 JsonSerializerDeserializer<T>.Serialize(message as T);
 
             //convert the string into an array of bytes
-            var frameInfoBytes = Encoding.ASCII.GetBytes(serializedObject);
+            //encrypt the message if needed
+            var bytesToSend = encryptor != null
+                ? await encryptor.EncryptAsync(serializedObject, key)
+                : Encoding.ASCII.GetBytes(serializedObject);
 
             //get the message length
-            var len = frameInfoBytes.Length;
+            var len = bytesToSend.Length;
 
             //reverse the bytes if little endian
             var lenAsBigEndian = BitConverter.GetBytes(len);
@@ -39,7 +49,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
             toSocket.Send(lenAsBigEndian);
 
             //send the message
-            toSocket.Send(frameInfoBytes);
+            toSocket.Send(bytesToSend);
         }
 
         /// <summary>
@@ -48,11 +58,16 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
         ///     The first 4 bytes are in big endian format so little endian conversion it is needed
         /// </summary>
         /// <param name="fromSocket">the socket from which we are waiting to read a message</param>
+        /// <param name="decryptor">this will be used to decrypt the message</param>
+        /// <param name="key">the key used for decryption</param>
         /// <returns>an instance of message</returns>
-        public static T ReceiveMessage<T>(Socket fromSocket) where T : class, INetworkMessage
+        public static async Task<T> ReceiveMessageAsync<T>(
+            Socket fromSocket,
+            IEncryptorDecryptor decryptor = null,
+            string key = null) where T : class, INetworkMessage
         {
             //get the number of bytes
-            var lenByteArray 
+            var lenByteArray
                 = ReceiveExactNumberOfBytes(4, fromSocket);
 
             //convert to machine endian
@@ -66,14 +81,16 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
                 .ToInt32(lenByteArray, 0);
 
             //receive the message bytes
-            var messageBytes = 
+            var messageBytes =
                 ReceiveExactNumberOfBytes(length, fromSocket);
 
             //convert the array of bytes into a string
-            var frameInfoBytes = Encoding.ASCII.GetString(messageBytes);
+            var receivedMessage = decryptor != null
+                ? await decryptor.DecryptAsync(messageBytes, key)
+                : Encoding.ASCII.GetString(messageBytes);
 
             //get the object
-            return JsonSerializerDeserializer<T>.Deserialize(frameInfoBytes);
+            return JsonSerializerDeserializer<T>.Deserialize(receivedMessage);
         }
 
         /// <summary>
@@ -88,16 +105,16 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
             var byteBuffer = new byte[bytesToReceive];
 
             //try to read the number of bytes in one shot
-            var receivedBytes = 
+            var receivedBytes =
                 client.Receive(byteBuffer, 0, bytesToReceive, SocketFlags.None);
 
             //if there are no items to read
             while (receivedBytes != bytesToReceive)
             {
                 receivedBytes += client.Receive(
-                    byteBuffer, 
-                    receivedBytes, 
-                    bytesToReceive - receivedBytes, 
+                    byteBuffer,
+                    receivedBytes,
+                    bytesToReceive - receivedBytes,
                     SocketFlags.None);
             }
 

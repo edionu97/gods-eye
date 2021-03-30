@@ -17,6 +17,7 @@
     <ProjectReference Include="..\GodsEye.Camera.ImageStreaming.ImageSource\GodsEye.Camera.ImageStreaming.ImageSource.csproj" />
     <ProjectReference Include="..\GodsEye.Camera.ImageStreaming\GodsEye.Camera.ImageStreaming.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility.Application.Security\GodsEye.Utility.Application.Security.csproj" />
   </ItemGroup>
 
 </Project>

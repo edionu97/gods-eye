@@ -17,7 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility.Application
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility.Application.Config", "GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj", "{35C87C1D-1F13-454E-9089-6CBC3EEF4D0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.Application.Resources", "GodsEye.Application.Resources\GodsEye.Application.Resources.csproj", "{B1E5935E-1335-4522-8F4E-033976911979}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Application.Resources", "GodsEye.Application.Resources\GodsEye.Application.Resources.csproj", "{B1E5935E-1335-4522-8F4E-033976911979}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility.Application.Security", "GodsEye.Utility.Application.Security\GodsEye.Utility.Application.Security.csproj", "{C8661BA6-C229-424D-91CB-37CB8B985876}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp2", "ConsoleApp2\ConsoleApp2.csproj", "{1722A395-0B5D-428F-A630-60325718169C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +61,14 @@ Global
 		{B1E5935E-1335-4522-8F4E-033976911979}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1E5935E-1335-4522-8F4E-033976911979}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1E5935E-1335-4522-8F4E-033976911979}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8661BA6-C229-424D-91CB-37CB8B985876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8661BA6-C229-424D-91CB-37CB8B985876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8661BA6-C229-424D-91CB-37CB8B985876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8661BA6-C229-424D-91CB-37CB8B985876}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1722A395-0B5D-428F-A630-60325718169C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1722A395-0B5D-428F-A630-60325718169C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1722A395-0B5D-428F-A630-60325718169C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1722A395-0B5D-428F-A630-60325718169C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

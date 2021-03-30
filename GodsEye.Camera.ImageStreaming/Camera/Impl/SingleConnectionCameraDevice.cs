@@ -6,18 +6,30 @@ using Microsoft.Extensions.Logging;
 using GodsEye.Utility.Application.Config.Settings;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
+using GodsEye.Utility.Application.Security.Encryption;
+using GodsEye.Utility.Application.Security.KeyProvider;
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.CameraDevice;
 
 namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 {
     public partial class SingleConnectionCameraDevice : ICameraDevice
     {
+        private readonly string _encryptionKey;
+
         public SingleConnectionCameraDevice(
-            IImageProvider imageProvider, ICameraSettings cameraSettings, ILoggerFactory loggerFactory)
+            IImageProvider imageProvider, 
+            ICameraSettings cameraSettings, 
+            ILoggerFactory loggerFactory,
+            IKeyProvider provider,
+            IEncryptorDecryptor encryptor)
         {
+            _encryptor = encryptor;
             _loggerFactory = loggerFactory;
             _imageProvider = imageProvider;
             _cameraSettings = cameraSettings;
+
+            //get the encryption key
+            _encryptionKey = provider?.GetKey();
         }
 
         public Task StartSendingImageFrames(string deviceId, int devicePort)
@@ -72,10 +84,10 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                         await foreach (var frameInfo in _imageProvider.ProvideImages(deviceId))
                         {
                             //send frame
-                            SendFrameToClient(client, frameInfo);
+                            await SendFrameToClientAsync(client, frameInfo);
 
                             //wait the interval in order to match the desired fps
-                            await WaitFrameInterval();
+                            await WaitFrameIntervalAsync();
                         }
                     }
                     catch (SocketException)

@@ -10,6 +10,10 @@ using GodsEye.Utility.Application.Config.Configuration;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Settings;
 using GodsEye.Utility.Application.Config.Settings.Impl;
+using GodsEye.Utility.Application.Security.Encryption;
+using GodsEye.Utility.Application.Security.Encryption.Impl;
+using GodsEye.Utility.Application.Security.KeyProvider;
+using GodsEye.Utility.Application.Security.KeyProvider.Impl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,6 +47,26 @@ namespace GodsEye.Camera.Startup
 
                     //register the application settings as singleton
                     services.AddSingleton<IApplicationSettings, ApplicationSettings>();
+
+                    //register the key provider
+                    services.AddSingleton<KeyBasicHashProvider>();
+
+                    //register the IKeyProvider
+                    services.AddSingleton<IKeyProvider, KeyBasicHashProvider>(s =>
+                    {
+                        //get the basic provider
+                        var basicHashProvider = s.GetService<KeyBasicHashProvider>();
+
+                        //register the key
+                        basicHashProvider?.RegisterKey("app key");
+
+                        //get the provider
+                        return basicHashProvider;
+                    });
+
+                    //register the encryptor as singleton
+                    services
+                        .AddSingleton<IEncryptorDecryptor, KeyBasedEncryptorDecryptor>();
 
                     //register the camera settings
                     services.AddSingleton<ICameraSettings>(serviceProvider =>
