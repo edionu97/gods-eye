@@ -21,7 +21,7 @@ namespace ConsoleApp1
 
             //get the address and the port
             var cameraIpAddress = IPAddress.Parse("192.168.0.101");
-            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, 5000);
+            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, 5001);
 
             using var s = new Socket(cameraIpEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
             {

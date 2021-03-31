@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using GodsEye.RemoteWorker.WebSocket.Server;
 using GodsEye.RemoteWorker.Worker.Streaming;
 using Microsoft.Extensions.DependencyInjection;
 

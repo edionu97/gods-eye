@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using GodsEye.Camera.ImageStreaming.Messages;
-using GodsEye.Utility.Application.Config.Settings;
+using GodsEye.Utility.Application.Security.Encryption;
+using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Helpers.Helpers.Network;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
-using GodsEye.Utility.Application.Config.Settings.Camera;
-using GodsEye.Utility.Application.Security.Encryption;
-using Microsoft.Extensions.Logging;
 
 namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 {
@@ -28,17 +27,17 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             await Task.Delay(TimeSpan.FromMilliseconds(frameInterval));
         }
 
-        private async Task SendFrameToClientAsync(Socket client, Tuple<string, byte[]> imageFrame)
+        private async Task SendFrameToClientAsync(Socket client, Tuple<string, string> imageFrame)
         {
             //deconstruct the object
-            var (frameName, frameBytes) = imageFrame;
+            var (frameName, imageBase64EncodedBytes) = imageFrame;
 
             //create the message that will be framed
             var imageFrameMessage = new ImageFrameMessage
             {
                 FrameName = frameName,
-                ImageBase64EncodedBytes = Convert.ToBase64String(frameBytes),
-                ImageType = _cameraSettings.StreamingImageType
+                ImageType = _cameraSettings.StreamingImageType,
+                ImageBase64EncodedBytes = imageBase64EncodedBytes
             };
 
             //send the message to the client and encrypt the message

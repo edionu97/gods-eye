@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace GodsEye.RemoteWorker.WebSocket.Server
+namespace GodsEye.RemoteWorker.Worker.Streaming.WebSocket
 {
     public interface IWebSocketServer
     {
@@ -19,6 +19,6 @@ namespace GodsEye.RemoteWorker.WebSocket.Server
         /// </summary>
         /// <param name="message">the value of the message</param>
         /// <param name="clientId">the id of the client (optional)</param>
-        public Task SendMessageAsync(string message, string clientId = null);
+        public Task SendMessageAsync<T>(T message, string clientId = null);
     }
 }

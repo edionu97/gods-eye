@@ -1,9 +1,10 @@
 ﻿using WatsonWebsocket;
 using System.Threading.Tasks;
+using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 
-namespace GodsEye.RemoteWorker.WebSocket.Server.Impl
+namespace GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl
 {
-    public class BroadcastToAllClientsWebSocketServer : IWebSocketServer
+    public class JsonBroadcastWebSocketServer : IWebSocketServer
     {
         private WatsonWsServer _wsServer;
 
@@ -18,13 +19,14 @@ namespace GodsEye.RemoteWorker.WebSocket.Server.Impl
             await _wsServer.StartAsync();
         }
 
-        public async Task SendMessageAsync(string message, string _ = null)
+        public async Task SendMessageAsync<T>(T message, string _ = null)
         {
             //iterate the clients
             foreach (var client in _wsServer.ListClients())
             {
                 //send the message
-                await _wsServer.SendAsync(client, message);
+                await _wsServer.SendAsync(
+                    client, JsonSerializerDeserializer<T>.Serialize(message));
             }
         }
     }

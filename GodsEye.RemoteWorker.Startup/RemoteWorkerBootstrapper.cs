@@ -1,23 +1,23 @@
 ﻿using System;
 using System.IO;
-using GodsEye.RemoteWorker.WebSocket.Server;
-using GodsEye.RemoteWorker.WebSocket.Server.Impl;
-using GodsEye.RemoteWorker.Worker.Streaming;
-using GodsEye.RemoteWorker.Worker.Streaming.Impl;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using GodsEye.RemoteWorker.Worker.Streaming;
 using Microsoft.Extensions.DependencyInjection;
-using GodsEye.Utility.Application.Config.Configuration;
-using GodsEye.Utility.Application.Config.Configuration.Impl;
+using GodsEye.RemoteWorker.Worker.Streaming.Impl;
 using GodsEye.Utility.Application.Config.Settings;
-using GodsEye.Utility.Application.Config.Settings.Camera;
-using GodsEye.Utility.Application.Config.Settings.Impl;
-using GodsEye.Utility.Application.Config.Settings.RemoteWorker;
+using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.Utility.Application.Security.Encryption;
-using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider;
+using GodsEye.Utility.Application.Config.Configuration;
+using GodsEye.Utility.Application.Config.Settings.Impl;
+using GodsEye.Utility.Application.Config.Settings.Camera;
+using GodsEye.Utility.Application.Security.Encryption.Impl;
+using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
+using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider.Impl;
+using GodsEye.Utility.Application.Config.Settings.RemoteWorker;
 
 namespace GodsEye.RemoteWorker.Startup
 {
@@ -86,12 +86,11 @@ namespace GodsEye.RemoteWorker.Startup
 
                     //register the web socket server
                     services
-                        .AddTransient<IWebSocketServer, BroadcastToAllClientsWebSocketServer>();
+                        .AddTransient<IWebSocketServer, JsonBroadcastWebSocketServer>();
 
                     //register the streaming image worker
                     services
                         .AddTransient<IStreamingImageWorker, StreamingImageWorker>();
-
                 })
                 .ConfigureLogging(logging =>
                 {

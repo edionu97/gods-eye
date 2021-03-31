@@ -10,6 +10,6 @@ namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider
         /// </summary>
         /// <param name="locationId">location's identifier</param>
         /// <returns>a tuple of elements representing the association between the name of the file and the file bytes</returns>
-        public IAsyncEnumerable<Tuple<string, byte[]>> ProvideImages(string locationId);
+        public IAsyncEnumerable<Tuple<string, string>> ProvideImages(string locationId);
     }
 }

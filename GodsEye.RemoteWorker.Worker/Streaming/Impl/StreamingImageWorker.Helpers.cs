@@ -3,9 +3,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using GodsEye.RemoteWorker.WebSocket.Server;
+using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Config.Settings.RemoteWorker;
+
 using WorkerConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
@@ -17,7 +18,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
         /// </summary>
         /// <param name="logger">the logger</param>
         /// <param name="cameraSettings">the camera setting</param>
-        /// <returns></returns>
+        /// <returns>returns the socket</returns>
         private static Socket ConnectToCamera(ILogger logger, ICameraSettings cameraSettings)
         {
             //get the address and the port

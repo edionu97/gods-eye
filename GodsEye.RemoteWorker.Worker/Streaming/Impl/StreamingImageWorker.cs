@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Sockets;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using GodsEye.RemoteWorker.WebSocket.Server;
 using GodsEye.Camera.ImageStreaming.Messages;
+using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Helpers.Helpers.Network;
@@ -11,16 +13,14 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
 {
     public partial class StreamingImageWorker : IStreamingImageWorker
     {
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IWebSocketServer _webSocketServer;
         private readonly IEncryptorDecryptor _encryptorDecryptor;
-
         private readonly ICameraSettings _cameraSettings;
         private readonly IWebSocketSettings _webSocketSettings;
 
-        private readonly ILoggerFactory _loggerFactory;
-
         public StreamingImageWorker(
-            IWebSocketServer webSocketServer, 
+            IWebSocketServer webSocketServer,
             IEncryptorDecryptor encryptor,
             ICameraSettings cameraSettings,
             IWebSocketSettings webSocketSettings, ILoggerFactory loggerFactory)
@@ -48,20 +48,24 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                 await StartWebSocketAsync(
                     _webSocketServer, _webSocketSettings, workerId, logger);
 
-                //infinite loop
-                while (true)
+                //get frames
+                await foreach (var frame in GetFramesAsync(tcpSocket))
                 {
-                    //read the message
-                    var message = await SendHelpers
-                        .ReceiveMessageAsync<ImageFrameMessage>(tcpSocket, _encryptorDecryptor);
-
                     //send the frame
-                    await _webSocketServer.SendMessageAsync(message.FrameName);
+                    await _webSocketServer.SendMessageAsync(frame);
                 }
-
-                // ReSharper disable once FunctionNeverReturns
             });
         }
-        
+
+        private async IAsyncEnumerable<ImageFrameMessage> GetFramesAsync(Socket fromCamera)
+        {
+            while (true)
+            {
+                yield return await SendHelpers
+                    .ReceiveMessageAsync<ImageFrameMessage>(fromCamera, _encryptorDecryptor);
+            }
+
+            // ReSharper disable once IteratorNeverReturns
+        }
     }
 }

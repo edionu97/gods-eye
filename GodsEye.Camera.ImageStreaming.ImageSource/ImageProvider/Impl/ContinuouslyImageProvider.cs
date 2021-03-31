@@ -24,13 +24,18 @@ namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
             _cameraSettings = generalAppSettings;
         }
 
-        public async IAsyncEnumerable<Tuple<string, byte[]>> ProvideImages(string locationId)
+        public async IAsyncEnumerable<Tuple<string, string>> ProvideImages(string locationId)
         {
             //create a dictionary for items
-            var byteImageDictionary = new Dictionary<string, byte[]>();
-            await foreach (var (imageBytes, imageName) in GetImages(locationId))
+            var byteImageDictionary = new Dictionary<string, string>();
+            await foreach (var (imagesBase64, imageName) in GetImages(locationId))
             {
-                byteImageDictionary.Add(imageName, imageBytes);
+                //return the images
+                yield return Tuple
+                    .Create(imageName, imagesBase64);
+
+                //cache images
+                byteImageDictionary.Add(imageName, imagesBase64);
             }
 
             //stream the images
@@ -55,7 +60,7 @@ namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
         /// </summary>
         /// <param name="imageLocation">the location of the image folder (relative to the path specified in json)</param>
         /// <returns>a tuple of items that represent the image bytes and the name of the file image</returns>
-        private async IAsyncEnumerable<Tuple<byte[], string>> GetImages(string imageLocation)
+        private async IAsyncEnumerable<Tuple<string, string>> GetImages(string imageLocation)
         {
             //iterate through all the image files from the location
             foreach (var imageFile in _imageLocator.LocateImages(imageLocation))
@@ -64,15 +69,6 @@ namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
                 var loadedImage =
                     await Image.LoadAsync<Rgba32>(imageFile.FullName);
 
-                //get the proper encoder
-                var imageEncoder = loadedImage
-                    .GetConfiguration()
-                    .ImageFormatsManager
-                    .FindEncoder(_cameraSettings.StreamingImageType.ToFormat());
-
-                //create the memory stream
-                await using var memoryStream = new MemoryStream();
-
                 //resize the image to desired resolution
                 loadedImage.Mutate(context =>
                     context.Resize(
@@ -80,12 +76,14 @@ namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
                         _cameraSettings.StreamingHeight, KnownResamplers.Lanczos8));
 
                 //save the image in the memory using the encoder
-                await loadedImage.SaveAsync(memoryStream, imageEncoder);
+                var imageFormatter =
+                    _cameraSettings.StreamingImageType.ToFormat();
 
                 //create a tuple of elements
                 var newFileName =
                     $"{Path.GetFileNameWithoutExtension(imageFile.Name)}.{_cameraSettings.StreamingImageType.ToString().ToLower()}";
-                yield return Tuple.Create(memoryStream.ToArray(), newFileName);
+
+                yield return Tuple.Create(loadedImage.ToBase64String(imageFormatter), newFileName);
             }
         }
 

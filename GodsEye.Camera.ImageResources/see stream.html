@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+
+<html>
+   <head>
+      
+	  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+      
+	  <script type = "text/javascript">
+         function WebSocketTest() {
+            
+            if ("WebSocket" in window) {
+               
+               var ws = new WebSocket("ws://192.168.0.101:9000");
+				
+               ws.onopen = function() { 
+                  console.log("Client connected");
+               };
+				
+               ws.onmessage = function (evt) { 
+				  let obj = JSON.parse(evt.data);
+                  $("#cam").attr('src', obj.ImageBase64EncodedBytes);
+               };
+				
+               ws.onclose = function() { 
+                  alert("Connection is closed..."); 
+               };
+			   
+            } else {
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+      </script>
+		
+   </head>
+   
+   <body>
+      <div id = "sse">
+         <a href = "javascript:WebSocketTest()">Run WebSocket</a>
+      </div>
+      <body>
+         <img id="cam" src=""/>
+      </body>
+   </body>
+</html>
