@@ -18,5 +18,18 @@
             public static string StreamingLocationLostMessage => "The communication with streaming location lost.";
         }
 
+        public static class Workers
+        {
+            public static string WebsocketServerCouldNotBeStartMessage => "Web socket server could not be started";
+
+            public static string WebSocketListeningOnPortMessage => "Started web socket server on {0}:{1}";
+
+            public static string TryingToConnectOnCameraMessage => "Trying to connect to camera: {0}:{1}";
+
+            public static string ConnectionStatusSuccessfulMessage => "Connection  status: successful";
+
+            public static string ConnectionStatusFailedMessage => "Connection  status: failed";
+        }
+
     }
 }

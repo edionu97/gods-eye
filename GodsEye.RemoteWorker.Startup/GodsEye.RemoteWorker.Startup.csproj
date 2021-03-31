@@ -11,12 +11,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="WatsonWebsocket" Version="2.2.1.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GodsEye.Application.Resources\GodsEye.Application.Resources.csproj" />
     <ProjectReference Include="..\GodsEye.Camera.ImageStreaming\GodsEye.Camera.ImageStreaming.csproj" />
+    <ProjectReference Include="..\GodsEye.RemoteWorker.WebSocket\GodsEye.RemoteWorker.WebSocket.csproj" />
+    <ProjectReference Include="..\GodsEye.RemoteWorker.Worker\GodsEye.RemoteWorker.Worker.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Security\GodsEye.Utility.Application.Security.csproj" />
   </ItemGroup>

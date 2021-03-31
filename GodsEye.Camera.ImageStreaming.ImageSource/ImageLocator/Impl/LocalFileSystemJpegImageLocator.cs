@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using GodsEye.Utility.Application.Config.Settings;
+using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Helpers.ExtensionMethods.PrimitivesExtensions;
 
 namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator.Impl

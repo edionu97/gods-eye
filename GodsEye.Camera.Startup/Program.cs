@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using GodsEye.Camera.ImageStreaming.Camera;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.Utility.Application.Config.Settings;
+using GodsEye.Utility.Application.Config.Settings.Camera;
 
 namespace GodsEye.Camera.Startup
 {

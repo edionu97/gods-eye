@@ -7,8 +7,8 @@ using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using GodsEye.Utility.Application.Items.Enums;
-using GodsEye.Utility.Application.Config.Settings;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator;
+using GodsEye.Utility.Application.Config.Settings.Camera;
 
 namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
 {

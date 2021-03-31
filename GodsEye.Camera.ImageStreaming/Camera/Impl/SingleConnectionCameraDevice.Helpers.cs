@@ -5,6 +5,7 @@ using GodsEye.Camera.ImageStreaming.Messages;
 using GodsEye.Utility.Application.Config.Settings;
 using GodsEye.Utility.Application.Helpers.Helpers.Network;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
+using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Security.Encryption;
 using Microsoft.Extensions.Logging;
 

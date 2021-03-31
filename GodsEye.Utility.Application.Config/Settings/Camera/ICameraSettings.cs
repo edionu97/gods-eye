@@ -1,6 +1,6 @@
 ﻿using GodsEye.Utility.Application.Items.Enums;
 
-namespace GodsEye.Utility.Application.Config.Settings
+namespace GodsEye.Utility.Application.Config.Settings.Camera
 {
     public interface ICameraSettings
     {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using GodsEye.Utility.Application.Config.Settings;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
+using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.KeyProvider;

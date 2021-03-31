@@ -9,6 +9,7 @@ using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl;
 using GodsEye.Utility.Application.Config.Configuration;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Settings;
+using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Config.Settings.Impl;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
