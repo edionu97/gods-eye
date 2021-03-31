@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
-using GodsEye.Camera.ImageStreaming.Camera;
-using GodsEye.Camera.ImageStreaming.Camera.Impl;
-using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator;
-using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator.Impl;
-using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
-using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using GodsEye.Utility.Application.Config.Configuration;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Settings;
@@ -14,19 +12,11 @@ using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider;
 using GodsEye.Utility.Application.Security.KeyProvider.Impl;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace GodsEye.Camera.Startup
+namespace GodsEye.RemoteWorker.Startup
 {
-    public static class Bootstrapper
+    public static class RemoteWorkerBootstrapper
     {
-        /// <summary>
-        /// Configure the classes for dependency injection
-        /// </summary>
-        /// <returns>the service provider that will be used for getting the instances</returns>
         public static IServiceProvider Load()
         {
             return Host
@@ -46,7 +36,7 @@ namespace GodsEye.Camera.Startup
                         context.Configuration.Get<AppConfig>());
 
                     //register the camera settings as singleton
-                    services.AddSingleton<ICameraSettings, ApplicationSettings>();
+                    services.AddSingleton<IRemoteWorkerSettings, ApplicationSettings>();
 
                     //register the key provider
                     services.AddSingleton<KeyBasicHashProvider>();
@@ -67,15 +57,7 @@ namespace GodsEye.Camera.Startup
                     //register the encryptor as singleton
                     services
                         .AddSingleton<IEncryptorDecryptor, KeyBasedEncryptorDecryptor>();
-
-                    //register the image provider as transient (new instance every time)
-                    services.AddSingleton<IImageLocator, LocalFileSystemJpegImageLocator>();
-
-                    //register the image provider as transient (new instance every time)
-                    services.AddTransient<IImageProvider, ContinuouslyImageProvider>();
-
-                    //register the camera as transient (new instance every time)
-                    services.AddTransient<ICameraDevice, SingleConnectionCameraDevice>();
+                   
                 })
                 .ConfigureLogging(logging =>
                 {

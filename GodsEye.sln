@@ -21,8 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Application.Resourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.Utility.Application.Security", "GodsEye.Utility.Application.Security\GodsEye.Utility.Application.Security.csproj", "{C8661BA6-C229-424D-91CB-37CB8B985876}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp2", "ConsoleApp2\ConsoleApp2.csproj", "{1722A395-0B5D-428F-A630-60325718169C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.RemoteWorker.Startup", "GodsEye.RemoteWorker.Startup\GodsEye.RemoteWorker.Startup.csproj", "{1722A395-0B5D-428F-A630-60325718169C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.RemoteWorker.WebSocket", "GodsEye.RemoteWorker.WebSocket\GodsEye.RemoteWorker.WebSocket.csproj", "{DB39B0C8-7144-44AA-9F11-11823E55C33D}"
+EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +72,10 @@ Global
 		{1722A395-0B5D-428F-A630-60325718169C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1722A395-0B5D-428F-A630-60325718169C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1722A395-0B5D-428F-A630-60325718169C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB39B0C8-7144-44AA-9F11-11823E55C33D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB39B0C8-7144-44AA-9F11-11823E55C33D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB39B0C8-7144-44AA-9F11-11823E55C33D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB39B0C8-7144-44AA-9F11-11823E55C33D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
