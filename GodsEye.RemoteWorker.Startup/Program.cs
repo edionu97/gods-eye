@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GodsEye.RemoteWorker.Worker.Streaming;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -6,20 +7,27 @@ namespace GodsEye.RemoteWorker.Startup
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             //get the service provider
             var service = RemoteWorkerBootstrapper.Load();
 
-            //get the web socket server
-            var imageWorker = service.GetService<IStreamingImageWorker>();
-
-            if (imageWorker == null)
+            var list = new List<Task>();
+            for (var i = 0; i < 2; ++i)
             {
-                return;
+                //get the web socket server
+                var imageWorker = service.GetService<IStreamingImageWorker>();
+
+                if (imageWorker == null)
+                {
+                    continue;
+                }
+
+                list.Add(imageWorker.StartAsync(i));
             }
 
-            await imageWorker.StartAsync(0);
+            Task.WaitAll(list.ToArray());
+
         }
     }
 }

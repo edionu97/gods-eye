@@ -41,7 +41,9 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                     .CreateLogger($"{nameof(StreamingImageWorker)}_{workerId}");
 
                 //connect to camera
-                using var tcpSocket = ConnectToCamera(logger, _appConfig.Get<NetworkSectionConfig>());
+                using var tcpSocket = ConnectToCamera(
+                    logger,
+                    _appConfig.Get<NetworkSectionConfig>(), workerId);
 
                 //start the ws service
                 await StartWebSocketAsync(

@@ -17,15 +17,17 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
         /// </summary>
         /// <param name="logger">the logger</param>
         /// <param name="networkConfig">the camera setting</param>
+        /// <param name="portOffset">the offset of the port</param>
         /// <returns>returns the socket</returns>
-        private static Socket ConnectToCamera(ILogger logger, NetworkSectionConfig networkConfig)
+        private static Socket ConnectToCamera(ILogger logger, 
+            NetworkSectionConfig networkConfig, int portOffset)
         {
             //deconstruct the object
             var (_, port, address) = networkConfig;
 
             //get the address and the port
             var cameraIpAddress = IPAddress.Parse(address);
-            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, port);
+            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, port + portOffset);
 
             //declare the socket
             var tcpSocket = new Socket(cameraIpEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
@@ -40,7 +42,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                 logger
                     .LogInformation(
                         WorkerConstants.TryingToConnectOnCameraMessage,
-                        address, port);
+                        address, port + portOffset);
 
                 //connect to the camera
                 tcpSocket.Connect(cameraIpEndPoint);
@@ -85,7 +87,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
 
             //log the message
             logger?.LogInformation(WorkerConstants
-                .WebSocketListeningOnPortMessage, address, port);
+                .WebSocketListeningOnPortMessage, address, port + portOffset);
         }
     }
 }
