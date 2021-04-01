@@ -1,4 +1,4 @@
-﻿using GodsEye.Utility.Application.Config.Configuration.Base;
+﻿using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 

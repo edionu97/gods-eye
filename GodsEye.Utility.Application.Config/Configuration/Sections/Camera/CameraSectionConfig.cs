@@ -1,9 +1,9 @@
-﻿using GodsEye.Utility.Application.Helpers.Helpers.Paths;
-using GodsEye.Utility.Application.Config.Configuration.Base;
+﻿using GodsEye.Utility.Application.Config.BaseConfig.Abstract;
+using GodsEye.Utility.Application.Helpers.Helpers.Paths;
 
 namespace GodsEye.Utility.Application.Config.Configuration.Sections.Camera
 {
-    public class CameraSectionConfig : IConfig
+    public class CameraSectionConfig : AbstractConfig
     {
         private string _imageDirectoryPath;
         public string ImageDirectoryPath

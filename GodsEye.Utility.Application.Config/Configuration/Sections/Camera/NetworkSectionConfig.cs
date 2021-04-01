@@ -1,9 +1,9 @@
-﻿using GodsEye.Utility.Application.Items.Enums;
-using GodsEye.Utility.Application.Config.Configuration.Base;
+﻿using GodsEye.Utility.Application.Config.BaseConfig.Abstract;
+using GodsEye.Utility.Application.Items.Enums;
 
 namespace GodsEye.Utility.Application.Config.Configuration.Sections.Camera
 {
-    public class NetworkSectionConfig : IConfig
+    public class NetworkSectionConfig : AbstractConfig
     {
         public ImageType ImageStreamingFormat { get; set; }
         public int StreamsOnPort { get; set; }

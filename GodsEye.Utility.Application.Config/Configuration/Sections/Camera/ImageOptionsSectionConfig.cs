@@ -1,8 +1,8 @@
-﻿using GodsEye.Utility.Application.Config.Configuration.Base;
+﻿using GodsEye.Utility.Application.Config.BaseConfig.Abstract;
 
 namespace GodsEye.Utility.Application.Config.Configuration.Sections.Camera
 {
-    public class ImageOptionsSectionConfig : IConfig
+    public class ImageOptionsSectionConfig : AbstractConfig
     {
         public int FramesPerSecond { get; set; }
         public ImageResolutionSectionConfig ImageResolution { get; set; }

@@ -1,8 +1,8 @@
-﻿using GodsEye.Utility.Application.Config.Configuration.Base;
+﻿using GodsEye.Utility.Application.Config.BaseConfig.Abstract;
 
 namespace GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker
 {
-    public class WebSocketSectionConfig : IConfig
+    public class WebSocketSectionConfig : AbstractConfig
     {
         public int ServerStartingPort { get; set; }
 
