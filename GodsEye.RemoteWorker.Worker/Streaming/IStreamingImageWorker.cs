@@ -8,6 +8,6 @@ namespace GodsEye.RemoteWorker.Worker.Streaming
         /// Starts the worker
         /// </summary>
         /// <returns>a task to the worker</returns>
-        public Task StartWorkerAsync(int workerId);
+        public Task StartAsync(int workerId);
     }
 }

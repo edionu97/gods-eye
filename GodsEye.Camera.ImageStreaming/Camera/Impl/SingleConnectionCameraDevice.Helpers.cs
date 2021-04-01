@@ -2,11 +2,11 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using GodsEye.Camera.ImageStreaming.Messages;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Helpers.Helpers.Network;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 
 namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 {
@@ -33,7 +33,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             var (frameName, imageBase64EncodedBytes) = imageFrame;
 
             //create the message that will be framed
-            var imageFrameMessage = new ImageFrameMessage
+            var imageFrameMessage = new NetworkImageFrameMessage
             {
                 FrameName = frameName,
                 ImageType = _cameraSettings.StreamingImageType,
@@ -42,7 +42,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 
             //send the message to the client and encrypt the message
             await SendHelpers
-                .SendMessageAsync<ImageFrameMessage>(imageFrameMessage, client, _encryptor);
+                .SendMessageAsync<NetworkImageFrameMessage>(imageFrameMessage, client, _encryptor);
         }
     }
 }

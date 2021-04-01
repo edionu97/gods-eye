@@ -72,7 +72,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
             var (port, address) = wsSettings;
 
             //start the web socket server using the same port and address
-            await webSocketServer.StartAsync(address, port + portOffset);
+            await webSocketServer.ConfigureAsync(address, port + portOffset);
 
             //check if the web socket is listening
             if (!webSocketServer.IsServerListening)
@@ -82,6 +82,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                 return;
             }
 
+            //log the message
             logger?.LogInformation(WorkerConstants
                 .WebSocketListeningOnPortMessage, address, port);
         }

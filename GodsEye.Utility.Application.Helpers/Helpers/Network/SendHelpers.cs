@@ -3,8 +3,8 @@ using System.Text;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using GodsEye.Utility.Application.Security.Encryption;
-using GodsEye.Utility.Application.Helpers.Helpers.Network.Message;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
+using GodsEye.Utility.Application.Items.Messages;
 
 namespace GodsEye.Utility.Application.Helpers.Helpers.Network
 {
@@ -20,10 +20,9 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
         /// <param name="encryptor">if specified this will be used for encrypting the message</param>
         /// <param name="key">the key used to encrypt the message</param>
         public static async Task SendMessageAsync<T>(
-            INetworkMessage message,
+            ISerializableByteNetworkMessage message,
             Socket toSocket,
-            IEncryptorDecryptor encryptor = null,
-            string key = null) where T : class, INetworkMessage
+            IEncryptorDecryptor encryptor = null, string key = null) where T : class, ISerializableByteNetworkMessage
         {
             //serialize the object
             var serializedObject =
@@ -63,8 +62,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
         /// <returns>an instance of message</returns>
         public static async Task<T> ReceiveMessageAsync<T>(
             Socket fromSocket,
-            IEncryptorDecryptor decryptor = null,
-            string key = null) where T : class, INetworkMessage
+            IEncryptorDecryptor decryptor = null, string key = null) where T : class, ISerializableByteNetworkMessage
         {
             //get the number of bytes
             var lenByteArray

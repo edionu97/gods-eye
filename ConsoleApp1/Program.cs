@@ -2,10 +2,10 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using GodsEye.Camera.ImageStreaming.Messages;
 using GodsEye.Utility.Application.Helpers.Helpers.Network;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider.Impl;
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 
 namespace ConsoleApp1
 {
@@ -33,7 +33,7 @@ namespace ConsoleApp1
             while (true)
             {
                 var message = 
-                    await SendHelpers.ReceiveMessageAsync<ImageFrameMessage>(s, decryptor);
+                    await SendHelpers.ReceiveMessageAsync<NetworkImageFrameMessage>(s, decryptor);
 
                 Console.WriteLine(message.FrameName);
             }

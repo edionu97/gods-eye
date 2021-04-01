@@ -7,12 +7,12 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.WebSocket
         public bool IsServerListening { get; }
 
         /// <summary>
-        /// Starts an instance of the server on a specific port and address
+        /// Configure the ws socket server to starts on a specific port and address
         /// </summary>
         /// <param name="address">the address of the server</param>
         /// <param name="port">the value of the port</param>
         /// <returns>a task</returns>
-        public Task StartAsync(string address, int port);
+        public Task ConfigureAsync(string address, int port);
 
         /// <summary>
         /// This method it is used to send a message to a specific client

@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using GodsEye.Camera.ImageStreaming.Messages;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Config.Settings.Camera;
 using GodsEye.Utility.Application.Helpers.Helpers.Network;
 using GodsEye.Utility.Application.Config.Settings.RemoteWorker;
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 
 namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
 {
@@ -32,7 +32,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
             _webSocketSettings = webSocketSettings;
         }
 
-        public Task StartWorkerAsync(int workerId)
+        public Task StartAsync(int workerId)
         {
             //create an worker and schedule the work on the threadPool
             return Task.Run(async () =>
@@ -57,12 +57,12 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
             });
         }
 
-        private async IAsyncEnumerable<ImageFrameMessage> GetFramesAsync(Socket fromCamera)
+        private async IAsyncEnumerable<NetworkImageFrameMessage> GetFramesAsync(Socket fromCamera)
         {
             while (true)
             {
                 yield return await SendHelpers
-                    .ReceiveMessageAsync<ImageFrameMessage>(fromCamera, _encryptorDecryptor);
+                    .ReceiveMessageAsync<NetworkImageFrameMessage>(fromCamera, _encryptorDecryptor);
             }
 
             // ReSharper disable once IteratorNeverReturns

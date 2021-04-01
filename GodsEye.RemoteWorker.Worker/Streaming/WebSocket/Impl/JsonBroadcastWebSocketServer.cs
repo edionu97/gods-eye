@@ -10,7 +10,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl
 
         public bool IsServerListening => (_wsServer?.IsListening).GetValueOrDefault();
 
-        public async Task StartAsync(string address, int port)
+        public async Task ConfigureAsync(string address, int port)
         {
             //create the ws server
             _wsServer = new WatsonWsServer(address, port);

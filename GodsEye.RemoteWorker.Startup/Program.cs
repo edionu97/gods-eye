@@ -19,7 +19,7 @@ namespace GodsEye.RemoteWorker.Startup
                 return;
             }
 
-            await imageWorker.StartWorkerAsync(0);
+            await imageWorker.StartAsync(0);
         }
     }
 }
