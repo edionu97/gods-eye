@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using GodsEye.Camera.ImageStreaming.Camera;
+using GodsEye.Utility.Application.Config.BaseConfig;
+using GodsEye.Utility.Application.Config.Configuration;
+using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using Microsoft.Extensions.DependencyInjection;
-using GodsEye.Utility.Application.Config.Settings;
-using GodsEye.Utility.Application.Config.Settings.Camera;
 
 namespace GodsEye.Camera.Startup
 {
@@ -17,24 +18,35 @@ namespace GodsEye.Camera.Startup
             //load the service provider
             var serviceProvider = Bootstrapper.Load();
 
+            //the app config
             var configuration =
-                serviceProvider.GetService<ICameraSettings>();
+                serviceProvider.GetService<IConfig>();
+
+            //check if the configuration is null
+            if (configuration == null)
+            {
+                return;
+            }
+
+            //get the image directory path
+            var (imageDirectoryPath, cameraId) = configuration.Get<CameraSectionConfig>();
+
+            //get the camera port
+            var (_, cameraPort, _) = configuration.Get<NetworkSectionConfig>();
 
             //iterate the image directory
-            var imageDirectory
-                = new DirectoryInfo(configuration?.ImageDirectoryPath ?? string.Empty);
+            var imageDirectory = new DirectoryInfo(imageDirectoryPath);
 
-            var onCameras = new List<Task>();
             //get the index of the camera
-            var cameraIdx = configuration?.CameraStreamingPort ?? throw new ArgumentNullException();
-            foreach (var subDirectory in imageDirectory.GetDirectories(configuration?.CameraId ?? string.Empty))
+            var onCameras = new List<Task>();
+            foreach (var subDirectory in imageDirectory.GetDirectories(cameraId))
             {
                 //get the camera device
                 var cameraDevice = 
                     serviceProvider.GetService<ICameraDevice>();
 
                 //start the image streaming
-                onCameras.Add(cameraDevice?.StartSendingImageFrames(subDirectory.Name, cameraIdx++));
+                onCameras.Add(cameraDevice?.StartSendingImageFrames(subDirectory.Name, cameraPort++));
             }
 
             //wait all the tasks to complete

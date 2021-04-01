@@ -4,9 +4,8 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
-using GodsEye.Utility.Application.Config.Settings.Camera;
-using GodsEye.Utility.Application.Config.Settings.RemoteWorker;
-
+using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
+using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 using WorkerConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
@@ -17,13 +16,16 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
         /// Connect to camera
         /// </summary>
         /// <param name="logger">the logger</param>
-        /// <param name="cameraSettings">the camera setting</param>
+        /// <param name="networkConfig">the camera setting</param>
         /// <returns>returns the socket</returns>
-        private static Socket ConnectToCamera(ILogger logger, ICameraSettings cameraSettings)
+        private static Socket ConnectToCamera(ILogger logger, NetworkSectionConfig networkConfig)
         {
+            //deconstruct the object
+            var (_, port, address) = networkConfig;
+
             //get the address and the port
-            var cameraIpAddress = IPAddress.Parse(cameraSettings.CameraAddress);
-            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, cameraSettings.CameraStreamingPort);
+            var cameraIpAddress = IPAddress.Parse(address);
+            var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, port);
 
             //declare the socket
             var tcpSocket = new Socket(cameraIpEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
@@ -38,8 +40,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                 logger
                     .LogInformation(
                         WorkerConstants.TryingToConnectOnCameraMessage,
-                        cameraSettings.CameraAddress,
-                        cameraSettings.CameraStreamingPort);
+                        address, port);
 
                 //connect to the camera
                 tcpSocket.Connect(cameraIpEndPoint);
@@ -66,7 +67,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
         /// <param name="logger">the logger</param>
         private static async Task StartWebSocketAsync(
             IWebSocketServer webSocketServer,
-            IWebSocketSettings wsSettings, int portOffset, ILogger logger = null)
+            WebSocketSectionConfig wsSettings, int portOffset, ILogger logger = null)
         {
             //get the properties
             var (port, address) = wsSettings;

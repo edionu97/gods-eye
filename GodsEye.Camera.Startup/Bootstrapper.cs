@@ -6,11 +6,9 @@ using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator.Impl;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl;
+using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
-using GodsEye.Utility.Application.Config.Settings;
-using GodsEye.Utility.Application.Config.Settings.Camera;
-using GodsEye.Utility.Application.Config.Settings.Impl;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider;
@@ -43,11 +41,7 @@ namespace GodsEye.Camera.Startup
                 .ConfigureServices((context, services) =>
                 {
                     //register the app config
-                    services.AddSingleton<IAppConfig>(
-                        context.Configuration.Get<AppConfig>());
-
-                    //register the camera settings as singleton
-                    services.AddSingleton<ICameraSettings, ApplicationSettings>();
+                    services.AddSingleton<IConfig>(context.Configuration.Get<AppConfig>());
 
                     //register the key provider
                     services.AddSingleton<KeyBasicHashProvider>();

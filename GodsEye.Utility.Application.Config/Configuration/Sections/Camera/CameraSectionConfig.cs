@@ -23,7 +23,15 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.Camera
         }
 
         public string CameraId { get; set; }
+
         public NetworkSectionConfig Network { get; set; }
+
         public ImageOptionsSectionConfig ImageOptions { get; set; }
+
+        public void Deconstruct(out string directoryPath, out string cameraId)
+        {
+            directoryPath = ImageDirectoryPath;
+            cameraId = CameraId;
+        }
     }
 }

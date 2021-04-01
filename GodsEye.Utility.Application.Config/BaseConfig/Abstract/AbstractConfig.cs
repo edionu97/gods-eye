@@ -6,15 +6,25 @@ namespace GodsEye.Utility.Application.Config.BaseConfig.Abstract
 {
     public abstract class AbstractConfig : IConfig
     {
+        private static readonly object LockObject = new object();
+
         protected ConfigMetadata Metadata { get; private set; }
 
         public T Get<T>() where T : class, IConfig
         {
-            //if the metadata.object tree is null then build the object tree
-            Metadata ??= InitializeMetadata();
+            //verify the value of the metadata
+            if (Metadata == null)
+            {
+                //critical section
+                lock (LockObject)
+                {
+                    Metadata ??= InitializeMetadata();
+                }
+            }
 
             //get the value 
             IConfig value = null;
+
             Metadata.ObjectTree?.TryGetValue(typeof(T), out value);
 
             //return the value
@@ -28,6 +38,7 @@ namespace GodsEye.Utility.Application.Config.BaseConfig.Abstract
         /// <returns>the metadata</returns>
         protected ConfigMetadata InitializeMetadata()
         {
+            //only a single thread can set this
             //initialize the metadata
             Metadata = new ConfigMetadata
             {
@@ -59,8 +70,6 @@ namespace GodsEye.Utility.Application.Config.BaseConfig.Abstract
             //set the object tree
             return Metadata;
         }
-
-
 
     }
 }

@@ -5,22 +5,27 @@ using SixLabors.ImageSharp;
 using System.Collections.Generic;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.PixelFormats;
-using GodsEye.Utility.Application.Items.Enums;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator;
-using GodsEye.Utility.Application.Config.Settings.Camera;
+using GodsEye.Utility.Application.Config.BaseConfig;
+using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
+using GodsEye.Utility.Application.Items.Enums;
 
 namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
 {
     public class ContinuouslyImageProvider : IImageProvider
     {
+        private readonly ImageType _streamImageType;
         private readonly IImageLocator _imageLocator;
-        private readonly ICameraSettings _cameraSettings;
+        private readonly ImageOptionsSectionConfig _imageConfig;
 
         public ContinuouslyImageProvider(
-            IImageLocator imageLocator, ICameraSettings generalAppSettings)
+            IImageLocator imageLocator, IConfig appConfig)
         {
             _imageLocator = imageLocator;
-            _cameraSettings = generalAppSettings;
+
+            //set the image config
+            _imageConfig = appConfig.Get<ImageOptionsSectionConfig>();
+            _streamImageType = appConfig.Get<NetworkSectionConfig>().ImageStreamingFormat;
         }
 
         public async IAsyncEnumerable<Tuple<string, string>> ProvideImages(string locationId)
@@ -61,6 +66,9 @@ namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
         /// <returns>a tuple of items that represent the image bytes and the name of the file image</returns>
         private async IAsyncEnumerable<Tuple<string, string>> GetImages(string imageLocation)
         {
+            //destruct the image config
+            var (_, (width, height)) = _imageConfig;
+
             //iterate through all the image files from the location
             foreach (var imageFile in _imageLocator.LocateImages(imageLocation))
             {
@@ -70,19 +78,12 @@ namespace GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl
 
                 //resize the image to desired resolution
                 loadedImage.Mutate(context =>
-                    context.Resize(
-                        _cameraSettings.StreamingWidth, 
-                        _cameraSettings.StreamingHeight, KnownResamplers.Lanczos8));
-
-                //save the image in the memory using the encoder
-                var imageFormatter =
-                    _cameraSettings.StreamingImageType.ToFormat();
+                    context.Resize(width, height, KnownResamplers.Lanczos8));
 
                 //create a tuple of elements
                 var newFileName =
-                    $"{Path.GetFileNameWithoutExtension(imageFile.Name)}.{_cameraSettings.StreamingImageType.ToString().ToLower()}";
-
-                yield return Tuple.Create(loadedImage.ToBase64String(imageFormatter), newFileName);
+                    $"{Path.GetFileNameWithoutExtension(imageFile.Name)}.{_streamImageType.ToString().ToLower()}";
+                yield return Tuple.Create(loadedImage.ToBase64String(_streamImageType.ToFormat()), newFileName);
             }
         }
 

@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using GodsEye.Utility.Application.Config.Settings;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
-using GodsEye.Utility.Application.Config.Settings.Camera;
+using GodsEye.Utility.Application.Config.BaseConfig;
+using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.KeyProvider;
@@ -18,16 +18,18 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
         private readonly string _encryptionKey;
 
         public SingleConnectionCameraDevice(
-            IImageProvider imageProvider, 
-            ICameraSettings cameraSettings, 
+            IImageProvider imageProvider,
             ILoggerFactory loggerFactory,
             IKeyProvider provider,
-            IEncryptorDecryptor encryptor)
+            IEncryptorDecryptor encryptor,
+            IConfig configuration)
         {
+            //set the config
+            _applicationConfig = configuration;
+
+            _imageProvider = imageProvider;
             _encryptor = encryptor;
             _loggerFactory = loggerFactory;
-            _imageProvider = imageProvider;
-            _cameraSettings = cameraSettings;
 
             //get the encryption key
             _encryptionKey = provider?.GetKey();
@@ -35,6 +37,14 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 
         public Task StartSendingImageFrames(string deviceId, int devicePort)
         {
+            //get the network config
+            var (imageType, port, cameraAddress) = _applicationConfig
+                .Get<NetworkSectionConfig>();
+
+            //get the image resolution section config
+            var (fps, (width, height)) =
+                _applicationConfig.Get<ImageOptionsSectionConfig>();
+
             //create the logger
             var logger = _loggerFactory.CreateLogger($"{deviceId}_");
 
@@ -46,7 +56,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             return Task.Run(async () =>
             {
                 //parse the address 
-                var ipAddress = IPAddress.Parse(_cameraSettings.CameraAddress);
+                var ipAddress = IPAddress.Parse(cameraAddress);
 
                 //get the listener
                 var clientListener = new TcpListener(ipAddress, devicePort);
@@ -71,10 +81,10 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                         var message = JsonSerializerDeserializer<dynamic>.Serialize(
                             new
                             {
-                                CameraAdress = _cameraSettings.CameraAddress,
-                                Resolution = $"{_cameraSettings.StreamingWidth}x{_cameraSettings.StreamingHeight}",
-                                Fps = _cameraSettings.FramesPerSecond,
-                                ImageFormat = _cameraSettings.StreamingImageType.ToString()
+                                CameraAdress = $"{cameraAddress}:{port}",
+                                Resolution = $"{width}x{height}",
+                                Fps = fps,
+                                ImageFormat = imageType.ToString()
                             });
 
                         //write the camera data
@@ -84,11 +94,11 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                         //iterate through the available images
                         await foreach (var frameInfo in _imageProvider.ProvideImages(deviceId))
                         {
-                            //send frame
-                            await SendFrameToClientAsync(client, frameInfo);
+                            //send frame to the client
+                            await SendFrameToClientAsync(client, frameInfo, imageType);
 
                             //wait the interval in order to match the desired fps
-                            await WaitFrameIntervalAsync();
+                            await WaitFrameIntervalAsync(fps);
                         }
                     }
                     catch (SocketException)
