@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
+using GodsEye.Utility.Application.Helpers.Helpers.Network;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Items.Messages.Registration;
 using GodsEye.Utility.Application.Security.Encryption;
@@ -37,10 +38,12 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             _registrationQueue = registrationMessageQueue;
         }
 
-        public Task StartSendingImageFrames(string deviceId, int devicePort)
+
+
+        public Task StartSendingImageFrames(string deviceId)
         {
             //get the network config
-            var (imageType, port, cameraAddress) = _applicationConfig
+            var (imageType, cameraAddress) = _applicationConfig
                 .Get<NetworkSectionConfig>();
 
             //get the image resolution section config
@@ -57,27 +60,21 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             //create a new task on thread pool
             return Task.Run(async () =>
             {
-                //parse the address 
-                var ipAddress = IPAddress.Parse(cameraAddress);
-
-                //get the listener
-                var clientListener = new TcpListener(ipAddress, devicePort);
-
-                //start the client listener
-                clientListener.Start();
-
                 //if the existing connection fails => accept other client
                 while (true)
                 {
+                    //start the tcp listener
+                    var (clientListener, streamingPort) = StartTcpListener(cameraAddress);
+
                     //display the message
                     logger.LogInformation(
-                        LocalConstants.CameraIsStreamingMessage, devicePort);
+                        LocalConstants.CameraIsStreamingMessage, streamingPort);
 
                     //send the images frame by frame to client
                     try
                     {
                         //register the camera
-                        RegisterThisCamera(cameraAddress, port);
+                        RegisterThisCamera(cameraAddress, streamingPort);
 
                         //wait for a single connection
                         using var client = await clientListener.AcceptSocketAsync();
@@ -86,7 +83,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                         var message = JsonSerializerDeserializer<dynamic>.Serialize(
                             new
                             {
-                                CameraAdress = $"{cameraAddress}:{port}",
+                                CameraAdress = $"{cameraAddress}:{streamingPort}",
                                 Resolution = $"{width}x{height}",
                                 Fps = fps,
                                 ImageFormat = imageType.ToString()
@@ -129,6 +126,24 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                 CameraIp = cameraAddress,
                 CameraPort = cameraPort
             });
+        }
+
+        private Tuple<TcpListener, int> StartTcpListener(string cameraAddress)
+        {
+            //get the streaming port
+            var streamingPort = PortAllocationHelpers.GetNextTcpAvailablePort();
+
+            //parse the address 
+            var ipAddress = IPAddress.Parse(cameraAddress);
+
+            //get the listener
+            var clientListener = new TcpListener(ipAddress, streamingPort);
+
+            //start the client listener
+            clientListener.Start();
+
+            //return the listener
+            return Tuple.Create(clientListener, streamingPort);
         }
     }
 }

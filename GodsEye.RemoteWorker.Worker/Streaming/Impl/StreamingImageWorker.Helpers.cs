@@ -4,7 +4,6 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
-using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using WorkerConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
@@ -12,12 +11,12 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
     public partial class StreamingImageWorker
     {
         /// <summary>
-        /// Connect to camera
+        /// 
         /// </summary>
-        /// <param name="logger">the logger</param>
-        /// <param name="cameraPort">the camera port/param>
-        /// <param name="cameraAddress">the camera address</param>
-        /// <returns>returns the socket</returns>
+        /// <param name="logger"></param>
+        /// <param name="cameraAddress"></param>
+        /// <param name="cameraPort"></param>
+        /// <returns></returns>
         private static Socket ConnectToCamera(
             ILogger logger, string cameraAddress, int cameraPort)
 
@@ -32,27 +31,17 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                 Blocking = true
             };
 
-            //try to connect
-            try
-            {
-                //log the message
-                logger
-                    .LogInformation(
-                        WorkerConstants.TryingToConnectOnCameraMessage,
-                        cameraAddress, cameraPort);
+            //log the message
+            logger
+                .LogInformation(
+                    WorkerConstants.TryingToConnectOnCameraMessage,
+                    cameraAddress, cameraPort);
 
-                //connect to the camera
-                tcpSocket.Connect(cameraIpEndPoint);
+            //connect to the camera
+            tcpSocket.Connect(cameraIpEndPoint);
 
-                //log successful message
-                logger.LogInformation(WorkerConstants.ConnectionStatusSuccessfulMessage);
-            }
-            catch (Exception e)
-            {
-                //log error message
-                logger.LogError(e, WorkerConstants.ConnectionStatusFailedMessage);
-                throw;
-            }
+            //log successful message
+            logger.LogInformation(WorkerConstants.ConnectionStatusSuccessfulMessage);
 
             return tcpSocket;
         }

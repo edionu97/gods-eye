@@ -28,8 +28,8 @@
 
             public static string ConnectionStatusSuccessfulMessage => "Connection  status: successful";
 
-            public static string ConnectionStatusFailedMessage => "Connection  status: failed";
+            public static string ConnectionStatusFailedMessage =>
+                "There was a problem with communication with camera: {0}:{1}. Stopped worker execution";
         }
-
     }
 }

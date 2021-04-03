@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using EasyNetQ;
 using System.Threading.Tasks;
 using GodsEye.RemoteWorker.Worker.Streaming;
@@ -13,6 +15,10 @@ namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
         private readonly IBus _messageBus;
         private readonly IServiceProvider _serviceProvider;
 
+        private readonly ISet<Task> _failedTasks = new HashSet<Task>();
+        private readonly ConcurrentBag<Task> _activeWorkerTasks = new ConcurrentBag<Task>();
+
+
         public MessageQueueRemoteWorkerStarter(
             IBus messageQueue, IServiceProvider serviceProvider)
         {
@@ -23,19 +29,40 @@ namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
         public async Task StartAsync()
         {
             //register the handler
-           _messageBus?.PubSub
-                .SubscribeAsync<OnlineCameraMessage>(
-                    StringConstants.CameraToBussQueueName, OnMessageFromCamera);
+            _messageBus?.PubSub
+                 .SubscribeAsync<OnlineCameraMessage>(
+                     StringConstants.CameraToBussQueueName, OnMessageFromCamera);
 
             //non busy wait
             while (true)
             {
+                //wait until each worker finishes
+                foreach (var activeWorkerTask in _activeWorkerTasks)
+                {
+                    //do not consider the failed processes
+                    if (_failedTasks.Contains(activeWorkerTask))
+                    {
+                        continue;
+                    }
+
+                    //wait for process to complete 
+                    try
+                    {
+                        await activeWorkerTask;
+                    }
+                    catch (Exception)
+                    {
+                        _failedTasks.Add(activeWorkerTask);
+                    }
+                }
+
+                //not busy wait
                 await Task.Delay(1000);
             }
             // ReSharper disable once FunctionNeverReturns
         }
 
-        private async Task OnMessageFromCamera(OnlineCameraMessage message)
+        private void OnMessageFromCamera(OnlineCameraMessage message)
         {
             //deconstruct the message
             var (cameraIp, cameraPort) = message;
@@ -50,7 +77,10 @@ namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
                 return;
             }
 
-            await siwService.StartAsync(0);
+            //attempt to create the worker
+            _activeWorkerTasks.Add(
+                siwService.StartAsync(cameraPort, cameraIp));
         }
+
     }
 }

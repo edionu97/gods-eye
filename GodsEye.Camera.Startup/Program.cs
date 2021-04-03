@@ -31,9 +31,6 @@ namespace GodsEye.Camera.Startup
             //get the image directory path
             var (imageDirectoryPath, cameraId) = configuration.Get<CameraSectionConfig>();
 
-            //get the camera port
-            var (_, cameraPort, _) = configuration.Get<NetworkSectionConfig>();
-
             //iterate the image directory
             var imageDirectory = new DirectoryInfo(imageDirectoryPath);
 
@@ -46,7 +43,7 @@ namespace GodsEye.Camera.Startup
                     serviceProvider.GetService<ICameraDevice>();
 
                 //start the image streaming
-                onCameras.Add(cameraDevice?.StartSendingImageFrames(subDirectory.Name, cameraPort++));
+                onCameras.Add(cameraDevice?.StartSendingImageFrames(subDirectory.Name));
             }
 
             //wait all the tasks to complete

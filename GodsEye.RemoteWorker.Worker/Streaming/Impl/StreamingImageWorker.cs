@@ -1,14 +1,16 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.Utility.Application.Config.BaseConfig;
-using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Helpers.Helpers.Network;
 using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
+
+using WorkerConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
 {
@@ -21,7 +23,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
 
         public StreamingImageWorker(
             IWebSocketServer webSocketServer,
-            IEncryptorDecryptor encryptor, 
+            IEncryptorDecryptor encryptor,
             ILoggerFactory loggerFactory,
             IConfig appConfig)
         {
@@ -31,37 +33,46 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
             _webSocketServer = webSocketServer;
         }
 
-        public Task StartAsync(int workerId)
+        public Task StartAsync(int cameraPort, string cameraAddress)
         {
             //get the address and port of this worker process
-            var (address, port) = 
+            var (address, port) =
                 _appConfig.Get<RemoteWorkerSectionConfig>();
-
-            var (_, cameraPort, cameraAddress) =
-                _appConfig.Get<NetworkSectionConfig>();
 
             //create an worker and schedule the work on the threadPool
             return Task.Run(async () =>
             {
                 //create the logger
                 var logger = _loggerFactory
-                    .CreateLogger($"{nameof(StreamingImageWorker)}_{workerId}");
+                    .CreateLogger($"{nameof(StreamingImageWorker)} => ({cameraAddress}:{cameraPort})");
 
-                //connect to camera
-                using var tcpSocket = ConnectToCamera(
-                    logger,
-                    cameraAddress, cameraPort + workerId);
-
-                //start the ws service
-                await StartWebSocketAsync(
-                    _webSocketServer, 
-                    address, port + workerId, logger);
-
-                //get frames
-                await foreach (var frame in GetFramesAsync(tcpSocket))
+                //connect to the camera
+                try
                 {
-                    //send the frame
-                    await _webSocketServer.SendMessageAsync(frame);
+                    //connect to camera
+                    using var tcpSocket =
+                        ConnectToCamera(logger, cameraAddress, cameraPort);
+
+                    //start the ws service
+                    await StartWebSocketAsync(
+                        _webSocketServer,
+                        address,
+                        PortAllocationHelpers.GetNextTcpAvailablePort(), logger);
+
+                    //get frames
+                    await foreach (var frame in GetFramesAsync(tcpSocket))
+                    {
+                        //send the frame
+                        await _webSocketServer.SendMessageAsync(frame);
+                    }
+                }
+                catch (Exception)
+                {
+                    //log the exception
+                    logger.LogCritical(
+                        WorkerConstants.ConnectionStatusFailedMessage, cameraAddress, cameraPort);
+
+                    throw;
                 }
             });
         }
