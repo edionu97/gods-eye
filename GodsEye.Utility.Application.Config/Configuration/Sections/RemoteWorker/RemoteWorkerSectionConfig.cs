@@ -8,8 +8,6 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker
 
         public int WorkersStartingPort { get; set; }
 
-        public WorkerStartupMessageBrokerConfig WebSocket { get; set; }
-
         public void Deconstruct(out string workersAddress, out int workersStartingPoint)
         {
             workersAddress = WorkersAddress;

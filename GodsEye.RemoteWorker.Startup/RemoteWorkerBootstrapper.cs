@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using EasyNetQ;
+using GodsEye.RemoteWorker.Startup.StartupWorker;
+using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -65,6 +69,26 @@ namespace GodsEye.RemoteWorker.Startup
 
                     #endregion
 
+                    //register the rabbit mq
+                    services.AddSingleton(x => RabbitHutch.CreateBus(
+                        new ConnectionConfiguration
+                        {
+                            UserName = "admin",
+                            Password = "admin",
+                            Hosts = new List<HostConfiguration>
+                            {
+                                new HostConfiguration
+                                {
+                                    Host = "192.168.0.101",
+                                    Port = 5672
+                                }
+                            }
+                        },
+                        _ => { }));
+
+                    //register the service provider
+                    services.AddSingleton(s => s);
+
                     //register the web socket server
                     services
                         .AddTransient<IWebSocketServer, JsonBroadcastWebSocketServer>();
@@ -72,6 +96,10 @@ namespace GodsEye.RemoteWorker.Startup
                     //register the streaming image worker
                     services
                         .AddTransient<IStreamingImageWorker, StreamingImageWorker>();
+
+                    //register the worker starter
+                    services
+                        .AddSingleton<IMessageQueueRemoteWorkerStarter, MessageQueueRemoteWorkerStarter>();
                 })
                 .ConfigureLogging(logging =>
                 {

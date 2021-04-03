@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using EasyNetQ;
 using GodsEye.Camera.ImageStreaming.Camera;
 using GodsEye.Camera.ImageStreaming.Camera.Impl;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator;
@@ -58,6 +60,23 @@ namespace GodsEye.Camera.Startup
                         //get the provider
                         return basicHashProvider;
                     });
+
+                    //register the rabbit mq
+                    services.AddSingleton(x => RabbitHutch.CreateBus(
+                        new ConnectionConfiguration
+                        {
+                            UserName = "admin",
+                            Password = "admin",
+                            Hosts = new List<HostConfiguration>
+                            {
+                                new HostConfiguration
+                                {
+                                    Host = "192.168.0.101",
+                                    Port = 5672
+                                }
+                            }
+                        },
+                        _ => { }));
 
                     //register the encryptor as singleton
                     services

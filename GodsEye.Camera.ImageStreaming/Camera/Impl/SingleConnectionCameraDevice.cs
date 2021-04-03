@@ -2,11 +2,13 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using EasyNetQ;
 using Microsoft.Extensions.Logging;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
+using GodsEye.Utility.Application.Items.Messages.Registration;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.KeyProvider;
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.CameraDevice;
@@ -15,14 +17,15 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 {
     public partial class SingleConnectionCameraDevice : ICameraDevice
     {
-        private readonly string _encryptionKey;
+        private readonly IBus _registrationQueue;
 
         public SingleConnectionCameraDevice(
             IImageProvider imageProvider,
             ILoggerFactory loggerFactory,
             IKeyProvider provider,
             IEncryptorDecryptor encryptor,
-            IConfig configuration)
+            IConfig configuration,
+            IBus registrationMessageQueue)
         {
             //set the config
             _applicationConfig = configuration;
@@ -31,8 +34,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             _encryptor = encryptor;
             _loggerFactory = loggerFactory;
 
-            //get the encryption key
-            _encryptionKey = provider?.GetKey();
+            _registrationQueue = registrationMessageQueue;
         }
 
         public Task StartSendingImageFrames(string deviceId, int devicePort)
@@ -74,6 +76,9 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                     //send the images frame by frame to client
                     try
                     {
+                        //register the camera
+                        RegisterThisCamera(cameraAddress, port);
+
                         //wait for a single connection
                         using var client = await clientListener.AcceptSocketAsync();
 
@@ -114,6 +119,15 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                 }
 
                 // ReSharper disable once FunctionNeverReturns
+            });
+        }
+
+        private void RegisterThisCamera(string cameraAddress, int cameraPort)
+        {
+            _registrationQueue?.PubSub.PublishAsync(new OnlineCameraMessage
+            {
+                CameraIp = cameraAddress,
+                CameraPort = cameraPort
             });
         }
     }
