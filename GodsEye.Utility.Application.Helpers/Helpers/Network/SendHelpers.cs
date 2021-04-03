@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -30,9 +32,11 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
 
             //convert the string into an array of bytes
             //encrypt the message if needed
-            var bytesToSend = encryptor != null
-                ? await encryptor.EncryptAsync(serializedObject, key)
-                : Encoding.ASCII.GetBytes(serializedObject);
+            var bytesToSend = 
+                await Compress(
+                    encryptor != null 
+                        ? await encryptor.EncryptAsync(serializedObject, key) 
+                        : Encoding.ASCII.GetBytes(serializedObject));
 
             //get the message length
             var len = bytesToSend.Length;
@@ -79,8 +83,9 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
                 .ToInt32(lenByteArray, 0);
 
             //receive the message bytes
-            var messageBytes =
-                ReceiveExactNumberOfBytes(length, fromSocket);
+            var messageBytes = 
+                await Decompress(
+                    ReceiveExactNumberOfBytes(length, fromSocket));
 
             //convert the array of bytes into a string
             var receivedMessage = decryptor != null
@@ -118,6 +123,42 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Network
 
             //return the bytes
             return byteBuffer;
+        }
+
+        private static async Task<byte[]> Compress(byte[] data)
+        {
+            //store the result of the compressed stream
+            await using var compressedStream = new MemoryStream();
+
+            //get the compression stream
+            await using var zipStream = new GZipStream(compressedStream, CompressionMode.Compress);
+
+            //write values to compress that stream
+            await zipStream.WriteAsync(data, 0, data.Length);
+
+            //do the flush (write all the bytes in the compressed stream)
+            await zipStream.FlushAsync();
+
+            //return the compressed values
+            return compressedStream.ToArray();
+        }
+
+        private static async Task<byte[]> Decompress(byte[] data)
+        {
+            //initialize the compressed stream
+            await using var compressedStream = new MemoryStream(data);
+
+            //create the zip stream for decompressing
+            await using var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress);
+
+            //create the decompressed stream
+            await using var decompressedStream = new MemoryStream();
+
+            //decompress the values
+            await zipStream.CopyToAsync(decompressedStream);
+
+            //get the decompressed values
+            return decompressedStream.ToArray();
         }
     }
 }
