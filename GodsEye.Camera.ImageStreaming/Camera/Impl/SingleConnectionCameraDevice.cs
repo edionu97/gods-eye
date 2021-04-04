@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using EasyNetQ;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -55,12 +56,17 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                 //if the existing connection fails => accept other client
                 while (true)
                 {
+                    
+
                     //start the tcp listener
                     var (clientListener, streamingPort) = StartTcpListener(cameraAddress);
 
                     //display the message
                     logger.LogInformation(
                         LocalConstants.CameraIsStreamingMessage, streamingPort);
+
+                    //create the frame synchronizer
+                    var frameStopWatch = new Stopwatch();
 
                     //send the images frame by frame to client
                     try
@@ -73,18 +79,28 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 
                         //log the camera data
                         LogCameraData(
-                            cameraAddress, 
-                            streamingPort, 
+                            cameraAddress,
+                            streamingPort,
                             width, height, fps, imageType, logger);
 
+                        //start the stopwatch
+                        frameStopWatch.Start();
+
                         //iterate through the available images
+                        var timeToRecover = .0;
                         await foreach (var frameInfo in _imageProvider.ProvideImages(deviceId))
                         {
+                            //time before sending
+                            var beforeSendingTime = frameStopWatch.Elapsed;
+
                             //send frame to the client
                             await SendFrameToClientAsync(client, frameInfo, imageType);
 
+                            //time after sending
+                            var sendingTime = (frameStopWatch.Elapsed - beforeSendingTime).TotalMilliseconds;
+
                             //wait the interval in order to match the desired fps
-                            await WaitFrameIntervalAsync(fps);
+                            timeToRecover = await SyncDesiredFrameRateAsync(fps, sendingTime, timeToRecover);
                         }
                     }
                     catch (SocketException)
@@ -96,6 +112,11 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                     {
                         //treat other exceptions
                         logger.LogError(e, e.Message);
+                    }
+                    finally
+                    {
+                        //stop the synchronizer
+                        frameStopWatch.Stop();
                     }
                 }
 

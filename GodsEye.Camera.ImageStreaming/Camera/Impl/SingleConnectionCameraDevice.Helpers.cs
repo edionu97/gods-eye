@@ -41,7 +41,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                 {
                     CameraAdress = $"{cameraAddress}:{streamingPort}",
                     Resolution = $"{width}x{height}",
-                    Fps = fps,
+                    DesiredFps = fps,
                     ImageFormat = imageType.ToString()
                 });
 
@@ -77,15 +77,35 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             return Tuple.Create(clientListener, streamingPort);
         }
 
-
-        private static async Task WaitFrameIntervalAsync(double desiredFps)
+        /// <summary>
+        /// This function it is used for keeping in sync the rate of image sending with the desired fps
+        /// </summary>
+        /// <param name="desiredFps">the number of frames per second that we want to send</param>
+        /// <param name="sendingTime">the time necessary for sending the image on network</param>
+        /// <param name="timeToRecover">the time that our device has to recover</param>
+        /// <returns>the time that our device needs to recover</returns>
+        private static async Task<double> SyncDesiredFrameRateAsync(
+            double desiredFps, double sendingTime, double timeToRecover)
         {
             //get the frame interval
             var frameInterval =
                 Math.Ceiling(1000.0 / desiredFps);
 
+            //compute the sleeping time
+            var sleepingTime = frameInterval - (sendingTime + timeToRecover);
+
+            //we need to recover this time
+            //no sleep
+            if (sleepingTime <= 0)
+            {
+                return Math.Abs(sleepingTime);
+            }
+
             //make the delay
             await Task.Delay(TimeSpan.FromMilliseconds(frameInterval));
+
+            //no more time to recover
+            return 0;
         }
 
         private async Task SendFrameToClientAsync(
