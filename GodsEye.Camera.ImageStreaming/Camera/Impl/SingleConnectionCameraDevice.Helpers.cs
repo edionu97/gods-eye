@@ -59,7 +59,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             });
         }
 
-        private Tuple<TcpListener, int> StartTcpListener(string cameraAddress)
+        private static Tuple<TcpListener, int> StartTcpListener(string cameraAddress)
         {
             //get the streaming port
             var streamingPort = PortAllocationHelpers.GetNextTcpAvailablePort();
@@ -84,7 +84,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
         /// <param name="sendingTime">the time necessary for sending the image on network</param>
         /// <param name="timeToRecover">the time that our device has to recover</param>
         /// <returns>the time that our device needs to recover</returns>
-        private static async Task<double> SyncDesiredFrameRateAsync(
+        private static async Task<double> SyncWithTheDesiredFrameRateAsync(
             double desiredFps, double sendingTime, double timeToRecover)
         {
             //get the frame interval
