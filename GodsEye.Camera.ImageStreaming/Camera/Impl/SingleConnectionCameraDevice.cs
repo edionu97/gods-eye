@@ -100,7 +100,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                             var sendingTime = (frameStopWatch.Elapsed - beforeSendingTime).TotalMilliseconds;
 
                             //wait the interval in order to match the desired fps
-                            timeToRecover = await SyncDesiredFrameRateAsync(fps, sendingTime, timeToRecover);
+                            timeToRecover = await SyncWithTheDesiredFrameRateAsync(fps, sendingTime, timeToRecover);
                         }
                     }
                     catch (SocketException)
