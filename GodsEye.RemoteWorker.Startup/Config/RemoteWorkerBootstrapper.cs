@@ -22,6 +22,8 @@ using Microsoft.Extensions.Logging;
 
 namespace GodsEye.RemoteWorker.Startup.Config
 {
+
+
     public static class RemoteWorkerBootstrapper
     {
         public static IServiceProvider Load()
@@ -119,7 +121,11 @@ namespace GodsEye.RemoteWorker.Startup.Config
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.AddConsole();
+                    logging.AddSimpleConsole(option =>
+                    {
+                        option.IncludeScopes = true;
+                        option.TimestampFormat = "[HH:mm:ss] ";
+                    });
                 })
                 .Build()
                 .Services;

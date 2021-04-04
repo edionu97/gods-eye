@@ -66,13 +66,16 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                         await _webSocketServer.SendMessageAsync(frame);
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //log the exception
-                    logger.LogCritical(
-                        WorkerConstants.ConnectionStatusFailedMessage, cameraAddress, cameraPort);
+                    using (logger.BeginScope(e.GetType()))
+                    {
+                        //log the exception
+                        logger.LogCritical(
+                            WorkerConstants.ConnectionStatusFailedMessage, cameraAddress, cameraPort);
+                    }
 
-                    throw;
+                    throw new Exception($"{cameraAddress}:{cameraPort}");
                 }
             });
         }

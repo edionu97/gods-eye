@@ -116,7 +116,11 @@ namespace GodsEye.Camera.Startup.Config
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.AddConsole();
+                    logging.AddSimpleConsole(option =>
+                    {
+                        option.IncludeScopes = true;
+                        option.TimestampFormat = "[HH:mm:ss] ";
+                    });
                 })
                 .Build()
                 .Services;
