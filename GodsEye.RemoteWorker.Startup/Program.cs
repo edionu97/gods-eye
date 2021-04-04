@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using GodsEye.RemoteWorker.Startup.Config;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 

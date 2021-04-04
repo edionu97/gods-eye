@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using GodsEye.Camera.ImageStreaming.Camera;
+using GodsEye.Camera.Startup.Config;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration;
 using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
@@ -16,7 +17,7 @@ namespace GodsEye.Camera.Startup
         public static void Main(string[] args)
         {
             //load the service provider
-            var serviceProvider = Bootstrapper.Load();
+            var serviceProvider = CameraConfiguration.Load();
 
             //the app config
             var configuration =

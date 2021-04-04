@@ -9,8 +9,8 @@ using GodsEye.Camera.ImageStreaming.ImageSource.ImageLocator.Impl;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
-using GodsEye.Utility.Application.Config.Configuration;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
+using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider;
@@ -20,9 +20,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace GodsEye.Camera.Startup
+namespace GodsEye.Camera.Startup.Config
 {
-    public static class Bootstrapper
+    public static class CameraConfiguration
     {
         /// <summary>
         /// Configure the classes for dependency injection
@@ -42,8 +42,14 @@ namespace GodsEye.Camera.Startup
                 })
                 .ConfigureServices((context, services) =>
                 {
+                    #region AppConfig
+
                     //register the app config
                     services.AddSingleton<IConfig>(context.Configuration.Get<AppConfig>());
+
+                    #endregion
+
+                    #region Authentication
 
                     //register the key provider
                     services.AddSingleton<KeyBasicHashProvider>();
@@ -61,22 +67,38 @@ namespace GodsEye.Camera.Startup
                         return basicHashProvider;
                     });
 
+                    #endregion
+
                     //register the rabbit mq
-                    services.AddSingleton(x => RabbitHutch.CreateBus(
-                        new ConnectionConfiguration
-                        {
-                            UserName = "admin",
-                            Password = "admin",
-                            Hosts = new List<HostConfiguration>
+                    services.AddSingleton(serviceProvider =>
+                    {
+                        //get the mq config
+                        var mqConfig = serviceProvider
+                            .GetService<IConfig>()
+                            ?.Get<RabbitMqConfig>();
+
+                        //destruct the message or throw exception
+                        var (username, password, host, port) =
+                            mqConfig
+                            ?? throw new ArgumentNullException(nameof(RabbitMqConfig));
+
+                        //create the queue
+                        return RabbitHutch.CreateBus(
+                            new ConnectionConfiguration
                             {
-                                new HostConfiguration
+                                UserName = username,
+                                Password = password,
+                                Hosts = new List<HostConfiguration>
                                 {
-                                    Host = "192.168.0.101",
-                                    Port = 5672
+                                    new HostConfiguration
+                                    {
+                                        Host = host,
+                                        Port = port
+                                    }
                                 }
-                            }
-                        },
-                        _ => { }));
+                            },
+                            _ => { });
+                    });
 
                     //register the encryptor as singleton
                     services

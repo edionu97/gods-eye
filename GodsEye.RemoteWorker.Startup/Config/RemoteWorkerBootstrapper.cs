@@ -4,22 +4,23 @@ using System.IO;
 using EasyNetQ;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using GodsEye.RemoteWorker.Worker.Streaming;
-using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Worker.Streaming.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
-using GodsEye.Utility.Application.Security.Encryption;
-using GodsEye.Utility.Application.Security.KeyProvider;
-using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
+using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using GodsEye.Utility.Application.Security.Encryption;
+using GodsEye.Utility.Application.Security.Encryption.Impl;
+using GodsEye.Utility.Application.Security.KeyProvider;
 using GodsEye.Utility.Application.Security.KeyProvider.Impl;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace GodsEye.RemoteWorker.Startup
+namespace GodsEye.RemoteWorker.Startup.Config
 {
     public static class RemoteWorkerBootstrapper
     {
@@ -70,21 +71,35 @@ namespace GodsEye.RemoteWorker.Startup
                     #endregion
 
                     //register the rabbit mq
-                    services.AddSingleton(x => RabbitHutch.CreateBus(
-                        new ConnectionConfiguration
-                        {
-                            UserName = "admin",
-                            Password = "admin",
-                            Hosts = new List<HostConfiguration>
+                    services.AddSingleton(serviceProvider =>
+                    {
+                        //get the mq config
+                        var mqConfig = serviceProvider
+                            .GetService<IConfig>()
+                            ?.Get<RabbitMqConfig>();
+
+                        //destruct the message or throw exception
+                        var (username, password, host, port) = 
+                            mqConfig 
+                            ?? throw new ArgumentNullException(nameof(RabbitMqConfig));
+                      
+                        //create the queue
+                        return RabbitHutch.CreateBus(
+                            new ConnectionConfiguration
                             {
-                                new HostConfiguration
+                                UserName = username,
+                                Password = password,
+                                Hosts = new List<HostConfiguration>
                                 {
-                                    Host = "192.168.0.101",
-                                    Port = 5672
+                                    new HostConfiguration
+                                    {
+                                        Host = host,
+                                        Port = port
+                                    }
                                 }
-                            }
-                        },
-                        _ => { }));
+                            },
+                            _ => { });
+                    });
 
                     //register the service provider
                     services.AddSingleton(s => s);
