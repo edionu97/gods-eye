@@ -88,8 +88,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             double desiredFps, double sendingTime, double timeToRecover)
         {
             //get the frame interval
-            var frameInterval =
-                Math.Ceiling(1000.0 / desiredFps);
+            var frameInterval = 1000.0 / desiredFps;
 
             //compute the sleeping time
             var sleepingTime = frameInterval - (sendingTime + timeToRecover);
@@ -102,7 +101,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             }
 
             //make the delay
-            await Task.Delay(TimeSpan.FromMilliseconds(frameInterval));
+            await Task.Delay(TimeSpan.FromMilliseconds(sleepingTime));
 
             //no more time to recover
             return 0;
