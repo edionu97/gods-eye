@@ -36,7 +36,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
         public Task StartAsync(int cameraPort, string cameraAddress)
         {
             //get the address and port of this worker process
-            var (address, port) =
+            var remoteConfig = 
                 _appConfig.Get<RemoteWorkerSectionConfig>();
 
             //create an worker and schedule the work on the threadPool
@@ -56,7 +56,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                     //start the ws service
                     await StartWebSocketAsync(
                         _webSocketServer,
-                        address,
+                        remoteConfig.WorkersAddress,
                         PortAllocationHelpers.GetNextTcpAvailablePort(), logger);
 
                     //get frames

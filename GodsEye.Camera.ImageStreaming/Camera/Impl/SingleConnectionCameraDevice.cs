@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Net;
+using EasyNetQ;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using EasyNetQ;
 using Microsoft.Extensions.Logging;
-using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Application.Config.BaseConfig;
-using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
-using GodsEye.Utility.Application.Helpers.Helpers.Network;
-using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
-using GodsEye.Utility.Application.Items.Messages.Registration;
 using GodsEye.Utility.Application.Security.Encryption;
-using GodsEye.Utility.Application.Security.KeyProvider;
+using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
+using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.CameraDevice;
 
 namespace GodsEye.Camera.ImageStreaming.Camera.Impl
@@ -23,7 +18,6 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
         public SingleConnectionCameraDevice(
             IImageProvider imageProvider,
             ILoggerFactory loggerFactory,
-            IKeyProvider provider,
             IEncryptorDecryptor encryptor,
             IConfig configuration,
             IBus registrationMessageQueue)
@@ -37,8 +31,6 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 
             _registrationQueue = registrationMessageQueue;
         }
-
-
 
         public Task StartSendingImageFrames(string deviceId)
         {
@@ -79,19 +71,11 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                         //wait for a single connection
                         using var client = await clientListener.AcceptSocketAsync();
 
-                        //message to write on console
-                        var message = JsonSerializerDeserializer<dynamic>.Serialize(
-                            new
-                            {
-                                CameraAdress = $"{cameraAddress}:{streamingPort}",
-                                Resolution = $"{width}x{height}",
-                                Fps = fps,
-                                ImageFormat = imageType.ToString()
-                            });
-
-                        //write the camera data
-                        logger.LogInformation(
-                            LocalConstants.CameraIsStreamingImagesMessage, message);
+                        //log the camera data
+                        LogCameraData(
+                            cameraAddress, 
+                            streamingPort, 
+                            width, height, fps, imageType, logger);
 
                         //iterate through the available images
                         await foreach (var frameInfo in _imageProvider.ProvideImages(deviceId))
@@ -117,33 +101,6 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
 
                 // ReSharper disable once FunctionNeverReturns
             });
-        }
-
-        private void RegisterThisCamera(string cameraAddress, int cameraPort)
-        {
-            _registrationQueue?.PubSub.PublishAsync(new OnlineCameraMessage
-            {
-                CameraIp = cameraAddress,
-                CameraPort = cameraPort
-            });
-        }
-
-        private Tuple<TcpListener, int> StartTcpListener(string cameraAddress)
-        {
-            //get the streaming port
-            var streamingPort = PortAllocationHelpers.GetNextTcpAvailablePort();
-
-            //parse the address 
-            var ipAddress = IPAddress.Parse(cameraAddress);
-
-            //get the listener
-            var clientListener = new TcpListener(ipAddress, streamingPort);
-
-            //start the client listener
-            clientListener.Start();
-
-            //return the listener
-            return Tuple.Create(clientListener, streamingPort);
         }
     }
 }
