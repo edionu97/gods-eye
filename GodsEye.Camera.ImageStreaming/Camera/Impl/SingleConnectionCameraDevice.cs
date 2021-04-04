@@ -56,8 +56,6 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                 //if the existing connection fails => accept other client
                 while (true)
                 {
-                    
-
                     //start the tcp listener
                     var (clientListener, streamingPort) = StartTcpListener(cameraAddress);
 
