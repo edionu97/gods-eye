@@ -4,6 +4,7 @@ using System.IO;
 using EasyNetQ;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
+using GodsEye.RemoteWorker.Worker.Remote;
 using GodsEye.RemoteWorker.Worker.Streaming;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl;
@@ -120,9 +121,13 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     services
                         .AddTransient<IStreamingImageWorker, StreamingImageWorker>();
 
+                    services
+                        .AddTransient<IRemoteWorker, Worker.Remote.Impl.RemoteWorker>();
+
                     //register the worker starter
                     services
                         .AddSingleton<IMessageQueueRemoteWorkerStarter, MessageQueueRemoteWorkerStarter>();
+
                 })
                 .ConfigureLogging(logging =>
                 {

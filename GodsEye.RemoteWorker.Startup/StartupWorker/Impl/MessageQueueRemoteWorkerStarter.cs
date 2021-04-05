@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using GodsEye.RemoteWorker.Worker.Remote;
+using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using GodsEye.RemoteWorker.Worker.Streaming;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
@@ -96,18 +98,25 @@ namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
             try
             {
                 //get the siw service
-                var siwService = _serviceProvider
-                    .GetService<IStreamingImageWorker>();
+                var remoteWorker = _serviceProvider
+                    .GetService<IRemoteWorker>();
 
                 //ignore the 
-                if (siwService == null)
+                if (remoteWorker == null)
                 {
                     return;
                 }
 
                 //attempt to create the worker
-                _activeWorkerTasks.Add(
-                    siwService.StartAsync(cameraPort, cameraIp));
+                _activeWorkerTasks.Add(remoteWorker
+                    .ConfigureWorkersAndStartAsync(new StartingInformation
+                    {
+                        Siw = new SiwInformation
+                        {
+                            CameraIp = cameraIp,
+                            CameraPort = cameraPort
+                        }
+                    }));
             }
             catch (Exception e)
             {

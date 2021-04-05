@@ -18,7 +18,6 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
     public partial class StreamingImageWorker : IStreamingImageWorker
     {
         private readonly IConfig _appConfig;
-        private readonly IFrameBuffer _frameBuffer;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IWebSocketServer _webSocketServer;
         private readonly IEncryptorDecryptor _encryptorDecryptor;
@@ -31,11 +30,13 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
             IFrameBuffer frameBuffer)
         {
             _appConfig = appConfig;
-            _frameBuffer = frameBuffer;
             _loggerFactory = loggerFactory;
             _encryptorDecryptor = encryptor;
             _webSocketServer = webSocketServer;
+            FrameBuffer = frameBuffer;
         }
+
+        public IFrameBuffer FrameBuffer { get; }
 
         public Task StartAsync(int cameraPort, string cameraAddress)
         {
@@ -67,7 +68,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                     await foreach (var frame in GetFramesAsync(tcpSocket))
                     {
                         //push the frame into frame buffer
-                        _frameBuffer.PushFrame(frame);
+                        FrameBuffer.PushFrame(frame);
 
                         //send the frame
                         await _webSocketServer.SendMessageAsync(frame);
