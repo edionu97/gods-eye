@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 using Microsoft.Extensions.Logging;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.Utility.Application.Config.BaseConfig;
@@ -17,6 +18,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
     public partial class StreamingImageWorker : IStreamingImageWorker
     {
         private readonly IConfig _appConfig;
+        private readonly IFrameBuffer _frameBuffer;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IWebSocketServer _webSocketServer;
         private readonly IEncryptorDecryptor _encryptorDecryptor;
@@ -25,9 +27,11 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
             IWebSocketServer webSocketServer,
             IEncryptorDecryptor encryptor,
             ILoggerFactory loggerFactory,
-            IConfig appConfig)
+            IConfig appConfig,
+            IFrameBuffer frameBuffer)
         {
             _appConfig = appConfig;
+            _frameBuffer = frameBuffer;
             _loggerFactory = loggerFactory;
             _encryptorDecryptor = encryptor;
             _webSocketServer = webSocketServer;
@@ -62,6 +66,9 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                     //get frames
                     await foreach (var frame in GetFramesAsync(tcpSocket))
                     {
+                        //push the frame into frame buffer
+                        _frameBuffer.PushFrame(frame);
+
                         //send the frame
                         await _webSocketServer.SendMessageAsync(frame);
                     }

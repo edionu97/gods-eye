@@ -5,6 +5,8 @@ using EasyNetQ;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming;
+using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
+using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
@@ -109,6 +111,10 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     //register the web socket server
                     services
                         .AddTransient<IWebSocketServer, JsonBroadcastWebSocketServer>();
+
+                    //add the frame buffer
+                    services
+                        .AddTransient<IFrameBuffer, ReverseOrderFrameBuffer>();
 
                     //register the streaming image worker
                     services

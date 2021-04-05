@@ -66,7 +66,7 @@ namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
                     catch (Exception e)
                     {
                         _failedTasks.Add(activeWorkerTask);
-                        
+
                         //log the message
                         _logger
                             .LogWarning(LocalConstants.WorkerHasBeenTerminatedMessage, e.Message);
@@ -93,20 +93,34 @@ namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
 
             //deconstruct the message
             var (cameraIp, cameraPort) = message;
-
-            //get the siw service
-            var siwService = _serviceProvider
-                .GetService<IStreamingImageWorker>();
-
-            //ignore the 
-            if (siwService == null)
+            try
             {
-                return;
-            }
+                //get the siw service
+                var siwService = _serviceProvider
+                    .GetService<IStreamingImageWorker>();
 
-            //attempt to create the worker
-            _activeWorkerTasks.Add(
-                siwService.StartAsync(cameraPort, cameraIp));
+                //ignore the 
+                if (siwService == null)
+                {
+                    return;
+                }
+
+                //attempt to create the worker
+                _activeWorkerTasks.Add(
+                    siwService.StartAsync(cameraPort, cameraIp));
+            }
+            catch (Exception e)
+            {
+                //log the failure message
+                using (_logger.BeginScope($"{e.GetType()}: {e.Message}"))
+                {
+                    _logger.LogCritical(LocalConstants
+                        .ProblemStartingWorkerMessage, cameraIp, cameraPort);
+                }
+
+                //throw the exception back
+                throw;
+            }
         }
 
     }

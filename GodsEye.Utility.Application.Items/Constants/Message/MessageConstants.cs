@@ -37,6 +37,8 @@
 
             public static string WorkerHasBeenTerminatedMessage => "The worker has been terminated, worker id: {0}\n";
 
+            public static string ProblemStartingWorkerMessage => "There was a problem starting the worker ({0}:{1})\n";
+
         }
     }
 }
