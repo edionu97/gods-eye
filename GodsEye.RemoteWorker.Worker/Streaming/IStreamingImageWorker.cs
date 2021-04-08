@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 
 namespace GodsEye.RemoteWorker.Worker.Streaming
@@ -14,6 +15,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming
         /// Starts the worker
         /// </summary>
         /// <returns>a task to the worker</returns>
-        public Task StartAsync(int cameraPort, string cameraAddress);
+        public Task StartAsync(
+            int cameraPort, string cameraAddress, CancellationTokenSource cancellationTokenSource);
     }
 }

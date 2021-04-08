@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GodsEye.RemoteWorker.Worker.Streaming;
@@ -8,11 +9,13 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
     public class RemoteWorker : IRemoteWorker
     {
+        private readonly CancellationTokenSource _cancellationToken;
         private readonly IStreamingImageWorker _streamingImageWorker;
 
         public RemoteWorker(IStreamingImageWorker streamingImageWorker)
         {
             _streamingImageWorker = streamingImageWorker;
+            _cancellationToken = new CancellationTokenSource();
         }
 
         public async Task ConfigureWorkersAndStartAsync(StartingInformation startingInformation)
@@ -23,20 +26,33 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             var _ = Task.Run(ReadingTask);
 
             //start the siw worker
-            await _streamingImageWorker.StartAsync(cameraPort, cameraIp);
+            await _streamingImageWorker
+                .StartAsync(cameraPort, cameraIp, _cancellationToken);
         }
 
-        public void ReadingTask()
+        public async Task ReadingTask()
         {
-            var frameBuffer = _streamingImageWorker.FrameBuffer;
-            while (true)
-            {
-                Thread.Sleep(100);
+            //get the token
+            var token = _cancellationToken.Token;
 
+            //get the frame buffer
+            var frameBuffer = _streamingImageWorker.FrameBuffer;
+            while (!token.IsCancellationRequested)
+            {
+                //await 1 second
+                await Task.Delay(1000, token);
+
+                //take the snapshot
                 var snapshot = frameBuffer.TakeASnapshot();
+                if (!snapshot.Any())
+                {
+                    continue;
+                }
 
                 Console.WriteLine(snapshot.Peek().Item1.Ticks);
             }
+
+            
         }
     }
 }

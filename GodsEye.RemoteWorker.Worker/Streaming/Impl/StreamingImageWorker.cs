@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 using Microsoft.Extensions.Logging;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
@@ -38,7 +39,9 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
 
         public IFrameBuffer FrameBuffer { get; }
 
-        public Task StartAsync(int cameraPort, string cameraAddress)
+        public Task StartAsync(
+            int cameraPort,
+            string cameraAddress, CancellationTokenSource cancellationTokenSource)
         {
             //get the address and port of this worker process
             var remoteConfig = 
@@ -83,6 +86,10 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.Impl
                             WorkerConstants.ConnectionStatusFailedMessage, cameraAddress, cameraPort);
                     }
 
+                    //signal the cancel to all the other workers
+                    cancellationTokenSource.Cancel();
+
+                    //throw the exception
                     throw new Exception($"{cameraAddress}:{cameraPort}");
                 }
             });
