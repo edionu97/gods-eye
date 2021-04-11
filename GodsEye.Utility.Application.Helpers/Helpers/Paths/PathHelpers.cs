@@ -25,5 +25,29 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Paths
 
             return Path.GetFullPath(path);
         }
+
+        /// <summary>
+        /// Create  the path to the file (all the directories on the way)
+        /// </summary>
+        /// <param name="path">the path</param>
+        /// <returns>a file info to the path</returns>
+        /// <exception cref="PathEmptyOrWhitespaceException">if the path is null or empty</exception>
+        public static FileInfo CreatePathToFile(string path)
+        {
+            //check the null values
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new PathEmptyOrWhitespaceException(path);
+            }
+
+            //get the parent directory path
+            var directoryPath = path
+                .Replace(Path.GetFileName(path), "");
+
+            //create the directory
+            Directory.CreateDirectory(directoryPath);
+
+            return new FileInfo(path);
+        }
     }
 }

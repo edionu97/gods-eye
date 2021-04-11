@@ -5,19 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="ConfigFiles\appSettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Images\Camera0\1.jpg">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Templates\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Items\GodsEye.Utility.Application.Items.csproj" />
   </ItemGroup>

@@ -6,6 +6,7 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker
     {
         public string WorkersAddress { get; set; }
         public int FrameBufferSize { get; set; }
+        public ResWsClientConfig ResWsClient { get; set; }
 
         public void Deconstruct(out string workersAddress, out int maxBufferSize)
         {

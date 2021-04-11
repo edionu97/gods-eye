@@ -14,6 +14,8 @@ using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using GodsEye.Utility.Application.Resources.Manager;
+using GodsEye.Utility.Application.Resources.Manager.Impl;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider;
@@ -25,8 +27,6 @@ using Microsoft.Extensions.Logging;
 
 namespace GodsEye.RemoteWorker.Startup.Config
 {
-
-
     public static class RemoteWorkerBootstrapper
     {
         public static IServiceProvider Load()
@@ -74,6 +74,9 @@ namespace GodsEye.RemoteWorker.Startup.Config
                         .AddSingleton<IEncryptorDecryptor, KeyBasedEncryptorDecryptor>();
 
                     #endregion
+
+                    //register the resources manager
+                    services.AddSingleton<IResourcesManager, ResourcesManager>();
 
                     //register the rabbit mq
                     services.AddSingleton(serviceProvider =>
