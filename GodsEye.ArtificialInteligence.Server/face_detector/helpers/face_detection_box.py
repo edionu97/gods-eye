@@ -1,4 +1,3 @@
-
 class FaceDetectionBox:
 
     @property
@@ -15,7 +14,7 @@ class FaceDetectionBox:
 
     @property
     def bottom_y(self) -> int:
-        return self.bottom_y
+        return self.__bottom_y
 
     def __init__(self, detection_box: list):
         # check if the length of the list is 4
@@ -25,6 +24,6 @@ class FaceDetectionBox:
         # set the top left and right
         self.__top_x, self.__top_y, width, height = detection_box
 
-        # set the bottom and left
+        # set the bottom right and left
         self.__bottom_x = self.top_x + width
         self.__bottom_y = self.top_y + height
