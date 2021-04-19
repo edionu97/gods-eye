@@ -1,0 +1,9 @@
+{
+  "recognition_dnn_model" : "VGG-Face",
+  "facial_attribute_analysis": [
+    "age",
+    "gender",
+    "race",
+    "emotion"
+  ]
+}
