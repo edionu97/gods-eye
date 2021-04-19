@@ -8,7 +8,7 @@ class ImageDrawerHelper:
     def draw_faces_on_image(bgr_image: [],
                             faces_information: list[FaceDetectionSummary],
                             put_key_points: bool = True,
-                            color: (int, int, int) = (0, 0, 255)):
+                            color: (int, int, int) = (0, 0, 255)) -> []:
         """
         Draw the the bounding boxes around the identified faces
         :param put_key_points: if true also the eye, mouth and nose will be identified
@@ -34,6 +34,37 @@ class ImageDrawerHelper:
                                                                         include_keypoints=put_key_points)
         # return the image
         return new_image
+
+    @staticmethod
+    def draw_border_around_image(image: [],
+                                 border: (int, int, int, int) = None,
+                                 border_color: [] = None) -> []:
+        """
+        Draw a border around the image
+        :param border_color: the color of the border
+        :param image: the image around which we will draw a border
+        :param border: (border_left, border_right, border_top, border_bottom)
+        :return: a new image with border
+        """
+
+        # put values if they are not specified
+        if border_color is None:
+            border_color = [0, 0, 0]
+
+        if border is None:
+            border = (10, 10, 10, 10)
+
+        # unpack the values
+        border_left, border_right, border_top, border_bottom = border
+
+        # draw the border
+        return cv2.copyMakeBorder(image,
+                                  top=border_top,
+                                  bottom=border_bottom,
+                                  left=border_left,
+                                  right=border_right,
+                                  borderType=cv2.BORDER_CONSTANT,
+                                  value=border_color)
 
     @staticmethod
     def __draw_info_around_img_result(bgr_image: [],

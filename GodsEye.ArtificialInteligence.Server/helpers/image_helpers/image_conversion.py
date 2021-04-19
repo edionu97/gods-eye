@@ -30,7 +30,7 @@ class ImageConversionHelpers:
         return f'data:image/{image_extension};base64,{str(base64.b64encode(encoded_image), "utf-8")}'
 
     @staticmethod
-    def convert_base64_string_to_bgr_image(base64_string: str) -> []:
+    def convert_base64_string_to_bgr_image(base64_string: str) -> ([], str):
         """
         Converts an image from base64 string into an image using opencv
         :param base64_string: string the base64 representation of the image
