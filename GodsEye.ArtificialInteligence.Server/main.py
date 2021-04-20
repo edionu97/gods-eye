@@ -1,18 +1,17 @@
 import matplotlib.pyplot as plt
-
-from face_detector.impl.mtcnndetector import MtcnnFaceDetector
 from face_recogniser.impl.analyzer import DnnFaceAnalyser
-from helpers.image_helpers.image_conversion import ImageConversionHelpers
+from face_detector.impl.mtcnndetector import MtcnnFaceDetector
 from helpers.image_helpers.image_drawer import ImageDrawerHelper
 from resources.manager.impl.resources_manager import ResourcesManager
+from helpers.image_helpers.image_conversion import ImageConversionHelpers
 
 try:
     # read the face of rob
-    with open(r"C:\Users\Eduard\Desktop\adam base64.txt") as file_rob:
+    with open(r"C:\Users\Eduard\Desktop\rob.txt") as file_rob:
         face_base64 = file_rob.read()
 
     # read the image with rob and adam
-    with open(r"C:\Users\Eduard\Desktop\rob and adam.txt") as file_rob_and_adam:
+    with open(r"C:\Users\Eduard\Desktop\adam sandler and rob .txt") as file_rob_and_adam:
         searched_base64 = file_rob_and_adam.read()
 
     # create the resources manager

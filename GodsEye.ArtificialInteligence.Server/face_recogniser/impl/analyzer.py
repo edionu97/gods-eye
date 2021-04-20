@@ -4,6 +4,7 @@ from face_detector.idetector import IDetector
 from face_recogniser.ianalyser import IAnalyser
 from resources.models.app_settings_model import AppSettings
 from helpers.image_helpers.image_drawer import ImageDrawerHelper
+from face_detector.helpers.face_detection_box import FaceDetectionBox
 from face_detector.helpers.detection_summary import FaceDetectionSummary
 from helpers.image_helpers.image_extraction import ImageExtractionHelpers
 from helpers.image_helpers.image_conversion import ImageConversionHelpers
@@ -60,6 +61,7 @@ class DnnFaceAnalyser(IAnalyser):
 
         # find the face of the person in the picture
         # align and isolate the face
+        # also the image is rgb
         face_of_the_searched_person_rgb = ImageDrawerHelper \
             .draw_border_around_image(DeepFace.detectFace(img_searched_person_as_bgr))
 
@@ -72,9 +74,11 @@ class DnnFaceAnalyser(IAnalyser):
         ]
 
         # create the face recognition pairs
+        # image pairs must be rgb
         # a pair is an association between the searched face and each face from the image
         face_recognition_pairs = [
-            [processed_face, face_of_the_searched_person_rgb] for processed_face, _ in detected_face_infos
+            [ImageConversionHelpers.convert_bgr_to_rgb(processed_face), face_of_the_searched_person_rgb]
+            for processed_face, _ in detected_face_infos
         ]
 
         # get the verification result of face recognition
@@ -121,31 +125,26 @@ class DnnFaceAnalyser(IAnalyser):
     def __detect_faces_and_preprocess_them(self, bgr_image: []) -> [(FaceDetectionSummary, [])]:
 
         """
-        This function it is used to detect, isolate and align the faces from an image
+        This function it is used to detect, crop, isolate and align the faces from an image
         :param bgr_image: the image
         :return: a lists of images
         """
 
         # detect the faces from the image and preprocess them
         for detected_face_summary in self.__face_detector.identify_faces(image_bytes=bgr_image):
-            # get the face box
-            face_box = detected_face_summary.box
 
-            # get the cropped face
-            cropped_face = ImageExtractionHelpers.crop_face_from_image(bgr_image, face_box)
+            # process the face
+            # crop, isolate and align
+            processed_face = self.__crop_isolate_and_align_the_face(bgr_image=bgr_image,
+                                                                    face_box=detected_face_summary.box)
 
             # if the face could not be cropped
             # ignore
-            if cropped_face is None:
+            if processed_face is None:
                 continue
 
-            # draw a border around the image
-            # used to better isolate the identified face
-            face_with_border = ImageDrawerHelper.draw_border_around_image(cropped_face)
-
-            # align the face
-            # for better face recognition
-            yield detected_face_summary, functions.align_face(face_with_border, detector_backend='mtcnn')
+            # get the result (tuple of two elements)
+            yield detected_face_summary, processed_face
 
     @staticmethod
     def __process_the_result(recognition_result: dict,
@@ -184,21 +183,41 @@ class DnnFaceAnalyser(IAnalyser):
 
         # iterate the face detection summaries
         for face_detection_summary in face_detection_summaries:
-            # get the face box
-            face_box = face_detection_summary.box
-
-            # get the cropped face
-            cropped_face = ImageExtractionHelpers.crop_face_from_image(bgr_image, face_box)
+            # process the face
+            # crop, isolate and align
+            processed_face = DnnFaceAnalyser.__crop_isolate_and_align_the_face(bgr_image=bgr_image,
+                                                                               face_box=face_detection_summary.box)
 
             # if the face could not be cropped
             # ignore
-            if cropped_face is None:
+            if processed_face is None:
                 continue
 
-            # draw a border around the image
-            # used to better isolate the identified face
-            face_with_border = ImageDrawerHelper.draw_border_around_image(cropped_face)
+            # return the face
+            yield processed_face
 
-            # align the face
-            # for better results
-            yield functions.align_face(face_with_border, detector_backend='mtcnn')
+    @staticmethod
+    def __crop_isolate_and_align_the_face(face_box: FaceDetectionBox, bgr_image: []) -> []:
+
+        """
+        This function it is used for cropping, isolating and alignment of one specific face in the image
+        :param face_box: the box which contains the image
+        :param bgr_image: the bgr image
+        :return: none if the image could not be cropped or the processed face
+        """
+
+        # get the cropped face
+        cropped_face = ImageExtractionHelpers.crop_face_from_image(bgr_image, face_box)
+
+        # if the face could not be cropped
+        # ignore
+        if cropped_face is None:
+            return None
+
+        # draw a border around the image
+        # used to better isolate the identified face
+        face_with_border = ImageDrawerHelper.draw_border_around_image(cropped_face)
+
+        # align the face
+        # for better results
+        return functions.align_face(face_with_border, detector_backend='mtcnn')
