@@ -1,5 +1,5 @@
 {
-  "recognition_dnn_model" : "VGG-Face",
+  "recognition_dnn_model": "VGG-Face",
   "facial_attribute_analysis": [
     "age",
     "gender",
@@ -7,7 +7,11 @@
     "emotion"
   ],
   "grpc_server": {
-    "certificate_name": "ai_server.crt",
-    "certificate_key": "ai_server.key"
+    "security": {
+      "certificate_name": "ai_server.crt",
+      "server_private_key_name": "ai_server.key"
+    },
+    "server_address": "localhost",
+    "server_port": 50051
   }
 }

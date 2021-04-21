@@ -9,7 +9,7 @@ class ResourcesManager(AbstractResourcesManager):
     def get_security_info(self, settings: AppSettings) -> (str, str):
 
         # read the content of the private key
-        with open(os.path.join(self._security_search_location, settings.certificate_key), 'rb') as file_private_key:
+        with open(os.path.join(self._security_search_location, settings.server_private_key), 'rb') as file_private_key:
             private_key = file_private_key.read()
 
         # read the certificate chain

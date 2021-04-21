@@ -25,12 +25,28 @@ class AppSettings:
         self.__certificate_name = value
 
     @property
-    def certificate_key(self) -> str:
-        return self.__certificate_key
+    def server_private_key(self) -> str:
+        return self.__server_private_key
 
-    @certificate_key.setter
-    def certificate_key(self, value: str):
-        self.__certificate_key = value
+    @server_private_key.setter
+    def server_private_key(self, value: str):
+        self.__server_private_key = value
+
+    @property
+    def server_port(self) -> int:
+        return self.__server_port
+
+    @server_port.setter
+    def server_port(self, value: int):
+        self.__server_port = value
+
+    @property
+    def server_address(self) -> str:
+        return self.__server_address
+
+    @server_address.setter
+    def server_address(self, value: str):
+        self.__server_address = value
 
     def __init__(self):
         """
@@ -39,8 +55,10 @@ class AppSettings:
 
         self.__recognition_model = ""
         self.__certificate_name = ""
-        self.__certificate_key = ""
+        self.__server_private_key = ""
         self.__facial_attribute_analysis_models = []
+        self.__server_port = 0
+        self.__server_address = ""
 
 
 def parse_app_settings_from_json_object(json_object) -> AppSettings:
@@ -60,10 +78,16 @@ def parse_app_settings_from_json_object(json_object) -> AppSettings:
     model.facial_attribute_analysis_models = json_object.facial_attribute_analysis
 
     # set the certificate name
-    model.certificate_name = json_object.grpc_server.certificate_name
+    model.certificate_name = json_object.grpc_server.security.certificate_name
 
     # set the certificate key
-    model.certificate_key = json_object.grpc_server.certificate_key
+    model.server_private_key = json_object.grpc_server.security.server_private_key_name
+
+    # set the server address
+    model.server_address = json_object.grpc_server.server_address
+
+    # set the server port
+    model.server_port = json_object.grpc_server.server_port
 
     # return the model
     return model
