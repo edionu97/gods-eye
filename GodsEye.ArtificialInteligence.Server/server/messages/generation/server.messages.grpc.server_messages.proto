@@ -23,18 +23,6 @@ service FacialRecognitionAndAnalysis {
 }
 
 /**
-	* This request it is used for creating a search person request
-	* The person_image_b64 represents the image with the face of the searched person
-	* The location_image_b64 represents the image in which the person is searched
-	* If include_cropped_faces_in_response is true then the response will also contain the cropped face/faces
- */
-message SearchForPersonRequest {
-  string person_image_b64 = 1;
-  string location_image_b64 = 2;
-  bool include_cropped_faces_in_response = 3;
-}
-
-/**
 	* This request is used for facial attribute analysis
 	* The face_bounding_box represents the coordinates of the analysed face in the given image
 	* The analyzed_image_containing_the_face_b64 represents the image in which the face is present
@@ -44,6 +32,29 @@ message FacialAttributeAnalysisRequest {
   FaceLocationBoundingBox face_bounding_box = 1;
   string analyzed_image_containing_the_face_b64 = 2;
   bool is_face_location_known = 3;
+}
+
+/**
+  * This represents the response of the facial analysis request
+  * Each field is populated with the right value
+ */
+message FacialAttributeAnalysisResponse {
+  string emotion = 1;
+  string race = 2;
+  int32 age = 3;
+  string gender = 4;
+}
+
+/**
+	* This request it is used for creating a search person request
+	* The person_image_b64 represents the image with the face of the searched person
+	* The location_image_b64 represents the image in which the person is searched
+	* If include_cropped_faces_in_response is true then the response will also contain the cropped face/faces
+ */
+message SearchForPersonRequest {
+  string person_image_b64 = 1;
+  string location_image_b64 = 2;
+  bool include_cropped_faces_in_response = 3;
 }
 
 /**
@@ -59,11 +70,12 @@ message SearchForPersonResponse {
 }
 
 /**
-  * The face recognition information including the face location and the face if specified
+  * The face recognition information including the face location, face points and the face if specified
  */
 message FaceRecognitionInformation {
   FaceLocationBoundingBox face_bounding_box = 1;
   string cropped_face_image_b64 = 2;
+  FaceKeypointsLocation face_points = 3;
 }
 
 /**
@@ -77,13 +89,22 @@ message FaceLocationBoundingBox {
 }
 
 /**
-  * This represents the response of the facial analysis request
-  * Each field is populated with the right value
+ * Represents the face keypoint locations
+ * Contains the information about the 5 important face points
  */
- message FacialAttributeAnalysisResponse {
-  string emotion = 1;
-  string race = 2;
-  int32 age = 3;
-  string gender = 4;
+message FaceKeypointsLocation {
+  FacePoint right_eye_point = 1;
+  FacePoint left_eye_point = 2;
+  FacePoint nose_point = 3;
+  FacePoint mouth_left_point = 4;
+  FacePoint mouth_right_point = 5;
+}
+
+/**
+ *  Represents the point coordinates
+ */
+message FacePoint {
+  int32 x = 1;
+  int32 y = 2;
 }
 
