@@ -5,11 +5,9 @@ from server.impl.base.grpc_server_base import FacialRecognitionAndAnalysisServic
 class FacialRecognitionAndAnalysisService(FacialRecognitionAndAnalysisServicer):
 
     def DoFacialRecognition(self, request, context):
-
-        print(request)
+        print(self.DoFacialRecognition.__name__)
         return SearchForPersonResponse()
 
     def DoFacialAttributeAnalysis(self, request, context):
-
-        print(request)
+        print(self.DoFacialAttributeAnalysis.__name__)
         return FacialAttributeAnalysisResponse()
