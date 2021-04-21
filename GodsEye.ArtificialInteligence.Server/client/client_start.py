@@ -39,9 +39,17 @@ try:
     # create the client
     server_stub = create_client(manager=resources_manager, settings=app_settings)
 
+    # read the face of rob
+    with open(r"C:\Users\Eduard\Desktop\rob.txt") as file_rob:
+        face_base64 = file_rob.read()
+
+    # read the image with rob and adam
+    with open(r"C:\Users\Eduard\Desktop\adam sandler and rob .txt") as file_rob_and_adam:
+        searched_base64 = file_rob_and_adam.read()
+
     # call the method through grpc
-    server_stub.DoFacialRecognition(SearchForPersonRequest(person_image_b64="ana are mere",
-                                                           location_image_b64="ana",
+    server_stub.DoFacialRecognition(SearchForPersonRequest(person_image_b64=face_base64,
+                                                           location_image_b64=searched_base64,
                                                            include_cropped_faces_in_response=True))
 
 except Exception as e:

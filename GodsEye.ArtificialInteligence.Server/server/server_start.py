@@ -6,6 +6,8 @@ from resources.manager.abs_resources_manager import AbstractResourcesManager
 from resources.manager.impl.resources_manager import ResourcesManager
 from resources.models.app_settings_model import AppSettings
 from server.impl.base.grpc_server_base import add_FacialRecognitionAndAnalysisServicer_to_server
+from server.services.face_analysis.components.face_detector.impl.mtcnndetector import MtcnnFaceDetector
+from server.services.face_analysis.components.face_recogniser.impl.analyzer import DnnFaceAnalyser
 from server.services.face_analysis.impl.facial_recognition_and_analysis_service import FacialRecognitionAndAnalysisService
 
 # set the logging
@@ -47,8 +49,15 @@ try:
     # get the app settings
     app_settings = resources_manager.parse_settings()
 
+    # create the face detector
+    face_detector = MtcnnFaceDetector()
+
+    # create the face analyzer
+    face_analyser = DnnFaceAnalyser(face_detector=face_detector, app_settings=app_settings)
+
     # start the server
-    start_server(service=FacialRecognitionAndAnalysisService(),
+    start_server(service=FacialRecognitionAndAnalysisService(face_detector=face_detector,
+                                                             face_analyser=face_analyser),
                  settings=app_settings,
                  manager=resources_manager)
 

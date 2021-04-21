@@ -1,3 +1,4 @@
+import re
 from server.services.face_analysis.components.face_detector.helpers.face_detection_box import FaceDetectionBox
 
 
@@ -37,3 +38,24 @@ class ImageExtractionHelpers:
 
         # return the cropped image
         return cropped_image
+
+    @staticmethod
+    def extract_image_extension_from_base64_string(base64_str: str) -> str:
+        """
+        Extracts the image type from the base64 string
+        :param base64_str: the b64 string
+        :return: the image extension
+        """
+
+        # treat the case in which the string is null or empty
+        if not base64_str:
+            return ""
+
+        # split the string into two parts
+        split_info = base64_str.split(',')
+
+        # get the extension
+        match = re.search('^data:image/(?P<extension>[a-zA-Z]+);base64$', split_info[0])
+
+        # return the image extension
+        return match and match.group('extension')

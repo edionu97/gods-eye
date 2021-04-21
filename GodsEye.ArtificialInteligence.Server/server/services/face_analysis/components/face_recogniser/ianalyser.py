@@ -7,7 +7,7 @@ class IAnalyser(ABC):
     @abstractmethod
     def search_person_in_image(self,
                                searched_person_base64: str,
-                               image_base64: str) -> (list[FaceDetectionSummary], []):
+                               image_base64: str) -> list[(FaceDetectionSummary, [])]:
         """
         Search the person in one image
         :param searched_person_base64: the image that contains the searched person face

@@ -46,7 +46,7 @@ class DnnFaceAnalyser(IAnalyser):
 
     def search_person_in_image(self,
                                searched_person_base64: str,
-                               image_base64: str) -> (list[FaceDetectionSummary], []):
+                               image_base64: str) -> list[(FaceDetectionSummary, [])]:
 
         # check if both the searched person and image base 64 are not null or empty
         if not searched_person_base64 or not image_base64:
@@ -148,7 +148,7 @@ class DnnFaceAnalyser(IAnalyser):
 
     @staticmethod
     def __process_the_result(recognition_result: dict,
-                             detected_face_infos: [(FaceDetectionSummary, [])]) -> (list[FaceDetectionSummary], []):
+                             detected_face_infos: [(FaceDetectionSummary, [])]) -> list[(FaceDetectionSummary, [])]:
 
         # create the index
         pair_index = -1
