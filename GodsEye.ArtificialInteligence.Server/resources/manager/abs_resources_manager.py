@@ -18,7 +18,7 @@ class AbstractResourcesManager(ABC):
             .joinpath('files', 'app_settings.json')
 
         # initialize the search location for security
-        self.__security_search_location = Path(__file__) \
+        self._security_search_location = Path(__file__) \
             .parent \
             .parent \
             .joinpath('files', 'security')
@@ -28,7 +28,7 @@ class AbstractResourcesManager(ABC):
             raise Exception(f"The app settings file does not exist in the specified path")
 
         # throw exception if the directory does not exist
-        if not Path(self.__security_search_location).is_dir():
+        if not Path(self._security_search_location).is_dir():
             raise Exception(f"The security folder could not be found in the specified path")
 
     @abstractmethod
