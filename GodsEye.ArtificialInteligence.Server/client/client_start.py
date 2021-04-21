@@ -1,5 +1,7 @@
 import grpc
+import matplotlib.pyplot as plt
 
+from helpers.image_helpers.image_conversion import ImageConversionHelpers
 from resources.manager.abs_resources_manager import AbstractResourcesManager
 from resources.manager.impl.resources_manager import ResourcesManager
 from resources.models.app_settings_model import AppSettings
@@ -48,9 +50,27 @@ try:
         searched_base64 = file_rob_and_adam.read()
 
     # call the method through grpc
-    server_stub.DoFacialRecognition(SearchForPersonRequest(person_image_b64=face_base64,
-                                                           location_image_b64=searched_base64,
-                                                           include_cropped_faces_in_response=True))
+    response = server_stub \
+        .DoFacialRecognition(SearchForPersonRequest(person_image_b64=face_base64,
+                                                    location_image_b64=searched_base64,
+                                                    include_cropped_faces_in_response=True))
+
+    for face_recognition_info in response.face_recognition_info:
+
+        # get the image
+        image, _ = ImageConversionHelpers\
+            .convert_base64_string_to_bgr_image(face_recognition_info.cropped_face_image_b64)
+
+        print("Top left=", face_recognition_info.face_bounding_box.top_x)
+        print("Top right=", face_recognition_info.face_bounding_box.top_y)
+        print("Bottom left=", face_recognition_info.face_bounding_box.bottom_x)
+        print("Bottom right=", face_recognition_info.face_bounding_box.bottom_y)
+
+        if not image.any():
+            continue
+
+        plt.imshow(ImageConversionHelpers.convert_bgr_to_rgb(image))
+        plt.show()
 
 except Exception as e:
     print(e)

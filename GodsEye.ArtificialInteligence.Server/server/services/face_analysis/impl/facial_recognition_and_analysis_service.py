@@ -1,8 +1,8 @@
 import grpc
 
+from server.messages.grpc.server_messages_pb2 import *
 from helpers.image_helpers.image_conversion import ImageConversionHelpers
 from helpers.image_helpers.image_extraction import ImageExtractionHelpers
-from server.messages.grpc.server_messages_pb2 import *
 from server.impl.base.grpc_server_base import FacialRecognitionAndAnalysisServicer
 from server.services.face_analysis.components.face_detector.idetector import IDetector
 from server.services.face_analysis.components.face_recogniser.ianalyser import IAnalyser
