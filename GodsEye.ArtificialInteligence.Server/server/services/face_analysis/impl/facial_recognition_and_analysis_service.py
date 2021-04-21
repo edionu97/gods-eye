@@ -24,6 +24,15 @@ class FacialRecognitionAndAnalysisService(FacialRecognitionAndAnalysisServicer):
         self.__face_analyser = face_analyser
 
     def DoFacialRecognition(self, request, context):
+        """
+            This represents the method that handles the facial recognition
+            As input it takes an instance of SearchForPersonRequest
+            As output returns an instance of SearchForPersonRequest
+        :param request: the SearchForPersonRequest
+        :param context: the grpc context
+        :return: an instance of SearchForPersonRequest
+        """
+
         # catch the exception and set the status code accordingly
         try:
             # handle the facial recognition task
