@@ -1,7 +1,7 @@
 import cv2
 from mtcnn import MTCNN
-from face_detector.idetector import IDetector
-from face_detector.helpers.detection_summary import FaceDetectionSummary
+from server.services.face_analysis.components.face_detector.idetector import IDetector
+from server.services.face_analysis.components.face_detector.helpers.detection_summary import FaceDetectionSummary
 from helpers.image_helpers.image_conversion import ImageConversionHelpers
 
 

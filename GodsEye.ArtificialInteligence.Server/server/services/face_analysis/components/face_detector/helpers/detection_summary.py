@@ -1,5 +1,5 @@
-from face_detector.helpers.face_detection_box import FaceDetectionBox
-from face_detector.helpers.face_points import FacePoints
+from server.services.face_analysis.components.face_detector.helpers.face_detection_box import FaceDetectionBox
+from server.services.face_analysis.components.face_detector.helpers.face_points import FacePoints
 
 
 class FaceDetectionSummary:

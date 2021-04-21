@@ -1,5 +1,5 @@
 import cv2
-from face_detector.helpers.detection_summary import FaceDetectionSummary
+from server.services.face_analysis.components.face_detector.helpers.detection_summary import FaceDetectionSummary
 
 
 class ImageDrawerHelper:

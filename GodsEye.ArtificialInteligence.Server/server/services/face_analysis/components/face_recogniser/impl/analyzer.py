@@ -1,14 +1,14 @@
 from deepface import DeepFace
 from deepface.commons import functions
-from face_detector.idetector import IDetector
-from face_recogniser.ianalyser import IAnalyser
+from server.services.face_analysis.components.face_detector.idetector import IDetector
+from server.services.face_analysis.components.face_recogniser.ianalyser import IAnalyser
 from resources.models.app_settings_model import AppSettings
 from helpers.image_helpers.image_drawer import ImageDrawerHelper
-from face_detector.helpers.face_detection_box import FaceDetectionBox
-from face_detector.helpers.detection_summary import FaceDetectionSummary
+from server.services.face_analysis.components.face_detector.helpers.face_detection_box import FaceDetectionBox
+from server.services.face_analysis.components.face_detector.helpers.detection_summary import FaceDetectionSummary
 from helpers.image_helpers.image_extraction import ImageExtractionHelpers
 from helpers.image_helpers.image_conversion import ImageConversionHelpers
-from face_recogniser.helpers.face_analiser_summary import FacialAttributeAnalysisModel
+from server.services.face_analysis.components.face_recogniser.helpers.face_analiser_summary import FacialAttributeAnalysisModel
 
 
 class DnnFaceAnalyser(IAnalyser):

@@ -6,7 +6,7 @@ from resources.manager.abs_resources_manager import AbstractResourcesManager
 from resources.manager.impl.resources_manager import ResourcesManager
 from resources.models.app_settings_model import AppSettings
 from server.impl.base.grpc_server_base import add_FacialRecognitionAndAnalysisServicer_to_server
-from server.services.face_analysis.facial_recognition_and_analysis_server import FacialRecognitionAndAnalysisService
+from server.services.face_analysis.facial_recognition_and_analysis_service import FacialRecognitionAndAnalysisService
 
 # set the logging
 os.environ["GRPC_VERBOSITY"] = "DEBUG"

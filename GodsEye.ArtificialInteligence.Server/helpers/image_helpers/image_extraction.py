@@ -1,4 +1,4 @@
-from face_detector.helpers.face_detection_box import FaceDetectionBox
+from server.services.face_analysis.components.face_detector.helpers.face_detection_box import FaceDetectionBox
 
 
 class ImageExtractionHelpers:
