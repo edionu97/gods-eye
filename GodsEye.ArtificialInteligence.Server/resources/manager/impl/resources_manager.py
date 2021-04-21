@@ -1,9 +1,17 @@
-from helpers.serializers.json.jsonserializerdeserializer import JsonSerializerDeserializer
+from pathlib import Path
 from resources.manager.abs_resources_manager import AbstractResourcesManager
+from helpers.serializers.json.jsonserializerdeserializer import JsonSerializerDeserializer
 from resources.models.app_settings_model import AppSettings, parse_app_settings_from_json_object
 
 
 class ResourcesManager(AbstractResourcesManager):
+
+    def get_security_info(self, settings: AppSettings) -> (str, str):
+
+
+
+
+        pass
 
     def parse_settings(self) -> AppSettings:
         # read the file and store the content in it

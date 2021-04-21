@@ -5,5 +5,9 @@
     "gender",
     "race",
     "emotion"
-  ]
+  ],
+  "grpc_server": {
+    "certificate_name": "ai_server.crt",
+    "certificate_key": "ai_server.key"
+  }
 }

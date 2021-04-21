@@ -2,7 +2,8 @@
 
 
 /GodsEye.ArtificialInteligence.Server/.idea/
-
+*.crt
+*.key
 
 
 # Byte-compiled / optimized / DLL files
