@@ -64,9 +64,13 @@ class FacialRecognitionAndAnalysisService(FacialRecognitionAndAnalysisServicer):
             # create the face location bounding box
             face_location_bounding_box = face_info.box.convert_to_grpc_message()
 
+            # convert the face points into an grpc message
+            face_points = face_info.face_points.convert_to_grpc_message()
+
             # if the faces are not required
             if not include_faces:
-                face_recognition_infos.append(FaceRecognitionInformation(face_bounding_box=face_location_bounding_box))
+                face_recognition_infos.append(FaceRecognitionInformation(face_bounding_box=face_location_bounding_box,
+                                                                         face_points=face_points))
                 continue
 
             # convert the face into an base64 img
@@ -77,6 +81,7 @@ class FacialRecognitionAndAnalysisService(FacialRecognitionAndAnalysisServicer):
 
             # add all the information in face recognition
             face_recognition_infos.append(FaceRecognitionInformation(face_bounding_box=face_location_bounding_box,
+                                                                     face_points=face_points,
                                                                      cropped_face_image_b64=cropped_face_image_b64))
 
         # return the response

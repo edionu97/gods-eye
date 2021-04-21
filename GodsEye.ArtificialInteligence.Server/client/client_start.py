@@ -61,10 +61,8 @@ try:
         image, _ = ImageConversionHelpers\
             .convert_base64_string_to_bgr_image(face_recognition_info.cropped_face_image_b64)
 
-        print("Top left=", face_recognition_info.face_bounding_box.top_x)
-        print("Top right=", face_recognition_info.face_bounding_box.top_y)
-        print("Bottom left=", face_recognition_info.face_bounding_box.bottom_x)
-        print("Bottom right=", face_recognition_info.face_bounding_box.bottom_y)
+        print(face_recognition_info.face_bounding_box)
+        print(face_recognition_info.face_points)
 
         if not image.any():
             continue
