@@ -1,3 +1,4 @@
+import os
 import grpc
 import matplotlib.pyplot as plt
 
@@ -7,6 +8,9 @@ from resources.manager.impl.resources_manager import ResourcesManager
 from resources.models.app_settings_model import AppSettings
 from server.impl.base.grpc_server_base import FacialRecognitionAndAnalysisStub
 from server.messages.grpc.server_messages_pb2 import FacialAttributeAnalysisRequest, SearchForPersonRequest
+
+# set the logging
+os.environ["GRPC_VERBOSITY"] = "INFO"
 
 
 def create_client(manager: AbstractResourcesManager,
@@ -58,7 +62,7 @@ try:
     for face_recognition_info in response.face_recognition_info:
 
         # get the image
-        image, _ = ImageConversionHelpers\
+        image, _ = ImageConversionHelpers \
             .convert_base64_string_to_bgr_image(face_recognition_info.cropped_face_image_b64)
 
         print(face_recognition_info.face_bounding_box)
