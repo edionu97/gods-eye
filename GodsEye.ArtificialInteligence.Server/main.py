@@ -41,7 +41,7 @@ try:
     plt.show()
 
     # print the emotion of the person from each face
-    for result_info, rgb_face in face_analyser.analyze_faces_from_image(searched_base64, infos):
+    for result_info, rgb_face in face_analyser.analyze_faces_from_image(searched_base64, [x.box for x in infos]):
         plt.imshow(rgb_face)
         plt.show()
         print(result_info.race, result_info.age, result_info.gender, result_info.emotion)
