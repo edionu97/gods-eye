@@ -40,6 +40,9 @@ class DnnFaceAnalyser(IAnalyser):
         # initialize the dictionary
         self.__facial_attribute_analysis_models = {}
 
+        # initialize the face detector first
+        functions.initialize_detector(detector_backend='mtcnn')
+
         # iterate the models and build the required models
         for model_key in app_settings.facial_attribute_analysis_models:
             # construct the model
