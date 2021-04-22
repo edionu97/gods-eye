@@ -30,14 +30,3 @@ class FaceDetectionBox:
         # set the bottom right and left
         self.__bottom_x = self.top_x + width
         self.__bottom_y = self.top_y + height
-
-    def convert_to_grpc_message(self) -> FaceLocationBoundingBox:
-        """
-        This method it is used for converting from an instance of face detection box into an grpc associate message
-        :return: an instance of FaceLocationBoundingBox
-        """
-
-        return FaceLocationBoundingBox(top_x=self.top_x,
-                                       top_y=self.top_y,
-                                       bottom_x=self.bottom_x,
-                                       bottom_y=self.bottom_y)

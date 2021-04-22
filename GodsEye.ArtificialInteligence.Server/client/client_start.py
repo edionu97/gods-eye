@@ -3,10 +3,10 @@ import grpc
 import matplotlib.pyplot as plt
 
 from threading import *
+from resources.models.app_settings_model import AppSettings
+from resources.manager.impl.resources_manager import ResourcesManager
 from helpers.image_helpers.image_conversion import ImageConversionHelpers
 from resources.manager.abs_resources_manager import AbstractResourcesManager
-from resources.manager.impl.resources_manager import ResourcesManager
-from resources.models.app_settings_model import AppSettings
 from server.impl.base.grpc_server_base import FacialRecognitionAndAnalysisStub
 from server.messages.grpc.server_messages_pb2 import FacialAttributeAnalysisRequest, SearchForPersonRequest
 
@@ -64,26 +64,33 @@ def start_recognition_job(searched_person_path: str, in_file_path: str):
         with open(in_file_path) as file_rob_and_adam:
             searched_base64 = file_rob_and_adam.read()
 
-            # call the method through grpc
-            response = server_stub \
-                .DoFacialRecognition(SearchForPersonRequest(person_image_b64=face_base64,
-                                                            location_image_b64=searched_base64,
-                                                            include_cropped_faces_in_response=True))
+        # call the method through grpc
+        response = server_stub \
+            .DoFacialRecognition(SearchForPersonRequest(person_image_b64=face_base64,
+                                                        location_image_b64=searched_base64,
+                                                        include_cropped_faces_in_response=False))
 
         # iterate in the face recognition results
         for face_recognition_info in response.face_recognition_info:
 
-            # get the image
-            image, _ = ImageConversionHelpers \
-                .convert_base64_string_to_bgr_image(face_recognition_info.cropped_face_image_b64)
+            image = None
 
-            if not image.any():
-                continue
+            if face_recognition_info.cropped_face_image_b64:
+                # get the image
+                image, _ = ImageConversionHelpers \
+                    .convert_base64_string_to_bgr_image(face_recognition_info.cropped_face_image_b64)
+
+            analysis_response = server_stub.DoFacialAttributeAnalysis(
+                FacialAttributeAnalysisRequest(is_face_location_known=True,
+                                               analyzed_image_containing_the_face_b64=searched_base64,
+                                               face_bounding_box=face_recognition_info.face_bounding_box))
 
             # critical section
             lock.acquire()
-            plt.imshow(ImageConversionHelpers.convert_bgr_to_rgb(image))
-            plt.show()
+            print(analysis_response)
+            if image is not None and image.any():
+                plt.imshow(ImageConversionHelpers.convert_bgr_to_rgb(image))
+                plt.show()
             lock.release()
 
     except Exception as e:
@@ -105,7 +112,7 @@ def start_clients():
     client_jobs = []
 
     # iterate the persons
-    for index in range(0, len(searched_in_paths)):
+    for index in range(0, len(searched_persons_paths)):
         # create the client job
         client_job = Thread(target=start_recognition_job,
                             args=[searched_persons_paths[index % len(searched_persons_paths)],
