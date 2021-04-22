@@ -8,7 +8,8 @@ from server.services.face_analysis.components.face_detector.helpers.face_detecti
 from server.services.face_analysis.components.face_detector.helpers.detection_summary import FaceDetectionSummary
 from helpers.image_helpers.image_extraction import ImageExtractionHelpers
 from helpers.image_helpers.image_conversion import ImageConversionHelpers
-from server.services.face_analysis.components.face_recogniser.helpers.face_analiser_summary import FacialAttributeAnalysisModel
+from server.services.face_analysis.components.face_recogniser.helpers.face_analiser_summary import \
+    FacialAttributeAnalysisModel
 
 
 class DnnFaceAnalyser(IAnalyser):
@@ -92,19 +93,19 @@ class DnnFaceAnalyser(IAnalyser):
         return self.__process_the_result(face_recognition_result, detected_face_infos)
 
     def analyze_faces_from_image(self,
-                                 source_image_base64: str,
-                                 face_detection_summaries: list[FaceDetectionSummary]):
+                                 person_image_base64: str,
+                                 detection_boxes: list[FaceDetectionBox]) -> list[FacialAttributeAnalysisModel]:
 
         # check if both the searched person and image base 64 are not null or empty
-        if not source_image_base64:
+        if not person_image_base64:
             raise Exception("The face image must not be null or empty")
 
         # convert the image into an bgr image
         (source_image_base64_as_bgr, _) = ImageConversionHelpers \
-            .convert_base64_string_to_bgr_image(source_image_base64)
+            .convert_base64_string_to_bgr_image(person_image_base64)
 
         # extract the faces from the images
-        detected_faces = self.__extract_faces_from_bgr_image(face_detection_summaries, source_image_base64_as_bgr)
+        detected_faces = self.__extract_faces_from_bgr_image(detection_boxes, source_image_base64_as_bgr)
 
         # convert the faces to rgb
         rgb_detected_faces = [ImageConversionHelpers.convert_bgr_to_rgb(face) for face in detected_faces]
@@ -172,21 +173,21 @@ class DnnFaceAnalyser(IAnalyser):
             yield detected_face_info, detected_face
 
     @staticmethod
-    def __extract_faces_from_bgr_image(face_detection_summaries: list[FaceDetectionSummary], bgr_image: []) -> []:
+    def __extract_faces_from_bgr_image(face_bounding_boxes: list[FaceDetectionBox], bgr_image: []) -> []:
         """
         This function it is used for cropping, isolating and aligning the faces using
         Uses the face detection summaries
-        :param face_detection_summaries: the list of face detection tips
+        :param face_bounding_boxes: the list of face detection tips
         :param bgr_image: the image in bgr format
         :return: the list of brg images representing the cropped faces
         """
 
         # iterate the face detection summaries
-        for face_detection_summary in face_detection_summaries:
+        for face_bounding_box in face_bounding_boxes:
             # process the face
             # crop, isolate and align
             processed_face = DnnFaceAnalyser.__crop_isolate_and_align_the_face(bgr_image=bgr_image,
-                                                                               face_box=face_detection_summary.box)
+                                                                               face_box=face_bounding_box)
 
             # if the face could not be cropped
             # ignore

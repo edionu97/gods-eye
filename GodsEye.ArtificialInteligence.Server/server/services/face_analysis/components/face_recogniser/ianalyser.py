@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from server.services.face_analysis.components.face_detector.helpers.detection_summary import FaceDetectionSummary
+from server.services.face_analysis.components.face_detector.helpers.face_detection_box import FaceDetectionBox
+from server.services.face_analysis.components.face_recogniser.helpers.face_analiser_summary import \
+    FacialAttributeAnalysisModel
 
 
 class IAnalyser(ABC):
@@ -17,11 +20,13 @@ class IAnalyser(ABC):
         raise Exception(f"Method {self.search_person_in_image.__name__} is not implemented")
 
     @abstractmethod
-    def analyze_faces_from_image(self, person_image_base64: str, detection_summary: list[FaceDetectionSummary]):
+    def analyze_faces_from_image(self,
+                                 person_image_base64: str,
+                                 detection_boxes: list[FaceDetectionBox]) -> list[FacialAttributeAnalysisModel]:
         """
         Analyse the face of the persons from that list
-        :param detection_summary: face detection summary
+        :param detection_boxes: face detection boxes
         :param person_image_base64: the image containing the person
-        :return: the result about person analyzing
+        :return: the result about persons analyzing as instances of FacialAttributeAnalysisModel
         """
         raise Exception(f"Method {self.analyze_faces_from_image.__name__} is not implemented")
