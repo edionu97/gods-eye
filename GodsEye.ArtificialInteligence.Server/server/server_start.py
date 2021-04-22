@@ -1,24 +1,32 @@
 import os
 import grpc
-from concurrent import futures
+import multiprocessing
 
+from concurrent import futures
 from resources.manager.abs_resources_manager import AbstractResourcesManager
 from resources.manager.impl.resources_manager import ResourcesManager
 from resources.models.app_settings_model import AppSettings
 from server.impl.base.grpc_server_base import add_FacialRecognitionAndAnalysisServicer_to_server
 from server.services.face_analysis.components.face_detector.impl.mtcnndetector import MtcnnFaceDetector
 from server.services.face_analysis.components.face_recogniser.impl.analyzer import DnnFaceAnalyser
-from server.services.face_analysis.impl.facial_recognition_and_analysis_service import FacialRecognitionAndAnalysisService
+from server.services.face_analysis.impl \
+    .facial_recognition_and_analysis_service import FacialRecognitionAndAnalysisService
 
-# set the logging
-os.environ["GRPC_VERBOSITY"] = "DEBUG"
+# set the logging level
+os.environ["GRPC_VERBOSITY"] = "INFO"
 
 
 def start_server(service: FacialRecognitionAndAnalysisService,
                  settings: AppSettings,
                  manager: AbstractResourcesManager):
+    """
+    Starts the server on a specific address and port
+    :param service: the service used
+    :param settings: the app settings
+    :param manager: the resources manager
+    """
     # create the grp server
-    grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()))
 
     # add the service to the server
     add_FacialRecognitionAndAnalysisServicer_to_server(service, grpc_server)
@@ -32,7 +40,8 @@ def start_server(service: FacialRecognitionAndAnalysisService,
 
     # start the server on the desired address and port
     # also add the credentials
-    grpc_server.add_secure_port('[::]:50051', server_credentials)
+    grpc_server.add_secure_port(server_credentials=server_credentials,
+                                address=f'{app_settings.server_address}:{app_settings.server_port}')
 
     # start the server at a specific address and port
     grpc_server.start()
