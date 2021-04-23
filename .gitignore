@@ -534,3 +534,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /GodsEye.Application.Resources/Generated
+
+

@@ -4,6 +4,8 @@ using System.IO;
 using EasyNetQ;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
+using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
+using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy.Impl;
 using GodsEye.RemoteWorker.Worker.Remote;
 using GodsEye.RemoteWorker.Worker.Streaming;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
@@ -124,6 +126,11 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     services
                         .AddTransient<IStreamingImageWorker, StreamingImageWorker>();
 
+                    //add the facial recognition and analysis proxy
+                    services
+                        .AddTransient<IFacialRecognitionAndAnalysisProxy, FacialRecognitionAndAnalysisProxy>();
+
+                    //register the remote worker
                     services
                         .AddTransient<IRemoteWorker, Worker.Remote.Impl.RemoteWorker>();
 

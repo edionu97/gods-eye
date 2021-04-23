@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="FacialAnalysis\GrpcProxy\Resources\server.messages.grpc.server_messages.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.15.8" />
+    <PackageReference Include="Grpc.Core" Version="2.37.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.37.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.37.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Nito.Collections.Deque" Version="1.1.0" />
     <PackageReference Include="WatsonWebsocket" Version="2.2.1.3" />
@@ -14,6 +25,10 @@
     <ProjectReference Include="..\GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Resources\GodsEye.Utility.Application.Resources.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Security\GodsEye.Utility.Application.Security.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="FacialAnalysis\GrpcProxy\Resources\server.messages.grpc.server_messages.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>
