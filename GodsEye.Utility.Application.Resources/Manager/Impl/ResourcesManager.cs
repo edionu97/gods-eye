@@ -26,7 +26,10 @@ namespace GodsEye.Utility.Application.Resources.Manager.Impl
             }
 
             //destruct the options
-            var (groupId, placeholderId, templateLocation, placeholderValues) = generationOptions;
+            var (groupId,
+                 placeholderId, 
+                 templateLocation, 
+                 placeholderValues) = generationOptions;
 
             //treat the file does not exist case
             if (!templateLocation.Exists)
