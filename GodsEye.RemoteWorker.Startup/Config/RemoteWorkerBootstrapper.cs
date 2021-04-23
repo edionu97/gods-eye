@@ -16,16 +16,22 @@ using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 using GodsEye.Utility.Application.Resources.Manager;
 using GodsEye.Utility.Application.Resources.Manager.Impl;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider;
 using GodsEye.Utility.Application.Security.KeyProvider.Impl;
+using Grpc.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
+using RemoteWorkerImpl = GodsEye.RemoteWorker.Worker.Remote.Impl.RemoteWorker;
+
+using static Gods.Eye.Server.Artificial.Intelligence.Messaging.FacialRecognitionAndAnalysis;
 
 namespace GodsEye.RemoteWorker.Startup.Config
 {
@@ -54,6 +60,25 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     #endregion
 
                     #region Authorization
+
+                    //register the grpc channel with it's credentials
+                    services.AddTransient<ChannelBase>(serviceProvider =>
+                    {
+                        //get the app config
+                        var grpcConfig = serviceProvider
+                                             .GetService<IConfig>()
+                                             ?.Get<GrpcFacialAnalysisServerConfig>()
+                                         ?? throw new ArgumentException();
+
+                        //destruct the application config
+                        var (certificateLocation, host, port) = grpcConfig;
+
+                        //read the certificate bytes
+                        var channelSslCredentials = new SslCredentials(File.ReadAllText(certificateLocation));
+
+                        //create the new channel
+                        return new Channel(host, port, channelSslCredentials);
+                    });
 
                     //register the key provider
                     services.AddSingleton<KeyBasicHashProvider>();
@@ -126,18 +151,18 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     services
                         .AddTransient<IStreamingImageWorker, StreamingImageWorker>();
 
-                    //add the facial recognition and analysis proxy
+                    //add the grpc recognition client 
+                    services.AddTransient<FacialRecognitionAndAnalysisClient>();
+
+                    //add the facial recognition and analysis service
                     services
-                        .AddTransient<IFacialRecognitionAndAnalysisProxy, FacialRecognitionAndAnalysisProxy>();
+                        .AddTransient<IFacialRecognitionAndAnalysisService, FacialRecognitionAndAnalysisService>();
 
                     //register the remote worker
-                    services
-                        .AddTransient<IRemoteWorker, Worker.Remote.Impl.RemoteWorker>();
+                    services.AddTransient<IRemoteWorker, RemoteWorkerImpl>();
 
                     //register the worker starter
-                    services
-                        .AddSingleton<IMessageQueueRemoteWorkerStarter, MessageQueueRemoteWorkerStarter>();
-
+                    services.AddSingleton<IMessageQueueRemoteWorkerStarter, MessageQueueRemoteWorkerStarter>();
                 })
                 .ConfigureLogging(logging =>
                 {

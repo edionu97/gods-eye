@@ -14,17 +14,17 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
     public class RemoteWorker : IRemoteWorker
     {
         private readonly CancellationTokenSource _cancellationToken;
-        private readonly IFacialRecognitionAndAnalysisProxy _proxy;
+        private readonly IFacialRecognitionAndAnalysisService _service;
         private readonly IStreamingImageWorker _streamingImageWorker;
 
         private readonly ILoggerFactory _loggerFactory;
 
         public RemoteWorker(
             IStreamingImageWorker streamingImageWorker, 
-            IFacialRecognitionAndAnalysisProxy proxy,
+            IFacialRecognitionAndAnalysisService service,
             ILoggerFactory loggerFactory)
         {
-            _proxy = proxy;
+            _service = service;
             _streamingImageWorker = streamingImageWorker;
             _loggerFactory = loggerFactory;
             _cancellationToken = new CancellationTokenSource();
@@ -55,23 +55,24 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             var frameBuffer = _streamingImageWorker.FrameBuffer;
             while (!token.IsCancellationRequested)
             {
-                foreach (var f in frameBuffer.TakeASnapshot())
+                foreach (var f in frameBuffer.TakeASnapshot().TakeWhile(f => !token.IsCancellationRequested))
                 {
                     try
                     {
-                        var r = await _proxy.IdentifyPersonAsync(
-                            f.Item2.ImageBase64EncodedBytes, searchedPerson
+                        var r = await _service.SearchPersonInImageAsync(
+                            searchedPerson, searchedPerson, token
                         );
 
                         logger.LogInformation(r + " " + r.IsFound +"\n");
                     }
                     catch (Exception e)
                     {
-                        logger.LogCritical(e.Message);
+                        break;
                     }
                 }
             }
 
+            logger.LogInformation("The Aiw is terminated");
 
         }
     }
