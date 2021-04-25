@@ -111,7 +111,7 @@ namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
 
                 //attempt to create the worker
                 _activeWorkerTasks.Add(remoteWorker
-                    .ConfigureWorkersAndStartAsync(new StartingInformation
+                    .ConfigureWorkersAndStartAsync(new RwStartingInformation
                     {
                         Siw = new SiwInformation
                         {

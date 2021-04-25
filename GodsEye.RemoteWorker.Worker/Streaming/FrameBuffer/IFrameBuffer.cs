@@ -6,6 +6,12 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer
 {
     public interface IFrameBuffer
     {
+        /// Gets the data input rate
+        public int InputRate { get; }
+
+        /// If true it means that the frame buffer is ready
+        public bool IsReady { get; }
+
         /// <summary>
         /// Inserts a frame into the buffer
         /// </summary>

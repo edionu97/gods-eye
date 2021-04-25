@@ -8,7 +8,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote
         /// <summary>
         /// Configure all the workers and start
         /// </summary>
-        /// <param name="startingInformation">the information used for starting</param>
-        public Task ConfigureWorkersAndStartAsync(StartingInformation startingInformation);
+        /// <param name="rwStartingInformation">the information used for starting</param>
+        public Task ConfigureWorkersAndStartAsync(RwStartingInformation rwStartingInformation);
     }
 }

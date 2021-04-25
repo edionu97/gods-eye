@@ -13,7 +13,7 @@
         }
     }
 
-    public class StartingInformation
+    public class RwStartingInformation
     {
         public SiwInformation Siw { get; set; }
     }

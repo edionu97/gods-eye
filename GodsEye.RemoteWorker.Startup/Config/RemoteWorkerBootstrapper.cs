@@ -4,8 +4,10 @@ using System.IO;
 using EasyNetQ;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
+using GodsEye.RemoteWorker.Worker.FacialAnalysis;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy.Impl;
+using GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl;
 using GodsEye.RemoteWorker.Worker.Remote;
 using GodsEye.RemoteWorker.Worker.Streaming;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
@@ -17,6 +19,8 @@ using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
+using GodsEye.Utility.Application.Items.Statistics.Time.ElapsedTime;
+using GodsEye.Utility.Application.Items.Statistics.Time.ElapsedTime.Impl;
 using GodsEye.Utility.Application.Resources.Manager;
 using GodsEye.Utility.Application.Resources.Manager.Impl;
 using GodsEye.Utility.Application.Security.Encryption;
@@ -147,6 +151,10 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     services
                         .AddTransient<IFrameBuffer, ReverseOrderFrameBuffer>();
 
+                    //add the period time interval counter
+                    services
+                        .AddTransient<IPeriodTimeIntervalCounter, LoopPeriodTimeIntervalIntervalCounter>();
+
                     //register the streaming image worker
                     services
                         .AddTransient<IStreamingImageWorker, StreamingImageWorker>();
@@ -157,6 +165,10 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     //add the facial recognition and analysis service
                     services
                         .AddTransient<IFacialRecognitionAndAnalysisService, FacialRecognitionAndAnalysisService>();
+
+                    //add the facial analysis and recognition worker
+                    services
+                        .AddTransient<IFacialAnalysisAndRecognitionWorker, FacialAnalysisAndRecognitionWorker>();
 
                     //register the remote worker
                     services.AddTransient<IRemoteWorker, RemoteWorkerImpl>();
