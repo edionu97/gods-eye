@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using EasyNetQ;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl;
 using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.DataStreaming.LoadShedding.Manager.Impl;
-using GodsEye.DataStreaming.LoadShedding.SheddingPolicies;
-using GodsEye.DataStreaming.LoadShedding.SheddingPolicies.Impl;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;

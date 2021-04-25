@@ -13,13 +13,13 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager
         /// </summary>
         /// <param name="dataToBeProcessed">data to be processes</param>
         /// <param name="avgProcessingRate">the last known processing rate</param>
-        /// <param name="avgIInputRate">the current input rate</param>
+        /// <param name="avgInputRate">the current input rate</param>
         /// <returns>
         ///     the new data such as avgProcessingRate is almost the same as avgProcessingRate or
         ///     the same data either if the NoLoadShedding policy is used
-        ///     either if the avgProcessingRate == avgIInputRate</returns>
+        ///     either if the avgProcessingRate == avgInputRate</returns>
         public Task<Queue<T>> 
             SyncUsedFixedPolicyAsync<T>(
-                IList<T> dataToBeProcessed, double avgProcessingRate, double avgIInputRate);
+                IList<T> dataToBeProcessed, double avgProcessingRate, double avgInputRate);
     }
 }
