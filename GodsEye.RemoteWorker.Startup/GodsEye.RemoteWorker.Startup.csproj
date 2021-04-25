@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GodsEye.Application.Resources\GodsEye.Application.Resources.csproj" />
+    <ProjectReference Include="..\GodsEye.DataStreaming.LoadShedding\GodsEye.DataStreaming.LoadShedding.csproj" />
     <ProjectReference Include="..\GodsEye.RemoteWorker.Worker\GodsEye.RemoteWorker.Worker.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Resources\GodsEye.Utility.Application.Resources.csproj" />

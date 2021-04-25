@@ -8,6 +8,7 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker
         public int FrameBufferSize { get; set; }
         public ResWsClientConfig ResWsClient { get; set; }
         public GrpcFacialAnalysisServerConfig GrpcFacialAnalysisServer { get; set; }
+        public FacialAnalysisAndRecognitionWorkerConfig FacialAnalysisAndRecognitionWorker { get; set; }
 
         public void Deconstruct(out string workersAddress, out int maxBufferSize)
         {

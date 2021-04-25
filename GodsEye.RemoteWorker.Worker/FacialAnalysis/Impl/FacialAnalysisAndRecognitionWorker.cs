@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
+using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
@@ -16,15 +17,18 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
     public class FacialAnalysisAndRecognitionWorker : IFacialAnalysisAndRecognitionWorker
     {
         private readonly ILoggerFactory _loggerFactory;
+        private readonly ILoadSheddingFixedPolicyManager _policyManager;
         private readonly IFacialRecognitionAndAnalysisService _facialAnalysisService;
 
         public FarwStartingInformation AnalysisSummary { get; private set; }
 
         public FacialAnalysisAndRecognitionWorker(
             ILoggerFactory loggerFactory,
-            IFacialRecognitionAndAnalysisService facialAnalysisService)
+            IFacialRecognitionAndAnalysisService facialAnalysisService,
+            ILoadSheddingFixedPolicyManager loadSheddingManager)
         {
             _loggerFactory = loggerFactory;
+            _policyManager = loadSheddingManager;
             _facialAnalysisService = facialAnalysisService;
         }
 

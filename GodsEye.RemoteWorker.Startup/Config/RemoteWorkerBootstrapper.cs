@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using EasyNetQ;
+using GodsEye.DataStreaming.LoadShedding.Manager;
+using GodsEye.DataStreaming.LoadShedding.Manager.Impl;
+using GodsEye.DataStreaming.LoadShedding.SheddingPolicies;
+using GodsEye.DataStreaming.LoadShedding.SheddingPolicies.Impl;
 using GodsEye.RemoteWorker.Startup.StartupWorker;
 using GodsEye.RemoteWorker.Startup.StartupWorker.Impl;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;
@@ -19,6 +23,7 @@ using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
+using GodsEye.Utility.Application.Items.Enums;
 using GodsEye.Utility.Application.Items.Statistics.Time.ElapsedTime;
 using GodsEye.Utility.Application.Items.Statistics.Time.ElapsedTime.Impl;
 using GodsEye.Utility.Application.Resources.Manager;
@@ -173,8 +178,51 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     //register the remote worker
                     services.AddTransient<IRemoteWorker, RemoteWorkerImpl>();
 
+                    //register the load shedding policies
+                    services
+                        .AddSingleton<NoLoadSheddingPolicy>();
+                    services
+                        .AddSingleton<RandomLoadSheddingPolicy>();
+                    services
+                        .AddSingleton<HeuristicLoadSheddingPolicy>();
+
+                    //register the used load shedding policy
+                    services.AddSingleton<ILoadSheddingPolicy>(serviceProvider =>
+                    {
+                        //get the configuration
+                        var configuration =
+                            serviceProvider
+                                .GetService<IConfig>()
+                            ?? throw new ArgumentNullException();
+
+                        //get the load shedding policy
+                        var sheddingPolicy = configuration
+                            .Get<FacialAnalysisAndRecognitionWorkerConfig>();
+
+                        //return the instance 
+                        return sheddingPolicy?.LoadSheddingPolicy switch
+                        {
+                            //handle the no load shedding action
+                            LoadSheddingPolicyType.NoLoadShedding => serviceProvider.GetService<NoLoadSheddingPolicy>(),
+
+                            //handle the random load shedding policy
+                            LoadSheddingPolicyType.RandomLoadShedding => serviceProvider.GetService<RandomLoadSheddingPolicy>(),
+
+                            //handle the case of heuristic load shedding
+                            LoadSheddingPolicyType.HeuristicLoadShedding => serviceProvider.GetService<HeuristicLoadSheddingPolicy>(),
+
+                            //throw exception if the policy is not known
+                            _ => throw new ArgumentOutOfRangeException(sheddingPolicy?.LoadSheddingPolicy.ToString())
+                        };
+                    });
+
+                    //register the policy manager
+                    services
+                        .AddSingleton<ILoadSheddingFixedPolicyManager, LoadSheddingFixedPolicyManager>();
+
                     //register the worker starter
-                    services.AddSingleton<IMessageQueueRemoteWorkerStarter, MessageQueueRemoteWorkerStarter>();
+                    services
+                        .AddSingleton<IMessageQueueRemoteWorkerStarter, MessageQueueRemoteWorkerStarter>();
                 })
                 .ConfigureLogging(logging =>
                 {

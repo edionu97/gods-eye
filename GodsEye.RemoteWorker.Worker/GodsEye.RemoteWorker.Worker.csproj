@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GodsEye.DataStreaming.LoadShedding\GodsEye.DataStreaming.LoadShedding.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Resources\GodsEye.Utility.Application.Resources.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Security\GodsEye.Utility.Application.Security.csproj" />
