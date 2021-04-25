@@ -5,6 +5,6 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies
 {
     public interface ILoadSheddingPolicy
     {
-        public Task<Queue<T>> ApplyPolicyAsync<T>(IList<T> data, int itemsToRemove);
+        public Task<Queue<T>> ApplyPolicyAsync<T>(IList<T> data, int itemsToKeep);
     }
 }

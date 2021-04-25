@@ -5,7 +5,7 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
 {
     public class HeuristicLoadSheddingPolicy : ILoadSheddingPolicy
     {
-        public Task<Queue<T>> ApplyPolicyAsync<T>(IList<T> data, int itemsToRemove)
+        public Task<Queue<T>> ApplyPolicyAsync<T>(IList<T> data, int itemsToKeep)
         {
             throw new System.NotImplementedException();
         }

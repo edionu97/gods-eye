@@ -6,7 +6,7 @@
 
         public static class Names
         {
-            public static string GeneratedWsClientNameFormat => "gen-ws-client-for_{0}_{1}.html";
+            public static string GeneratedWsClientNameFormat => "gen-ws-client-for_{0}itemsToKeep{1}.html";
         }
     }
 }

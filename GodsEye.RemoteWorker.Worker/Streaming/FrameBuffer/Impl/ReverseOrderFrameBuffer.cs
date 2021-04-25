@@ -61,18 +61,18 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl
             }
         }
 
-        public Queue<(DateTime, NetworkImageFrameMessage)> TakeASnapshot()
+        public IList<(DateTime, NetworkImageFrameMessage)> TakeASnapshot()
         {
             //declare the queue
-            Queue<(DateTime, NetworkImageFrameMessage)> frameQueue;
+            IList<(DateTime, NetworkImageFrameMessage)> frameList;
 
             //extract the frame buffer buffer
             lock (_lockObject)
             {
-                frameQueue = new Queue<(DateTime, NetworkImageFrameMessage)>(_frameBuffer);
+                frameList = new List<(DateTime, NetworkImageFrameMessage)>(_frameBuffer);
             }
 
-            return frameQueue;
+            return frameList;
         }
     }
 }

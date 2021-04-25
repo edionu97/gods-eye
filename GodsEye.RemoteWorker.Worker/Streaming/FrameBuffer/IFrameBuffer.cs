@@ -25,6 +25,6 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer
         ///     1. the timestamp in which the frame entered into the buffer
         ///     2. the frame itself
         /// </returns>
-        public Queue<(DateTime, NetworkImageFrameMessage)> TakeASnapshot();
+        public IList<(DateTime, NetworkImageFrameMessage)> TakeASnapshot();
     }
 }

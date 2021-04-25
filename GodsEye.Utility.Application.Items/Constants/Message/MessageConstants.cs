@@ -51,5 +51,14 @@
             public static string ProblemStartingWorkerMessage => "There was a problem starting the worker ({0}:{1})\n";
 
         }
+
+        public static class LoadShedding
+        {
+            public static string LoadSheddingShouldBePerformedMessage => 
+                "Load shedding the data is required: Input rate: {0} processing rate: {1}";
+
+            public static string WrongGenerationParametersMessage =>
+                "The maximum number of values that can be generated are {0}";
+        }
     }
 }
