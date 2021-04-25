@@ -8,6 +8,6 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis
     {
         public FarwStartingInformation AnalysisSummary { get; }
 
-        public Task StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationTokenSource cancellationToken);
+        public Task StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationToken cancellationToken);
     }
 }

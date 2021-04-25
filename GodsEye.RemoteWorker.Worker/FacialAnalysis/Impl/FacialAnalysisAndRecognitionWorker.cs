@@ -1,8 +1,13 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
+using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 using GodsEye.Utility.Application.Helpers.Helpers.Threading;
 using Microsoft.Extensions.Logging;
 
@@ -24,7 +29,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
         }
 
 
-        public Task StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationTokenSource cancellationToken)
+        public Task StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationToken cancellationToken)
         {
             //set the analysis summary 
             AnalysisSummary = startingInformation;
@@ -34,27 +39,72 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                  personBase64Img,
                  (cameraIp, cameraPort)) = AnalysisSummary;
 
+            //
+            var logger =
+                _loggerFactory.CreateLogger($"FacialAnalysisAndRecognition started for {cameraIp}:{cameraPort}");
 
             //run in another thread the recognition job
             return Task.Run(async () =>
             {
-                //
-                var logger =
-                    _loggerFactory.CreateLogger($"FacialAnalysisAndRecognition started for {cameraIp}:{cameraPort}");
-
-                logger.LogInformation("Wait until the frame buffer is full");
-
+                //wait until the frame buffer is full and the input rate is calculated
                 await WaitHelpers.WaitWhile(() => !frameBuffer.IsReady);
+                await WaitHelpers.WaitWhile(() => frameBuffer.InputRate <= 0);
 
-                logger.LogInformation("SS done");
-                //for (var isFound = false; !cancellationToken.IsCancellationRequested && !isFound;)
-                //{
+                var avgProcessingTime = .0;
+                do
+                {
+                    //compute the response
+                    var (response, roundAvgTime) =
+                        await DoASearchingRoundAsync(frameBuffer, personBase64Img, cancellationToken);
 
+                    logger.LogInformation($"Processing rate: {roundAvgTime/1000} seconds per frame");
+                    logger.LogInformation($"Input rate: {frameBuffer.InputRate} frames");
 
-                //    logger.LogInformation("Snapshot values {0}", frameBuffer.TakeASnapshot().Count);
+                    avgProcessingTime = roundAvgTime;
 
-                //}
-            });
+                } while (!cancellationToken.IsCancellationRequested);
+
+            }, cancellationToken);
+        }
+
+        public async Task<(SearchForPersonResponse, double)> DoASearchingRoundAsync(IFrameBuffer frameBuffer, string personBase64Img, CancellationToken token)
+        {
+            //take the snapshot
+            var snapShot = frameBuffer.TakeASnapshot();
+
+            //remember the number of total frames
+            var totalFramesToProcess = snapShot.Count;
+
+            //count the number of values from buffer
+            var averageFrameProcessingTime = .0;
+
+            //create a new watch
+            var watch = Stopwatch.StartNew();
+
+            //start the searching
+            while (snapShot.Any() && !token.IsCancellationRequested)
+            {
+                //unpack the data tuple value
+                var (_, message) = snapShot.Dequeue();
+
+                //get the response and it's processing time
+                var currentFrameProcessingTime = watch.Elapsed;
+                var response = await _facialAnalysisService
+                    .SearchPersonInImageAsync(personBase64Img, message.ImageBase64EncodedBytes, token);
+                averageFrameProcessingTime += (watch.Elapsed - currentFrameProcessingTime).TotalMilliseconds;
+
+                //continue with next frames if the person is not found
+                if (!response.FaceRecognitionInfo.Any())
+                {
+                    continue;
+                }
+
+                //return response
+                return (response, Math.Ceiling(averageFrameProcessingTime / totalFramesToProcess));
+            }
+
+            //null response
+            return (null, Math.Ceiling(averageFrameProcessingTime / totalFramesToProcess));
         }
     }
 }

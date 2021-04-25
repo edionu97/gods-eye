@@ -42,7 +42,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         StatisticsInformation = (cameraIp, cameraPort),
                         SearchedPersonBase64Img = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
                     },
-                    _cancellationToken);
+                    _cancellationToken.Token);
 
             //start the siw worker
             await _streamingImageWorker
