@@ -18,7 +18,7 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager
         ///     the new data such as avgProcessingRate is almost the same as avgProcessingRate or
         ///     the same data either if the NoLoadShedding policy is used
         ///     either if the avgProcessingRate == avgIInputRate</returns>
-        public Task<IList<T>> 
+        public Task<Queue<T>> 
             SyncUsedFixedPolicyAsync<T>(
                 IList<T> dataToBeProcessed, double avgProcessingRate, double avgIInputRate);
     }
