@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using GodsEye.Utility.Application.Items.Enums;
 using ImageMagick;
+using GodsEye.Utility.Application.Items.Enums;
 
 namespace GodsEye.Utility.Application.Helpers.Helpers.Image
 {
