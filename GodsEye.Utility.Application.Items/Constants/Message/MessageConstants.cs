@@ -54,9 +54,11 @@
 
         public static class LoadShedding
         {
-            public static string LoadSheddingShouldBePerformedMessage => "Load shedding the data is required";
+            public static string LoadSheddingShouldBePerformedMessage => "Load shedding of the data is required";
 
             public static string NoLoadSheddingRequiredMessage => "No load shedding of the data is required";
+
+            public static string TheAvailableTimeForDataProcessingMessage => "Time available for processing the frame buffer is: {0} sec";
 
             public static string WrongGenerationParametersMessage => "The maximum number of values that can be generated are {0}";
 

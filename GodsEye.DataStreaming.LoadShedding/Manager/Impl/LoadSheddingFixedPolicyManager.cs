@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
@@ -16,8 +16,8 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
         private readonly INoLoadSheddingPolicy _noLoadSheddingPolicy;
 
         public LoadSheddingFixedPolicyManager(
-            ILogger<ILoadSheddingFixedPolicyManager> logger, 
-            ILoadSheddingPolicy loadSheddingPolicy, 
+            ILogger<ILoadSheddingFixedPolicyManager> logger,
+            ILoadSheddingPolicy loadSheddingPolicy,
             INoLoadSheddingPolicy noLoadSheddingPolicy)
         {
             //set the logger
@@ -50,14 +50,10 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
             //if the load shedding is not needed then apply the NoLs policy
             if (remainingTuples >= remainingTuplesToProcess.Count)
             {
-                //if there is some data in the 
-                if (remainingTuplesToProcess.Any())
-                {
-                    //log the no ls message
-                    LogTheNoLsMessage(
-                        remainingTuplesToProcess.Count,
-                        lastKnownTupleProcessingRate, availableTimeToProcessData);
-                }
+                //log the no ls message
+                LogTheNoLsMessage(
+                    remainingTuplesToProcess.Count,
+                    lastKnownTupleProcessingRate, availableTimeToProcessData);
 
                 //apply the no ls policy
                 return await _noLoadSheddingPolicy
@@ -82,12 +78,13 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
                 _logger.LogDebug(JsonSerializerDeserializer<dynamic>.Serialize(new
                 {
                     AppliedPolicy = _noLoadSheddingPolicy.GetType().Name,
-                    DataSize = dataSize,
+                    ActualDataSize = dataSize,
                     ProcessingStatistics = new
                     {
                         TupleProcessing = string
                             .Format(Constants.TupleRequiresXSecondsToBeProcessedMessage, lastKnownTupleProcessingRate),
-                        RemaingTimeToProcessAllData = $"{availableTimeToProcessData}sec",
+                        RemaingTimeToProcessAllData = string
+                            .Format(Constants.TheAvailableTimeForDataProcessingMessage, availableTimeToProcessData),
                     }
                 }) + "\n");
             }
@@ -104,13 +101,14 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
                 _logger.LogWarning(JsonSerializerDeserializer<dynamic>.Serialize(new
                 {
                     AppliedPolicy = _loadSheddingPolicy.GetType().Name,
-                    DataSize = dataSize,
+                    ActualDataSize = dataSize,
                     ProcessingStatistics = new
                     {
                         TupleProcessing = string
                             .Format(Constants.TupleRequiresXSecondsToBeProcessedMessage, lastKnownTupleProcessingRate),
-                        RemaingTimeToProcessAllData = $"{availableTimeToProcessData}sec",
-                        TheNumberOfItemsToBeRemovedToMatchTime = dataSize - remainingTuples,
+                        RemaingTimeToProcessAllData = string
+                            .Format(Constants.TheAvailableTimeForDataProcessingMessage, availableTimeToProcessData),
+                        NewDataSize = remainingTuples,
                     }
                 }) + "\n");
             }
