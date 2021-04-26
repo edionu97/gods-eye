@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 using GodsEye.Utility.Application.Helpers.Helpers.Threading;
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 using Microsoft.Extensions.Logging;
 
 namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
@@ -32,7 +31,6 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             _facialAnalysisService = facialAnalysisService;
         }
 
-
         public Task StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationToken cancellationToken)
         {
             //set the analysis summary 
@@ -51,110 +49,90 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             return Task.Run(async () =>
             {
                 //wait until the frame buffer is full and the input rate is calculated
-                await WaitHelpers.WaitWhile(() => !frameBuffer.IsReady);
-                await WaitHelpers.WaitWhile(() => frameBuffer.InputRate <= 0);
+                await WaitHelpers.WaitWhileAsync(() => !frameBuffer.IsReady, cancellationToken);
+                await WaitHelpers.WaitWhileAsync(() => frameBuffer.InputRate <= 0, cancellationToken);
 
                 //start the searching
-                double? lastRoundAvgProcessingTime = null;
                 do
                 {
                     //compute the response
-                    var (response, roundAvgTime) =
-                        await DoASearchingRoundAsync(
+                    var response = await
+                        ProcessTheFrameBufferAsync(
                             frameBuffer,
-                            personBase64Img,
-                            lastRoundAvgProcessingTime,
-                            cancellationToken);
+                            (message, token) =>
+                                _facialAnalysisService.SearchPersonInImageAsync(personBase64Img,
+                                    message.ImageBase64EncodedBytes, token),
+                            (r) => r.FaceRecognitionInfo.Any(),
+                            cancellationToken, (logger, cameraIp, cameraPort));
 
-                    logger.LogInformation($"Processing rate: {roundAvgTime / 1000} seconds per frame");
-                    logger.LogInformation($"Input rate: {frameBuffer.InputRate} frames");
-
-                    //set the last avg processing time to current round processing time
-                    lastRoundAvgProcessingTime = roundAvgTime;
 
                 } while (!cancellationToken.IsCancellationRequested);
 
             }, cancellationToken);
         }
 
-        public async Task<(SearchForPersonResponse, double)> DoASearchingRoundAsync(
+        /// <summary>
+        /// This method it is used for processing the frame buffer
+        /// </summary>
+        /// <typeparam name="T">type of the response</typeparam>
+        /// <param name="frameBuffer">the instance of the frame buffer</param>
+        /// <param name="bufferProcessor">the function that processes the buffer</param>
+        /// <param name="stoppingPredicate">the stopping condition</param>
+        /// <param name="token">the cancellation token</param>
+        /// <param name="loggingInfo">the logging information</param>
+        /// <returns>a task containing the result or null if nothing could not be found</returns>
+        public async Task<T> ProcessTheFrameBufferAsync<T>(
             IFrameBuffer frameBuffer,
-            string personBase64Img,
-            double? lastRoundAvgProcessingTime,
-            CancellationToken token)
+            Func<NetworkImageFrameMessage, CancellationToken, Task<T>> bufferProcessor,
+            Predicate<T> stoppingPredicate,
+            CancellationToken token, (ILogger, string, int) loggingInfo) where T : class
         {
-            //compute the processing rate and the input rate
-            var (processingRateFps, inputRateFps) =
-                ConvertInputAndProcessingRateToFps(frameBuffer, lastRoundAvgProcessingTime);
+            //deconstruct the logging information
+            var (logger, cameraIp, cameraPort) = loggingInfo;
 
             //get the working snapshot
-            //do the load shedding if necessary
-            var snapShot = await _policyManager
-                .SyncUsedFixedPolicyAsync(
-                    frameBuffer.TakeASnapshot(), processingRateFps, inputRateFps);
+            var snapShot = frameBuffer.TakeASnapshot();
 
-            //remember the number of total frames
-            var totalFramesToProcess = snapShot.Count;
+            logger.LogDebug($"Snapshot-ed the frame buffer, the number of total frames read is: {snapShot.Count}");
 
-            //count the number of values from buffer
-            var averageFrameProcessingTime = .0;
-
-            //create a new watch
-            var watch = Stopwatch.StartNew();
-
-            //start the searching
-            while (snapShot.Any() && !token.IsCancellationRequested)
+            //begin a logging scope
+            using (logger.BeginScope($"Recognition Job for camera {cameraIp}:{cameraPort}"))
             {
-                //unpack the data tuple value
-                var (_, message) = snapShot.Dequeue();
+                //create a new watch
+                var watch = Stopwatch.StartNew();
 
-                //get the response and it's processing time
-                var currentFrameProcessingTime = watch.Elapsed;
-
-                //call the server method
-                var response = await _facialAnalysisService
-                    .SearchPersonInImageAsync(personBase64Img, message.ImageBase64EncodedBytes, token);
-
-                //compute the call time
-                averageFrameProcessingTime += (watch.Elapsed - currentFrameProcessingTime).TotalMilliseconds;
-
-                //continue with next frames if the person is not found
-                if (!response.FaceRecognitionInfo.Any())
+                //start the searching
+                var totalProcessingTime = .0;
+                while (snapShot.Any() && !token.IsCancellationRequested)
                 {
-                    continue;
-                }
+                    //unpack the data tuple value
+                    var (_, message) = snapShot.Dequeue();
 
-                //return response
-                return (response, Math.Ceiling(averageFrameProcessingTime / totalFramesToProcess));
+                    //do the buffer processing and count the times
+                    var beforeElapsed = watch.Elapsed;
+                    var response = await bufferProcessor(message, token);
+                    var frameProcessingTime = (watch.Elapsed - beforeElapsed).TotalSeconds;
+
+                    //continue with next frames if the person is not found
+                    if (stoppingPredicate?.Invoke(response) == true)
+                    {
+                        return response;
+                    }
+
+                    //increment the total processing time
+                    totalProcessingTime += frameProcessingTime;
+
+                    //load shed the data if needed
+                    snapShot = await _policyManager
+                        .ApplyLoadSheddingPolicyAsync(
+                            snapShot,
+                            frameBuffer.InputRate - totalProcessingTime,
+                            frameProcessingTime);
+                }
             }
 
             //null response
-            return (null, Math.Ceiling(averageFrameProcessingTime / totalFramesToProcess));
-        }
-
-        /// <summary>
-        /// This function it is used for converting the processing times into fps rates
-        /// </summary>
-        /// <param name="frameBuffer">the frame buffer that contains info about the input rate</param>
-        /// <param name="lastRoundProcessingTime">the avg time for last round</param>
-        /// <returns>a pair of items (the processingRate as Fps, input rate as Fps)</returns>
-        private static (double, double) ConvertInputAndProcessingRateToFps(IFrameBuffer frameBuffer, double? lastRoundProcessingTime)
-        {
-            //get the tuple input rate in fps
-            var tupleInputRateFps = frameBuffer.InputRate;
-
-            //if the value is null we need to adjust it such as the value of the avgProcessingRateFps == avgProcessingRateFps
-            //so in that case it should be 1000
-            var avgProcessingRateTime = lastRoundProcessingTime ?? 1000;
-
-            //transform the fps in time (total sending time)
-            var tupleInputRateAsTime = tupleInputRateFps * 1000.0;
-
-            //transform the processing rate in frames per second
-            var avgProcessingRateFps = tupleInputRateAsTime / avgProcessingRateTime;
-
-            //return the processing rate and the input rate in frames per second
-            return (avgProcessingRateFps, tupleInputRateFps);
+            return null;
         }
     }
 }

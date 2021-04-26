@@ -54,11 +54,13 @@
 
         public static class LoadShedding
         {
-            public static string LoadSheddingShouldBePerformedMessage => 
-                "Load shedding the data is required: Input rate: {0} processing rate: {1}";
+            public static string LoadSheddingShouldBePerformedMessage => "Load shedding the data is required";
 
-            public static string WrongGenerationParametersMessage =>
-                "The maximum number of values that can be generated are {0}";
+            public static string NoLoadSheddingRequiredMessage => "No load shedding of the data is required";
+
+            public static string WrongGenerationParametersMessage => "The maximum number of values that can be generated are {0}";
+
+            public static string TupleRequiresXSecondsToBeProcessedMessage => "One tuple requires {0} sec to be processed";
         }
     }
 }

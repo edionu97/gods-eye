@@ -11,15 +11,16 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager
         ///     RandomLoadShedding => it will use the random policy in order to remove tuples from data
         ///     HeuristicLoadShedding => it will use the heuristic policy in order to remove tuples
         /// </summary>
-        /// <param name="dataToBeProcessed">data to be processes</param>
-        /// <param name="avgProcessingRate">the last known processing rate</param>
-        /// <param name="avgInputRate">the current input rate</param>
+        /// <param name="remainingTuplesToProcess">data to be processes</param>
+        /// <param name="availableTimeToProcessData">the time in which the data should be processed</param>
+        /// <param name="lastKnownTupleProcessingRate">the last known processing rate of a tuple from the data</param>
         /// <returns>
         ///     the new data such as avgProcessingRate is almost the same as avgProcessingRate or
         ///     the same data either if the NoLoadShedding policy is used
         ///     either if the avgProcessingRate == avgInputRate</returns>
         public Task<Queue<T>> 
-            SyncUsedFixedPolicyAsync<T>(
-                IList<T> dataToBeProcessed, double avgProcessingRate, double avgInputRate);
+            ApplyLoadSheddingPolicyAsync<T>(
+                Queue<T> remainingTuplesToProcess,
+                double availableTimeToProcessData, double lastKnownTupleProcessingRate);
     }
 }

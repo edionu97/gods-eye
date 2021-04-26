@@ -12,6 +12,8 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer
         /// If true it means that the frame buffer is ready
         public bool IsReady { get; }
 
+        public int BufferSize { get; }
+
         /// <summary>
         /// Inserts a frame into the buffer
         /// </summary>
@@ -25,6 +27,6 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer
         ///     1. the timestamp in which the frame entered into the buffer
         ///     2. the frame itself
         /// </returns>
-        public IList<(DateTime, NetworkImageFrameMessage)> TakeASnapshot();
+        public Queue<(DateTime, NetworkImageFrameMessage)> TakeASnapshot();
     }
 }

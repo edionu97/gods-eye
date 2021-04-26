@@ -186,6 +186,10 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     services
                         .AddSingleton<HeuristicLoadSheddingPolicy>();
 
+                    //register also the no load shedding policy as INoLoadSheddingPolicy
+                    services.AddSingleton<INoLoadSheddingPolicy>(serviceProvider =>
+                        serviceProvider.GetService<NoLoadSheddingPolicy>());
+
                     //register the used load shedding policy
                     services.AddSingleton<ILoadSheddingPolicy>(serviceProvider =>
                     {
@@ -232,6 +236,8 @@ namespace GodsEye.RemoteWorker.Startup.Config
                         option.IncludeScopes = true;
                         option.TimestampFormat = "[HH:mm:ss] ";
                     });
+
+                    logging.SetMinimumLevel(LogLevel.Debug);
                 })
                 .Build()
                 .Services;

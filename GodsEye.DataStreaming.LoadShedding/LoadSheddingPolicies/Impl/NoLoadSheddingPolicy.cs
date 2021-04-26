@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
 {
-    public class NoLoadSheddingPolicy : ILoadSheddingPolicy
+    public class NoLoadSheddingPolicy : INoLoadSheddingPolicy
     {
         public Task<Queue<T>> ApplyPolicyAsync<T>(IList<T> data, int itemsToKeep)
         {

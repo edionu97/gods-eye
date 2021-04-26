@@ -25,6 +25,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl
         }
 
         public bool IsReady { get; private set; }
+        public int BufferSize { get; private set; }
 
         public ReverseOrderFrameBuffer(IConfig config, IPeriodTimeIntervalCounter periodTimeIntervalCounter)
         {
@@ -56,20 +57,23 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl
                     _frameBuffer.RemoveFromBack();
                 }
 
+                //set the buffer size
+                BufferSize = _frameBuffer.Count;
+
                 //always keep the frames ordered by timestamp
                 _frameBuffer.AddToFront((DateTime.UtcNow, frame));
             }
         }
 
-        public IList<(DateTime, NetworkImageFrameMessage)> TakeASnapshot()
+        public Queue<(DateTime, NetworkImageFrameMessage)> TakeASnapshot()
         {
             //declare the queue
-            IList<(DateTime, NetworkImageFrameMessage)> frameList;
+            Queue<(DateTime, NetworkImageFrameMessage)> frameList;
 
             //extract the frame buffer buffer
             lock (_lockObject)
             {
-                frameList = new List<(DateTime, NetworkImageFrameMessage)>(_frameBuffer);
+                frameList = new Queue<(DateTime, NetworkImageFrameMessage)>(_frameBuffer);
             }
 
             return frameList;

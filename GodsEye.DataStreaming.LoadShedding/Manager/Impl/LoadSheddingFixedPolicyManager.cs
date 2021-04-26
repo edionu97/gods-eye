@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
-using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies;
-using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl;
-using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.LoadShedding;
 
@@ -15,15 +13,12 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
     {
         private readonly ILoadSheddingPolicy _loadSheddingPolicy;
         private readonly ILogger<ILoadSheddingFixedPolicyManager> _logger;
-        private readonly ILoadSheddingPolicy _policyUsedWhenNoLoadShedData;
-        private readonly FacialAnalysisAndRecognitionWorkerConfig _facialAnalysisConfig;
+        private readonly INoLoadSheddingPolicy _noLoadSheddingPolicy;
 
-        // ReSharper disable once SuggestBaseTypeForParameter
         public LoadSheddingFixedPolicyManager(
-            IConfig config,
-            ILogger<ILoadSheddingFixedPolicyManager> logger,
-            ILoadSheddingPolicy loadSheddingPolicy,
-            NoLoadSheddingPolicy policyUsedWhenNoLoadShedData)
+            ILogger<ILoadSheddingFixedPolicyManager> logger, 
+            ILoadSheddingPolicy loadSheddingPolicy, 
+            INoLoadSheddingPolicy noLoadSheddingPolicy)
         {
             //set the logger
             _logger = logger;
@@ -32,43 +27,93 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
             _loadSheddingPolicy = loadSheddingPolicy;
 
             //set the no load shedding policy
-            _policyUsedWhenNoLoadShedData = policyUsedWhenNoLoadShedData;
-
-            //set the facial analysis config
-            _facialAnalysisConfig = config.Get<FacialAnalysisAndRecognitionWorkerConfig>();
+            _noLoadSheddingPolicy = noLoadSheddingPolicy;
         }
 
-        public async Task<Queue<T>> SyncUsedFixedPolicyAsync<T>(
-            IList<T> dataToBeProcessed, double avgProcessingRate, double avgInputRate)
+        public async Task<Queue<T>>
+            ApplyLoadSheddingPolicyAsync<T>(
+                Queue<T> remainingTuplesToProcess,
+                double availableTimeToProcessData, double lastKnownTupleProcessingRate)
         {
-            //round the rates
-            var inputRate = Math.Max(Math.Ceiling(avgInputRate), 1);
-            var processingRate = Math.Max(Math.Ceiling(avgProcessingRate), 1);
+            //round the available time to process the data
+            availableTimeToProcessData = Math
+                .Max(Math.Ceiling(availableTimeToProcessData), 1);
 
-            //get the number of tuples that need to be unloaded
-            var systemOverloadRate = Math.Floor(inputRate) - Math.Floor(processingRate);
+            //round the last known tuple processing rate
+            lastKnownTupleProcessingRate = Math
+                .Max(Math.Ceiling(lastKnownTupleProcessingRate), 1);
 
-            //if the system is not overloaded => do not load shed data
-            if (systemOverloadRate <= _facialAnalysisConfig.LoadSheddingThresholdValue)
+            //remaining frames if the ls will be applied
+            var remainingTuples = (int)Math
+                .Floor(availableTimeToProcessData / lastKnownTupleProcessingRate);
+
+            //if the load shedding is not needed then apply the NoLs policy
+            if (remainingTuples >= remainingTuplesToProcess.Count)
             {
-                return
-                    await _policyUsedWhenNoLoadShedData
-                        .ApplyPolicyAsync(dataToBeProcessed, (int)systemOverloadRate);
+                //if there is some data in the 
+                if (remainingTuplesToProcess.Any())
+                {
+                    //log the no ls message
+                    LogTheNoLsMessage(
+                        remainingTuplesToProcess.Count,
+                        lastKnownTupleProcessingRate, availableTimeToProcessData);
+                }
+
+                //apply the no ls policy
+                return await _noLoadSheddingPolicy
+                    .ApplyPolicyAsync(remainingTuplesToProcess.ToList(), remainingTuples);
             }
 
-            //log the messages
-            using (_logger.BeginScope(string.Format(Constants.LoadSheddingShouldBePerformedMessage, inputRate, processingRate)))
+            //log the message
+            LogTheLsMessage(
+                remainingTuplesToProcess.Count,
+                lastKnownTupleProcessingRate,
+                availableTimeToProcessData, remainingTuples);
+
+            //apply the ls policy
+            return await _loadSheddingPolicy.ApplyPolicyAsync(remainingTuplesToProcess.ToList(), remainingTuples);
+        }
+
+        private void LogTheNoLsMessage(int dataSize, double lastKnownTupleProcessingRate, double availableTimeToProcessData)
+        {
+            //log the message
+            using (_logger.BeginScope(Constants.NoLoadSheddingRequiredMessage))
+            {
+                _logger.LogDebug(JsonSerializerDeserializer<dynamic>.Serialize(new
+                {
+                    AppliedPolicy = _noLoadSheddingPolicy.GetType().Name,
+                    DataSize = dataSize,
+                    ProcessingStatistics = new
+                    {
+                        TupleProcessing = string
+                            .Format(Constants.TupleRequiresXSecondsToBeProcessedMessage, lastKnownTupleProcessingRate),
+                        RemaingTimeToProcessAllData = $"{availableTimeToProcessData}sec",
+                    }
+                }) + "\n");
+            }
+        }
+
+        private void LogTheLsMessage(
+            int dataSize,
+            double lastKnownTupleProcessingRate,
+            double availableTimeToProcessData, int remainingTuples)
+        {
+            //log the message
+            using (_logger.BeginScope(Constants.LoadSheddingShouldBePerformedMessage))
             {
                 _logger.LogWarning(JsonSerializerDeserializer<dynamic>.Serialize(new
                 {
                     AppliedPolicy = _loadSheddingPolicy.GetType().Name,
-                    CurrentDataSize = dataToBeProcessed.Count,
-                    TuplesToBeRemoved = dataToBeProcessed.Count - (int)processingRate
-                }));
+                    DataSize = dataSize,
+                    ProcessingStatistics = new
+                    {
+                        TupleProcessing = string
+                            .Format(Constants.TupleRequiresXSecondsToBeProcessedMessage, lastKnownTupleProcessingRate),
+                        RemaingTimeToProcessAllData = $"{availableTimeToProcessData}sec",
+                        TheNumberOfItemsToBeRemovedToMatchTime = dataSize - remainingTuples,
+                    }
+                }) + "\n");
             }
-
-            //apply the policy based on instance
-            return await _loadSheddingPolicy.ApplyPolicyAsync(dataToBeProcessed, (int)processingRate);
         }
     }
 }

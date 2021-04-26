@@ -9,16 +9,12 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker
 
         public LoadSheddingPolicyType LoadSheddingPolicy { get; set; }
 
-        public double LoadSheddingThresholdValue { get; set; }
-
         public void Deconstruct(
             out bool startWorkerOnlyWhenBufferIsFull,
-            out LoadSheddingPolicyType loadSheddingPolicy,
-            out double loadSheddingThresholdValue)
+            out LoadSheddingPolicyType loadSheddingPolicy)
         {
             startWorkerOnlyWhenBufferIsFull = StartWorkerOnlyWhenBufferIsFull;
             loadSheddingPolicy = LoadSheddingPolicy;
-            loadSheddingThresholdValue = LoadSheddingThresholdValue;
         }
     }
 }
