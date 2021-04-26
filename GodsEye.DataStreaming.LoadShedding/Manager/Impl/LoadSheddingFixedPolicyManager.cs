@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.LoadShedding;
 
 namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
@@ -30,9 +31,9 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
             _noLoadSheddingPolicy = noLoadSheddingPolicy;
         }
 
-        public async Task<Queue<T>>
-            ApplyLoadSheddingPolicyAsync<T>(
-                Queue<T> remainingTuplesToProcess,
+        public async Task<Queue<(DateTime, NetworkImageFrameMessage)>>
+            ApplyLoadSheddingPolicyAsync(
+                Queue<(DateTime, NetworkImageFrameMessage)> remainingTuplesToProcess,
                 double availableTimeToProcessData, double lastKnownTupleProcessingRate)
         {
             //round the available time to process the data

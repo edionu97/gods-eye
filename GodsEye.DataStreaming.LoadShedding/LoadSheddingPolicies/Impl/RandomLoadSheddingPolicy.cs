@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.LoadShedding;
 
 
@@ -10,7 +10,7 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
 {
     public class RandomLoadSheddingPolicy : ILoadSheddingPolicy
     {
-        public Task<Queue<T>> ApplyPolicyAsync<T>(IList<T> data, int itemsToKeep)
+        public Task<Queue<(DateTime, NetworkImageFrameMessage)>> ApplyPolicyAsync(IList<(DateTime, NetworkImageFrameMessage)> data, int itemsToKeep)
         {
             //positions to keep
             var generatePositionsToKeep = 
@@ -21,7 +21,7 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
                 .Select(itemPosition => data[itemPosition]);
 
             //iterate the position indexes and remove the values
-            return Task.FromResult(new Queue<T>(dataAfterLoadShedding));
+            return Task.FromResult(new Queue<(DateTime, NetworkImageFrameMessage)>(dataAfterLoadShedding));
         }
 
         private static IEnumerable<int> GeneratePositionsThatWillBeKept(int maxPositionValue, int itemsCount)

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 
 namespace GodsEye.DataStreaming.LoadShedding.Manager
 {
@@ -18,9 +20,10 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager
         ///     the new data such as avgProcessingRate is almost the same as avgProcessingRate or
         ///     the same data either if the NoLoadShedding policy is used
         ///     either if the avgProcessingRate == avgInputRate</returns>
-        public Task<Queue<T>> 
-            ApplyLoadSheddingPolicyAsync<T>(
-                Queue<T> remainingTuplesToProcess,
-                double availableTimeToProcessData, double lastKnownTupleProcessingRate);
+        public Task<Queue<(DateTime, NetworkImageFrameMessage)>> 
+            ApplyLoadSheddingPolicyAsync(
+                Queue<(DateTime, NetworkImageFrameMessage)> remainingTuplesToProcess,
+                double availableTimeToProcessData,
+                double lastKnownTupleProcessingRate);
     }
 }
