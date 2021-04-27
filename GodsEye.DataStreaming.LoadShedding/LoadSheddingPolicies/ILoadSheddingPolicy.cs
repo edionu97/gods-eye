@@ -14,6 +14,6 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies
         /// <param name="itemsToKeep">the number of items that need to remain</param>
         /// <returns>a queue of items</returns>
         public Task<Queue<(DateTime, NetworkImageFrameMessage)>> 
-            ApplyPolicyAsync(IList<(DateTime, NetworkImageFrameMessage)> data, int itemsToKeep);
+            ApplyPolicyAsync(IEnumerable<(DateTime, NetworkImageFrameMessage)> data, int itemsToKeep);
     }
 }

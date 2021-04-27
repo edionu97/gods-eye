@@ -58,7 +58,7 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
 
                 //apply the no ls policy
                 return await _noLoadSheddingPolicy
-                    .ApplyPolicyAsync(remainingTuplesToProcess.ToList(), remainingTuples);
+                    .ApplyPolicyAsync(remainingTuplesToProcess, remainingTuples);
             }
 
             //log the message
@@ -68,7 +68,7 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
                 availableTimeToProcessData, remainingTuples);
 
             //apply the ls policy
-            return await _loadSheddingPolicy.ApplyPolicyAsync(remainingTuplesToProcess.ToList(), remainingTuples);
+            return await _loadSheddingPolicy.ApplyPolicyAsync(remainingTuplesToProcess, remainingTuples);
         }
 
         private void LogTheNoLsMessage(int dataSize, double lastKnownTupleProcessingRate, double availableTimeToProcessData)

@@ -10,8 +10,11 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
 {
     public class RandomLoadSheddingPolicy : ILoadSheddingPolicy
     {
-        public Task<Queue<(DateTime, NetworkImageFrameMessage)>> ApplyPolicyAsync(IList<(DateTime, NetworkImageFrameMessage)> data, int itemsToKeep)
+        public Task<Queue<(DateTime, NetworkImageFrameMessage)>> ApplyPolicyAsync(IEnumerable<(DateTime, NetworkImageFrameMessage)> dataToProcess, int itemsToKeep)
         {
+            //convert the IEnumerable in list 
+            var data = dataToProcess.ToList();
+
             //positions to keep
             var generatePositionsToKeep = 
                 GeneratePositionsThatWillBeKept(data.Count, itemsToKeep);

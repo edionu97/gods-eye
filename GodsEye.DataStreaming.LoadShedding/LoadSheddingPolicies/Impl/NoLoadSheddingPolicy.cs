@@ -8,7 +8,7 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
     public class NoLoadSheddingPolicy : INoLoadSheddingPolicy
     {
         public Task<Queue<(DateTime, NetworkImageFrameMessage)>> 
-            ApplyPolicyAsync(IList<(DateTime, NetworkImageFrameMessage)> data, int itemsToKeep)
+            ApplyPolicyAsync(IEnumerable<(DateTime, NetworkImageFrameMessage)> data, int itemsToKeep)
         {
             return Task.FromResult(new Queue<(DateTime, NetworkImageFrameMessage)>(data));
         }

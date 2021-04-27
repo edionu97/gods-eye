@@ -52,21 +52,38 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                 await WaitHelpers.WaitWhileAsync(() => !frameBuffer.IsReady, cancellationToken);
                 await WaitHelpers.WaitWhileAsync(() => frameBuffer.InputRate <= 0, cancellationToken);
 
-                //start the searching
-                do
+                try
                 {
-                    //compute the response
-                    var response = await
-                        ProcessTheFrameBufferAsync(
-                            frameBuffer,
-                            (message, token) =>
-                                _facialAnalysisService.SearchPersonInImageAsync(personBase64Img,
-                                    message.ImageBase64EncodedBytes, token),
-                            (r) => r.FaceRecognitionInfo.Any(),
-                            cancellationToken, (logger, cameraIp, cameraPort));
+
+                    //start the searching
+                    do
+                    {
+                        //compute the response
+                        var response = await
+                            ProcessTheFrameBufferAsync(
+                                frameBuffer,
+                                (message, token) =>
+                                    _facialAnalysisService.SearchPersonInImageAsync(
+                                        personBase64Img,
+                                        message.ImageBase64EncodedBytes,
+                                        token),
+                                (r) => r.FaceRecognitionInfo.Any(),
+                                cancellationToken, (logger, cameraIp, cameraPort));
 
 
-                } while (!cancellationToken.IsCancellationRequested);
+                    } while (!cancellationToken.IsCancellationRequested);
+                }
+                catch (Exception e)
+                {
+
+                }
+                finally
+                {
+                    Console.WriteLine("Done");
+
+                }
+
+
 
             }, cancellationToken);
         }
