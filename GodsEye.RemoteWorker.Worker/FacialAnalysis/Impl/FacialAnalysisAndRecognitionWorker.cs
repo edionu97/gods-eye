@@ -50,7 +50,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                  (cameraIp, cameraPort)) = AnalysisSummary;
 
             //create the logger fot the 
-            var logger =_loggerFactory
+            var logger = _loggerFactory
                 .CreateLogger(string
                     .Format(Constants.FarwStartedLoggerScopeMessage, cameraIp, cameraPort));
 
@@ -139,7 +139,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                 .Format(Constants.FarwSnapshotedBufferMessage, snapShot.Count));
 
             //begin a logging scope
-            using (logger.BeginScope(string.Format(Constants.FarwRecognitionJobMessage, cameraIp, cameraPort)))
+            using (logger.BeginScope(string.Format(Constants.FarwJobDetailsMessage, cameraIp, cameraPort)))
             {
                 //create a new watch
                 var watch = Stopwatch.StartNew();
