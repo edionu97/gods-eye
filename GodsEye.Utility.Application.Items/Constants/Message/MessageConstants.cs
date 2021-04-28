@@ -1,4 +1,6 @@
-﻿namespace GodsEye.Utility.Application.Items.Constants.Message
+﻿using Microsoft.VisualBasic.CompilerServices;
+
+namespace GodsEye.Utility.Application.Items.Constants.Message
 {
     public class MessageConstants
     {
@@ -50,6 +52,20 @@
 
             public static string ProblemStartingWorkerMessage => "There was a problem starting the worker ({0}:{1})\n";
 
+            public static string FarwStartedLoggerScopeMessage => "FacialAnalysisAndRecognition for {0}:{1}";
+
+            public static string TheWorkerWillStopMessage => "This error will make the worker to stop...";
+
+            public static string FarwStartedStoppedMessage => "The facial recognition worker has stopped";
+
+            public static string FarwWaitUntilTheBufferIsFullMessage => "Waiting until the buffer is full";
+
+            public static string FarwWorkerStartedMessage => "Worker started";
+
+            public static string FarwSnapshotedBufferMessage =>
+                "Snapshot-ed the frame buffer, the number of total frames read is: {0}";
+
+            public static string FarwJobDetailsMessage => "Job for camera {0}:{1}";
         }
 
         public static class LoadShedding

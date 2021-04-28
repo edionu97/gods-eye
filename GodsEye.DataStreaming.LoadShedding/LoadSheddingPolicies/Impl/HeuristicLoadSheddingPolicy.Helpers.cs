@@ -51,7 +51,7 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
         /// </summary>
         /// <param name="videoFrameImages">the list of similar videoFrameImages</param>
         /// <returns></returns>
-        public static int FindMostSimilarTwoImagesRelativeToListBorders(IList<string> videoFrameImages)
+        private static int FindMostSimilarTwoImagesRelativeToListBorders(IList<string> videoFrameImages)
         {
             //iterate until one answer is found
             for (int leftImageIndex = 0, rightImageIndex = videoFrameImages.Count - 1; ;)

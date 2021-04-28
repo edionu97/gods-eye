@@ -1,20 +1,26 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using GodsEye.DataStreaming.LoadShedding.Manager;
-using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
-using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
-using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
-using GodsEye.Utility.Application.Helpers.Helpers.Threading;
-using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 using Microsoft.Extensions.Logging;
+using GodsEye.DataStreaming.LoadShedding.Manager;
+using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
+using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
+using GodsEye.Utility.Application.Helpers.Helpers.Threading;
+using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
+using GodsEye.Utility.Application.Config.BaseConfig;
+using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
+using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
+
+using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
 {
     public class FacialAnalysisAndRecognitionWorker : IFacialAnalysisAndRecognitionWorker
     {
+        private readonly FacialAnalysisAndRecognitionWorkerConfig _config;
+
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILoadSheddingFixedPolicyManager _policyManager;
         private readonly IFacialRecognitionAndAnalysisService _facialAnalysisService;
@@ -22,6 +28,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
         public FarwStartingInformation AnalysisSummary { get; private set; }
 
         public FacialAnalysisAndRecognitionWorker(
+            IConfig config,
             ILoggerFactory loggerFactory,
             IFacialRecognitionAndAnalysisService facialAnalysisService,
             ILoadSheddingFixedPolicyManager loadSheddingManager)
@@ -29,6 +36,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             _loggerFactory = loggerFactory;
             _policyManager = loadSheddingManager;
             _facialAnalysisService = facialAnalysisService;
+            _config = config.Get<FacialAnalysisAndRecognitionWorkerConfig>();
         }
 
         public Task StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationToken cancellationToken)
@@ -41,19 +49,32 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                  personBase64Img,
                  (cameraIp, cameraPort)) = AnalysisSummary;
 
-            //
-            var logger =
-                _loggerFactory.CreateLogger($"FacialAnalysisAndRecognition started for {cameraIp}:{cameraPort}");
+            //create the logger fot the 
+            var logger =_loggerFactory
+                .CreateLogger(string
+                    .Format(Constants.FarwStartedLoggerScopeMessage, cameraIp, cameraPort));
 
             //run in another thread the recognition job
             return Task.Run(async () =>
             {
                 //wait until the frame buffer is full and the input rate is calculated
                 await WaitHelpers.WaitWhileAsync(() => !frameBuffer.IsReady, cancellationToken);
-                await WaitHelpers.WaitWhileAsync(() => frameBuffer.InputRate <= 0, cancellationToken);
 
+                //wait until the buffer is full
+                if (_config.StartWorkerOnlyWhenBufferIsFull)
+                {
+                    //log the message
+                    logger.LogInformation(Constants.FarwWaitUntilTheBufferIsFullMessage);
+
+                    //wait for buffer to become full
+                    await WaitHelpers.WaitWhileAsync(() => frameBuffer.InputRate <= 0, cancellationToken);
+                }
+
+                //start the worker
                 try
                 {
+                    //log the starting message
+                    logger.LogDebug(Constants.FarwWorkerStartedMessage);
 
                     //start the searching
                     do
@@ -75,15 +96,18 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                 }
                 catch (Exception e)
                 {
+                    //log the failure message
+                    using (logger.BeginScope($"{e.GetType()}: {e.Message}"))
+                    {
+                        logger.LogCritical(Constants.TheWorkerWillStopMessage);
+                    }
 
+                    throw;
                 }
                 finally
                 {
-                    Console.WriteLine("Done");
-
+                    logger.LogInformation(Constants.FarwStartedStoppedMessage);
                 }
-
-
 
             }, cancellationToken);
         }
@@ -110,10 +134,12 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             //get the working snapshot
             var snapShot = frameBuffer.TakeASnapshot();
 
-            logger.LogDebug($"Snapshot-ed the frame buffer, the number of total frames read is: {snapShot.Count}");
+            //log the message
+            logger.LogDebug(string
+                .Format(Constants.FarwSnapshotedBufferMessage, snapShot.Count));
 
             //begin a logging scope
-            using (logger.BeginScope($"Recognition Job for camera {cameraIp}:{cameraPort}"))
+            using (logger.BeginScope(string.Format(Constants.FarwRecognitionJobMessage, cameraIp, cameraPort)))
             {
                 //create a new watch
                 var watch = Stopwatch.StartNew();
