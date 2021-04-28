@@ -44,7 +44,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                 _applicationConfig.Get<ImageOptionsSectionConfig>();
 
             //create the logger
-            var logger = _loggerFactory.CreateLogger($"{deviceId}itemsToKeep");
+            var logger = _loggerFactory.CreateLogger($"{deviceId}");
 
             //log the message
             logger

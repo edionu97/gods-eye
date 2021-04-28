@@ -54,16 +54,16 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
 
             public static string FarwStartedLoggerScopeMessage => "FacialAnalysisAndRecognition for {0}:{1}";
 
-            public static string TheWorkerWillStopMessage => "This error will make the worker to stop...";
+            public static string TheWorkerWillStopMessage => "This error will make the worker to stop...\n";
 
-            public static string FarwStartedStoppedMessage => "The facial recognition worker has stopped";
+            public static string FarwStartedStoppedMessage => "The facial recognition worker has stopped\n";
 
-            public static string FarwWaitUntilTheBufferIsFullMessage => "Waiting until the buffer is full";
+            public static string FarwWaitUntilTheBufferIsFullMessage => "Waiting until the buffer is full\n";
 
-            public static string FarwWorkerStartedMessage => "Worker started";
+            public static string FarwWorkerStartedMessage => "Worker started\n";
 
             public static string FarwSnapshotedBufferMessage =>
-                "Snapshot-ed the frame buffer, the number of total frames read is: {0}";
+                "Snapshot-ed the frame buffer, the number of total frames read is: {0}\n";
 
             public static string FarwJobDetailsMessage => "Job for camera {0}:{1}";
         }
