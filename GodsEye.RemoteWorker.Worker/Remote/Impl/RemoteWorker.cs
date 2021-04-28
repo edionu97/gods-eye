@@ -33,6 +33,8 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             //get the starting information
             var (cameraIp, cameraPort) = rwStartingInformation.Siw;
 
+            var l = _loggerFactory.CreateLogger("Temp results");
+
             //start the farw worker
             var _ = _facialAnalysisAndRecognitionWorker
                 .StartSearchingForPersonAsync(
@@ -40,7 +42,11 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     {
                         FrameBuffer = _streamingImageWorker.FrameBuffer,
                         StatisticsInformation = (cameraIp, cameraPort),
-                        SearchedPersonBase64Img = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
+                        SearchedPersonBase64Img = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt"),
+                        OnBufferProcessed = r =>
+                        {
+                            l.LogInformation($"The search round result is: {r != null}\n");
+                        }
                     },
                     _cancellationToken.Token);
 

@@ -1,4 +1,6 @@
-﻿using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
+﻿using System;
+using Gods.Eye.Server.Artificial.Intelligence.Messaging;
+using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 
 namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo
 {
@@ -10,12 +12,16 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo
 
         public (string UsingCameraIp, int UsingCameraPort) StatisticsInformation { get; set; }
 
+        public Action<SearchForPersonResponse> OnBufferProcessed { get; set; }
+
         public void Deconstruct(
             out IFrameBuffer frameBuffer, 
             out string searchedPersonBase64Img, 
-            out (string UsingCameraIp, int UsingCameraPort) statisticsInformation)
+            out (string UsingCameraIp, int UsingCameraPort) statisticsInformation,
+            out Action<SearchForPersonResponse> onBufferProcessed)
         {
             frameBuffer = FrameBuffer;
+            onBufferProcessed = OnBufferProcessed;
             searchedPersonBase64Img = SearchedPersonBase64Img;
             statisticsInformation = StatisticsInformation;
         }

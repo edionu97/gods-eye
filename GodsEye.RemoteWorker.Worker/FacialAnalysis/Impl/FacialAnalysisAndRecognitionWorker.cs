@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using Microsoft.Extensions.Logging;
 using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
@@ -39,7 +40,8 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             _config = config.Get<FacialAnalysisAndRecognitionWorkerConfig>();
         }
 
-        public Task StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationToken cancellationToken)
+        public Task<SearchForPersonResponse>
+            StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationToken cancellationToken)
         {
             //set the analysis summary 
             AnalysisSummary = startingInformation;
@@ -47,7 +49,8 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             //deconstruct the object
             var (frameBuffer,
                  personBase64Img,
-                 (cameraIp, cameraPort)) = AnalysisSummary;
+                 (cameraIp, cameraPort),
+                 onBufferProcessed) = AnalysisSummary;
 
             //create the logger fot the 
             var logger = _loggerFactory
@@ -74,9 +77,9 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                 try
                 {
                     //log the starting message
-                    logger.LogDebug(Constants.FarwWorkerStartedMessage);
+                    logger.LogInformation(Constants.FarwWorkerStartedMessage);
 
-                    //start the searching
+                    //start the searching rounds
                     do
                     {
                         //compute the response
@@ -91,6 +94,14 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                                 (r) => r.FaceRecognitionInfo.Any(),
                                 cancellationToken, (logger, cameraIp, cameraPort));
 
+                        //invoke the method if is not null
+                        onBufferProcessed?.Invoke(response);
+
+                        //stop the cycle if we have the response
+                        if (response != null)
+                        {
+                            return response;
+                        }
 
                     } while (!cancellationToken.IsCancellationRequested);
                 }
@@ -109,6 +120,8 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     logger.LogInformation(Constants.FarwStartedStoppedMessage);
                 }
 
+                //return null 
+                return null;
             }, cancellationToken);
         }
 
