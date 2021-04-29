@@ -20,6 +20,12 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
                 "The client  for ws({0}:{1}) could not be generated\n";
         }
 
+        public static class FrameBuffer
+        {
+            public static string FrameBufferAutoAdjustedMessage =>
+                "The frame buffer size auto adjusted(f={0}, t={1}) in order to keep up with the input rate({2})\n";
+        }
+
         public static class CameraDevice
         {
             public static string CameraIsInitializedMessage => "Camera is up and running\n";
