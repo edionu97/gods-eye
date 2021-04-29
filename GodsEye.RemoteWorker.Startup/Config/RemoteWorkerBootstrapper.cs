@@ -237,7 +237,7 @@ namespace GodsEye.RemoteWorker.Startup.Config
                         option.TimestampFormat = "[HH:mm:ss] ";
                     });
 
-                    logging.SetMinimumLevel(LogLevel.Information);
+                    logging.SetMinimumLevel(LogLevel.Debug);
                 })
                 .Build()
                 .Services;

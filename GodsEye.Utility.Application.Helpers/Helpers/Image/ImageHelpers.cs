@@ -83,6 +83,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Image
             return loadedImage.ToBase64String(imageType.ToFormat());
         }
 
+
         /// <summary>
         /// Compare two images using the PHash algorithm
         /// </summary>
@@ -94,7 +95,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Image
         ///     ImageComparisonResultType.RoughlySimilar if the distance is between 20 and 25
         ///     ImageComparisonResultType.Different otherwise
         /// </returns>
-        public static (ImageComparisonResultType, double) CompareImages(string firstImageBase64, string secondImageBase64)
+        public static (ImageComparisonResultType, double) CompareB64Images(string firstImageBase64, string secondImageBase64)
         {
             //return different
             if (string.IsNullOrEmpty(firstImageBase64) || string.IsNullOrEmpty(secondImageBase64))
@@ -106,6 +107,18 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Image
             var firstImage = new MagickImage(ConvertImageFromBase64(firstImageBase64));
             var secondImage = new MagickImage(ConvertImageFromBase64(secondImageBase64));
 
+            //compare the images
+            return CompareImages(firstImage, secondImage);
+        }
+
+        /// <summary>
+        /// Compare the image instances
+        /// </summary>
+        /// <param name="firstImage">the first image</param>
+        /// <param name="secondImage">the second image</param>
+        /// <returns></returns>
+        public static (ImageComparisonResultType, double) CompareImages(MagickImage firstImage, MagickImage secondImage)
+        {
             //compare those two images using the perceptual hash
             var comparisonResult = firstImage.Compare(secondImage, ErrorMetric.PerceptualHash);
 

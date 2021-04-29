@@ -2,17 +2,20 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using GodsEye.Utility.Application.Config.BaseConfig;
-using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
+using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
+
+using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.LoadShedding;
 
 namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
 {
     public partial class HeuristicLoadSheddingPolicy : ILoadSheddingPolicy
     {
+        private readonly ILogger<HeuristicLoadSheddingPolicy> _logger;
         private readonly HeuristicLoadSheddingConfig _heuristicConfig;
-
-        public HeuristicLoadSheddingPolicy(IConfig config)
+        public HeuristicLoadSheddingPolicy(IConfig config, ILogger<HeuristicLoadSheddingPolicy> logger)
         {
             _heuristicConfig = config.Get<HeuristicLoadSheddingConfig>();
 
@@ -22,6 +25,9 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
                 ResizeImageToHeight = 50,
                 ResizeImageToWidth = 50
             };
+
+            //set the logger
+            _logger = logger;
         }
 
         public Task<Queue<(DateTime, NetworkImageFrameMessage)>>
@@ -30,43 +36,51 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
             //convert the enumerable into an list
             var data = dataToLoadShed.ToList();
 
+            //get the number of items that need to be removed
+            var numberOfItemsToRemove = data.Count - itemsToKeep;
+
             //read the heuristic config 
             var (w, h) = _heuristicConfig;
 
             //resize all the videoFrameImages to a specific size
-            //speed up the image comparision
-            var images = ResizeAllTheB64ImagesToFixedSize(data.ToList(), (w, h));
+            var resizedImages =
+                ResizeAllTheB64ImagesToFixedSize(data.ToList(), (w, h)).ToList();
 
-            //as long as we need to remove data
-            var indexesToRemove = new HashSet<int>();
-            while (images.Any() && indexesToRemove.Count < data.Count - itemsToKeep)
+            //begin scope for messaging logging
+            using (_logger.BeginScope(string
+                .Format(Constants.HeuristicLoadSheddingScopeMessage, data.Count, itemsToKeep)))
             {
-                //compute the index of data that needs to be removed
-                var index = FindMostSimilarTwoImagesRelativeToListBorders(images);
+                //get the distinct frames (image and it's index in original frame buffer)
+                var framesAfterFirstRound =
+                    ApplyTheBulkRemovalOfDuplicateFramesPolicy(resizedImages, numberOfItemsToRemove).ToList();
 
-                //mark the position as removable
-                indexesToRemove.Add(index);
+                //log the message after the first round
+                _logger.LogDebug(string
+                    .Format(
+                        Constants.HeuristicLoadSheddingFirstRoundFinishedMessage,
+                        framesAfterFirstRound.Count,
+                        framesAfterFirstRound.Count != itemsToKeep));
 
-                //remove the image
-                images.RemoveAt(index);
-            }
+                //apply the second round and remove from the frames that are no such similar
+                var framesAfterSecondRound =
+                    ApplyTheRemovalOfNoSoSimilarFramesPolicy(framesAfterFirstRound,
+                        framesAfterFirstRound.Count - itemsToKeep);
 
-            //add the items that remain back in the queue
-            var queue = new Queue<(DateTime, NetworkImageFrameMessage)>();
-            for (var index = 0; index < data.Count; ++index)
-            {
-                //if the index is back listed then continue
-                if (indexesToRemove.Contains(index))
+                //add the items that remain back in the queue
+                //those items will be processed
+                var queue = new Queue<(DateTime, NetworkImageFrameMessage)>();
+                foreach (var (_, dataIndex) in framesAfterSecondRound)
                 {
-                    continue;
+                    queue.Enqueue(data[dataIndex]);
                 }
 
-                //add the item in queue
-                queue.Enqueue(data[index]);
-            }
+                //log the message
+                _logger.LogDebug(string.Format(Constants
+                    .HeuristicLoadSheddingDataSizeMessage, queue.Count));
 
-            //return the queue
-            return Task.FromResult(queue);
+                //return the queue
+                return Task.FromResult(new Queue<(DateTime, NetworkImageFrameMessage)>(queue));
+            }
         }
     }
 }

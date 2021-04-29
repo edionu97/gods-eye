@@ -60,17 +60,17 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             //run in another thread the recognition job
             return Task.Run(async () =>
             {
-                //wait until the frame buffer is full and the input rate is calculated
-                await WaitHelpers.WaitWhileAsync(() => !frameBuffer.IsReady, cancellationToken);
-
+                //wait for buffer to become full
+                await WaitHelpers.WaitWhileAsync(() => frameBuffer.InputRate <= 0, cancellationToken);
+                
                 //wait until the buffer is full
                 if (_config.StartWorkerOnlyWhenBufferIsFull)
                 {
                     //log the message
                     logger.LogInformation(Constants.FarwWaitUntilTheBufferIsFullMessage);
 
-                    //wait for buffer to become full
-                    await WaitHelpers.WaitWhileAsync(() => frameBuffer.InputRate <= 0, cancellationToken);
+                    //wait until the frame buffer is full and the input rate is calculated
+                    await WaitHelpers.WaitWhileAsync(() => !frameBuffer.IsReady, cancellationToken);
                 }
 
                 //start the worker

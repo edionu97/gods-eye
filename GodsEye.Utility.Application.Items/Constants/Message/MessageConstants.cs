@@ -79,6 +79,12 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
             public static string WrongGenerationParametersMessage => "The maximum number of values that can be generated are {0}";
 
             public static string TupleRequiresXSecondsToBeProcessedMessage => "One tuple requires {0} sec to be processed";
+
+            public static string HeuristicLoadSheddingScopeMessage => "Heuristic load shedding for reducing initial data size f={0} t={1}";
+
+            public static string HeuristicLoadSheddingFirstRoundFinishedMessage => "After first round the number of items kept are: {0}. Applying the next round: {1}\n";
+
+            public static string HeuristicLoadSheddingDataSizeMessage => "Load shed-ed data size={0}\n";
         }
     }
 }
