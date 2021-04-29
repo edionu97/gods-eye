@@ -1,12 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using ImageMagick;
-using GodsEye.Utility.Application.Items.Enums;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using GodsEye.Utility.Application.Items.Enums;
 
 using ImageSharp = SixLabors.ImageSharp.Image;
 
@@ -14,6 +11,12 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Image
 {
     public static class ImageHelpers
     {
+        /// <summary>
+        /// This function it is used for resizing an image that is in base 64 format to a specific width and height
+        /// </summary>
+        /// <param name="base64String">the string representing the image</param>
+        /// <param name="resizeTo">the tuple which contains info about the with and height</param>
+        /// <returns>the base64 image</returns>
         public static string ResizeBase64Image(string base64String, (int Width, int Height) resizeTo)
         {
             //if the image is null then return null
@@ -42,73 +45,6 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Image
 
             //convert the image back in the base64
             return loadedImage.ToBase64String(type.ToFormat());
-        }
-
-        /// <summary>
-        /// Convert the image from a file into an base64 string
-        /// </summary>
-        /// <param name="imagePath">the path of the image</param>
-        /// <param name="imageType">the image type</param>
-        /// <param name="resizeTo">if specified contains the width and height</param>
-        /// <returns>the conversion in base64 of the image</returns>
-        public static async Task<string> ReadImageFromBase64FileAsync(
-            FileInfo imagePath, 
-            ImageType imageType, 
-            (int Width, int Height)? resizeTo = null)
-        {
-            //if the image does not exist then return null
-            if (!imagePath.Exists)
-            {
-                return null;
-            }
-
-            //load the image in memory
-            var loadedImage = 
-                await ImageSharp.LoadAsync<Rgba32>(imagePath.FullName);
-
-            //if the resize is not specified return the image as it is
-            if (!resizeTo.HasValue)
-            {
-                return loadedImage.ToBase64String(imageType.ToFormat());
-            }
-
-            //do the resize nothing
-            var (w, h) = resizeTo.Value;
-            
-            //resize the image to desired resolution
-            loadedImage.Mutate(context =>
-                context.Resize(w, h, KnownResamplers.Lanczos8));
-
-            //convert the image in base64 string
-            return loadedImage.ToBase64String(imageType.ToFormat());
-        }
-
-
-        /// <summary>
-        /// Compare two images using the PHash algorithm
-        /// </summary>
-        /// <param name="firstImageBase64">the first image</param>
-        /// <param name="secondImageBase64">the second image</param>
-        /// <returns>an enum with 4 values
-        ///     ImageComparisonResultType.Same if the distance is less than 10
-        ///     ImageComparisonResultType.Similar if the distance is between 10 and 20
-        ///     ImageComparisonResultType.RoughlySimilar if the distance is between 20 and 25
-        ///     ImageComparisonResultType.Different otherwise
-        /// </returns>
-        public static (ImageComparisonResultType, double) CompareB64Images(string firstImageBase64, string secondImageBase64)
-        {
-            //return different
-            if (string.IsNullOrEmpty(firstImageBase64) || string.IsNullOrEmpty(secondImageBase64))
-            {
-                return (ImageComparisonResultType.Different, double.MaxValue);
-            }
-
-            //load the first image
-            var firstImage = new MagickImage(ConvertImageFromBase64(firstImageBase64));
-            var secondImage = new MagickImage(ConvertImageFromBase64(secondImageBase64));
-
-            //compare the images
-            return CompareImages(firstImage, secondImage);
         }
 
         /// <summary>
