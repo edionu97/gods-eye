@@ -1,37 +1,29 @@
 ﻿using System;
-using System.IO;
+using EasyNetQ;
 using System.Threading;
 using System.Threading.Tasks;
-using EasyNetQ;
-using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using GodsEye.RemoteWorker.Worker.Streaming;
-using GodsEye.RemoteWorker.Worker.FacialAnalysis;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
-using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
-using GodsEye.Utility.Application.Items.Constants.String;
-using GodsEye.Utility.Application.Items.Messages.MasterToSlave.Impl.Requests;
 
 namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
     public partial class RemoteWorker : IRemoteWorker
     {
         private readonly IBus _messageBus;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IStreamingImageWorker _streamingImageWorker;
-
         private readonly CancellationTokenSource _parentCancellationTokenSource;
+        private readonly IList<ISubscriptionResult> _subscriptionResults = new List<ISubscriptionResult>();
 
         public RemoteWorker(
             IBus bus,
-            ILoggerFactory loggerFactory,
             IServiceProvider serviceProvider,
             IStreamingImageWorker streamingImageWorker)
         {
             _parentCancellationTokenSource = new CancellationTokenSource();
 
             _messageBus = bus;
-            _loggerFactory = loggerFactory;
             _serviceProvider = serviceProvider;
             _streamingImageWorker = streamingImageWorker;
         }
@@ -41,12 +33,37 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             //get the starting information
             var (cameraIp, cameraPort) = rwStartingInformation.Siw;
 
-            //register all the handlers
-            await RegisterHandlersAsync(cameraIp, cameraPort);
+            try
+            {
+                //register all the handlers
+                await RegisterHandlersAsync(cameraIp, cameraPort);
 
-            //start the siw worker
-            await _streamingImageWorker
-                .StartAsync(cameraPort, cameraIp, _parentCancellationTokenSource);
+                //start the siw worker
+                await _streamingImageWorker
+                    .StartAsync(cameraPort, cameraIp, _parentCancellationTokenSource);
+            }
+            finally
+            {
+                //remove the unused queues async
+                await RemoveUnusedQueuesAsync();
+            }
+        }
+
+        private async Task RemoveUnusedQueuesAsync()
+        {
+            //delete the used queues
+            foreach (var subscriptionResult in _subscriptionResults)
+            {
+                //dispose all the queues
+                try
+                {
+                    await _messageBus.Advanced.QueueDeleteAsync(subscriptionResult.Queue);
+                }
+                catch (Exception)
+                {
+                    //queue disposed
+                }
+            }
         }
     }
 }

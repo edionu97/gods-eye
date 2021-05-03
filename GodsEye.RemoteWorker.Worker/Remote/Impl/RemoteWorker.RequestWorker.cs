@@ -9,6 +9,7 @@ using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
+using GodsEye.Utility.Application.Items.Messages.MasterToSlave;
 using GodsEye.Utility.Application.Items.Messages.MasterToSlave.Impl.Requests;
 using GodsEye.Utility.Application.Items.Messages.SlaveToMaster.Impl.Responses;
 
@@ -28,18 +29,20 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             var cancellationToken = _parentCancellationTokenSource.Token;
 
             //start listening for search for person messages
-            await _messageBus.PubSub
+            _subscriptionResults.Add(
+                await _messageBus.PubSub
                 .SubscribeAsync<SearchForPersonMessage>(
                     StringConstants.MasterToSlaveBusQueueName + subscriptionId,
                     async r => await OnSearchForPersonMessageAsync(r, cameraIp, cameraPort, cancellationToken),
-                    cancellationToken);
+                    cancellationToken));
 
             //start listening for cancellation messages
+            _subscriptionResults.Add(
             await _messageBus.PubSub
                 .SubscribeAsync<StopSearchingForPersonMessage>(
                     StringConstants.MasterToSlaveBusQueueName + subscriptionId,
                      r => OnStopSearchingForPersonMessage(r, cameraIp, cameraPort),
-                    cancellationToken);
+                    cancellationToken));
         }
 
         private async Task OnSearchForPersonMessageAsync(SearchForPersonMessage message, string cameraIp, int cameraPort, CancellationToken token)
@@ -49,13 +52,10 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 .GetChecksumOfStringContentAsync(message.MessageContent);
 
             //get the service
-            var facialAnalysisWorkerInstance = _serviceProvider
-                .GetService<IFacialAnalysisAndRecognitionWorker>();
-
-            if (facialAnalysisWorkerInstance == null)
-            {
-                throw new Exception("Worker could not be created");
-            }
+            var facialAnalysisWorkerInstance = 
+                _serviceProvider
+                    .GetService<IFacialAnalysisAndRecognitionWorker>()
+                ?? throw new ArgumentNullException();
 
             //create a linked token source, relative to the parent
             //if child gets cancelled => parent is alive
@@ -99,7 +99,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 .TryAdd(message.IdentificationNumber, (recognitionTask, recognitionTaskCancellation));
         }
 
-        private void OnStopSearchingForPersonMessage(StopSearchingForPersonMessage message, string cameraIp, int cameraPort)
+        private void OnStopSearchingForPersonMessage(IMasterToSlaveMessage message, string cameraIp, int cameraPort)
         {
             //get the message id
             var id = message.IdentificationNumber;
@@ -124,7 +124,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             {
                 cancellationTokenSource.Cancel();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //ignore
             }

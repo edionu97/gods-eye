@@ -147,7 +147,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             var (logger, cameraIp, cameraPort) = loggingInfo;
 
             //get the working snapshot
-            var snapShot = new Queue<(DateTime, NetworkImageFrameMessage)>(frameBuffer.TakeASnapshot().ToList());
+            var snapShot = frameBuffer.TakeASnapshot();
 
             //log the message
             logger.LogDebug(string
