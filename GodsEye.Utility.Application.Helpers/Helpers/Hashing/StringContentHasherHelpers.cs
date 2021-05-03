@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using GodsEye.Utility.Application.Helpers.ExtensionMethods.PrimitivesExtensions;
 
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.ContentHasherHelpers;
@@ -17,7 +16,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Hashing
         /// <param name="string">the string</param>
         /// <exception cref="ArgumentNullException">if the string is null or empty</exception>
         /// <returns>the checksum</returns>
-        public static async Task<string> GetChecksumOfStringContentAsync(string @string)
+        public static string GetChecksumOfStringContentAsync(string @string)
         {
             //check if the string is eligible
             if (string.IsNullOrEmpty(@string))
@@ -26,10 +25,10 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Hashing
             }
 
             //convert the string into a stream
-            await using var stream = @string.AsStream();
+            using var stream = @string.AsStream();
 
             //get the checksum of the string
-            return await ComputeChecksumAsync(stream);
+            return ComputeChecksumAsync(stream);
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Hashing
         /// </summary>
         /// <param name="stream">the stream containing the data</param>
         /// <returns>the checksum</returns>
-        private static Task<string> ComputeChecksumAsync(Stream stream)
+        private static string ComputeChecksumAsync(Stream stream)
         {
             //create the instance of the sha algorithm
             using var sha256 = new SHA256Managed();
@@ -48,7 +47,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Hashing
             {
                 checksumBuilder.Append(@byte.ToString("x2"));
             }
-            return Task.FromResult(checksumBuilder.ToString());
+            return checksumBuilder.ToString();
         }
     }
 }

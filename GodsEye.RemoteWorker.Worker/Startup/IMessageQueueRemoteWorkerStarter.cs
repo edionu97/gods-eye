@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace GodsEye.RemoteWorker.Startup.StartupWorker
+namespace GodsEye.RemoteWorker.Worker.Startup
 {
     public interface IMessageQueueRemoteWorkerStarter
     {

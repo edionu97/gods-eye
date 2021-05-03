@@ -9,9 +9,9 @@ using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
-using GodsEye.Utility.Application.Items.Messages.MasterToSlave;
-using GodsEye.Utility.Application.Items.Messages.MasterToSlave.Impl.Requests;
-using GodsEye.Utility.Application.Items.Messages.SlaveToMaster.Impl.Responses;
+using GodsEye.RemoteWorker.Worker.Remote.Messages.Requests;
+using GodsEye.RemoteWorker.Worker.Remote.Messages.Responses;
+using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
 
 namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
@@ -20,6 +20,11 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
         private readonly ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)> _onlineRecognitionWorkers =
             new ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)>();
 
+        /// <summary>
+        /// Register the handlers for requests
+        /// </summary>
+        /// <param name="cameraIp">the ip of the camera</param>
+        /// <param name="cameraPort">the camera port</param>
         private async Task RegisterHandlersAsync(string cameraIp, int cameraPort)
         {
             //create a new subscription id
@@ -33,7 +38,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 await _messageBus.PubSub
                 .SubscribeAsync<SearchForPersonMessage>(
                     StringConstants.MasterToSlaveBusQueueName + subscriptionId,
-                    async r => await OnSearchForPersonMessageAsync(r, cameraIp, cameraPort, cancellationToken),
+                    r => StartSearchingPerson(r, cameraIp, cameraPort, cancellationToken),
                     cancellationToken));
 
             //start listening for cancellation messages
@@ -41,18 +46,24 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             await _messageBus.PubSub
                 .SubscribeAsync<StopSearchingForPersonMessage>(
                     StringConstants.MasterToSlaveBusQueueName + subscriptionId,
-                     r => OnStopSearchingForPersonMessage(r, cameraIp, cameraPort),
-                    cancellationToken));
+                    StopSearchingPerson, cancellationToken));
         }
 
-        private async Task OnSearchForPersonMessageAsync(SearchForPersonMessage message, string cameraIp, int cameraPort, CancellationToken token)
+        /// <summary>
+        /// Handle the search for person message
+        /// </summary>
+        /// <param name="message">the message itself</param>
+        /// <param name="cameraIp">the camera ip</param>
+        /// <param name="cameraPort">the camera port</param>
+        /// <param name="token">the cancellation token</param>
+        private void StartSearchingPerson(
+            SearchForPersonMessage message,
+            string cameraIp,
+            int cameraPort,
+            CancellationToken token)
         {
-            //set the identification number if not already set 
-            message.IdentificationNumber ??= await StringContentHasherHelpers
-                .GetChecksumOfStringContentAsync(message.MessageContent);
-
             //get the service
-            var facialAnalysisWorkerInstance = 
+            var facialAnalysisWorkerInstance =
                 _serviceProvider
                     .GetService<IFacialAnalysisAndRecognitionWorker>()
                 ?? throw new ArgumentNullException();
@@ -83,11 +94,11 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                            //person potentially found
                            _messageBus.PubSub
                                // ReSharper disable once MethodSupportsCancellation
-                               .Publish(new PersonFoundMessage<SearchForPersonResponse>
+                               .Publish(new PersonFoundMessage
                                {
                                    IsFound = r != null,
                                    MessageContent = r,
-                                   IdentificationNumber = message.IdentificationNumber,
+                                   MessageId = message.MessageId,
                                    StartTimeUtc = startTime,
                                    EndTimeUtc = endTime
                                });
@@ -95,15 +106,25 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     },
                     recognitionTaskCancellation.Token);
 
+            //if there is already a worker that handles the identification for a specific person do nothing
+            if (_onlineRecognitionWorkers.ContainsKey(message.MessageId))
+            {
+                return;
+            }
+
             //register the worker as online
             _onlineRecognitionWorkers
-                .TryAdd(message.IdentificationNumber, (recognitionTask, recognitionTaskCancellation));
+                .TryAdd(message.MessageId, (recognitionTask, recognitionTaskCancellation));
         }
 
-        private void OnStopSearchingForPersonMessage(IMasterToSlaveMessage message, string cameraIp, int cameraPort)
+        /// <summary>
+        /// Stops the search for a specific node
+        /// </summary>
+        /// <param name="message">the message </param>
+        private void StopSearchingPerson(IMessage message)
         {
             //get the message id
-            var id = message.IdentificationNumber;
+            var id = message.MessageId;
 
             //handle the empty id case
             if (string.IsNullOrEmpty(id))

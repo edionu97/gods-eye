@@ -1,22 +1,18 @@
 ﻿using System;
-using EasyNetQ;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using EasyNetQ;
 using GodsEye.RemoteWorker.Worker.Remote;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
-using GodsEye.RemoteWorker.Worker.Streaming;
-using Microsoft.Extensions.DependencyInjection;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
-using GodsEye.Utility.Application.Items.Constants;
-using GodsEye.Utility.Application.Items.Constants.Message;
 using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Items.Messages.Registration;
-
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
-namespace GodsEye.RemoteWorker.Startup.StartupWorker.Impl
+namespace GodsEye.RemoteWorker.Worker.Startup.Impl
 {
     public class MessageQueueRemoteWorkerStarter : IMessageQueueRemoteWorkerStarter
     {

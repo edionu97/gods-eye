@@ -1,24 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using EasyNetQ;
-using EasyNetQ.Management.Client;
-using Gods.Eye.Server.Artificial.Intelligence.Messaging;
-using GodsEye.Utility.Application.Config.BaseConfig;
+using GodsEye.RemoteWorker.Worker.Remote.Messages.Requests;
+using GodsEye.RemoteWorker.Worker.Remote.Messages.Responses;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
-using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
-using GodsEye.Utility.Application.Helpers.Helpers.Network;
-using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Items.Constants.String;
-using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
-using GodsEye.Utility.Application.Items.Messages.MasterToSlave;
-using GodsEye.Utility.Application.Items.Messages.MasterToSlave.Impl.Requests;
-using GodsEye.Utility.Application.Items.Messages.SlaveToMaster.Impl.Responses;
-using GodsEye.Utility.Application.Security.Encryption.Impl;
-using GodsEye.Utility.Application.Security.KeyProvider.Impl;
 
 
 namespace ConsoleApp1
@@ -63,7 +51,7 @@ namespace ConsoleApp1
             });
 
 
-            await queue.PubSub.SubscribeAsync<PersonFoundMessage<SearchForPersonResponse>>(
+            await queue.PubSub.SubscribeAsync<PersonFoundMessage>(
                 StringConstants.SlaveToMasterBusQueueName,
                 r =>
                 {
