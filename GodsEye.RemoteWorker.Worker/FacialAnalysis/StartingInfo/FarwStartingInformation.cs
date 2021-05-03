@@ -12,13 +12,13 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo
 
         public (string UsingCameraIp, int UsingCameraPort) StatisticsInformation { get; set; }
 
-        public Action<SearchForPersonResponse> OnBufferProcessed { get; set; }
+        public Action<SearchForPersonResponse, DateTime, DateTime> OnBufferProcessed { get; set; }
 
         public void Deconstruct(
             out IFrameBuffer frameBuffer, 
             out string searchedPersonBase64Img, 
             out (string UsingCameraIp, int UsingCameraPort) statisticsInformation,
-            out Action<SearchForPersonResponse> onBufferProcessed)
+            out Action<SearchForPersonResponse, DateTime, DateTime> onBufferProcessed)
         {
             frameBuffer = FrameBuffer;
             onBufferProcessed = OnBufferProcessed;

@@ -3,8 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
@@ -80,6 +81,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     logger.LogInformation(Constants.FarwWorkerStartedMessage);
 
                     //start the searching rounds
+                    var startTime = DateTime.UtcNow;
                     do
                     {
                         //compute the response
@@ -95,7 +97,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                                 cancellationToken, (logger, cameraIp, cameraPort));
 
                         //invoke the method if is not null
-                        onBufferProcessed?.Invoke(response);
+                        onBufferProcessed?.Invoke(response, startTime, DateTime.UtcNow);
 
                         //stop the cycle if we have the response
                         if (response != null)
@@ -145,7 +147,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             var (logger, cameraIp, cameraPort) = loggingInfo;
 
             //get the working snapshot
-            var snapShot = frameBuffer.TakeASnapshot();
+            var snapShot = new Queue<(DateTime, NetworkImageFrameMessage)>(frameBuffer.TakeASnapshot().ToList());
 
             //log the message
             logger.LogDebug(string
