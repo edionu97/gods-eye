@@ -1,7 +1,6 @@
 ﻿using System;
 using Nito.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using GodsEye.Utility.Application.Items.Enums;
 using GodsEye.Utility.Application.Config.BaseConfig;
@@ -54,7 +53,17 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl
             //configure the time interval counter
             _periodTimeIntervalCounter = periodTimeIntervalCounter;
             _periodTimeIntervalCounter.Period = 1000;
-            _periodTimeIntervalCounter.OnPeriodExpiredCallback = value => InputRate = value;
+            _periodTimeIntervalCounter.OnPeriodExpiredCallback = value =>
+            {
+                //the value always is less than the max value of input rate
+                if (value > _frameBufferConfig.MaxValueOfInputRate)
+                {
+                    return;
+                }
+
+                //the input rate should always be lower then the camera fps
+                InputRate = value;
+            };
         }
 
         public void PushFrame(NetworkImageFrameMessage frame)

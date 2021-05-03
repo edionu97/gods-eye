@@ -9,8 +9,11 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker
 
         public BufferBehaviourType BufferBehaviour { get; set; }
 
-        public void Deconstruct(out int bufferSize, out BufferBehaviourType bufferBehaviour)
+        public int MaxValueOfInputRate { get; set; }
+
+        public void Deconstruct(out int bufferSize, out BufferBehaviourType bufferBehaviour, out int maxValueOfIr)
         {
+            maxValueOfIr = MaxValueOfInputRate;
             bufferSize = BufferSize;
             bufferBehaviour = BufferBehaviour;
         }

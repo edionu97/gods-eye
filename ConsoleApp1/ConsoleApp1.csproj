@@ -7,10 +7,12 @@
 
   <ItemGroup>
     <PackageReference Include="EasyNetQ" Version="6.3.1" />
+    <PackageReference Include="EasyNetQ.Management.Client" Version="1.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GodsEye.Camera.ImageStreaming\GodsEye.Camera.ImageStreaming.csproj" />
+    <ProjectReference Include="..\GodsEye.RemoteWorker.Worker\GodsEye.RemoteWorker.Worker.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj" />
   </ItemGroup>
 

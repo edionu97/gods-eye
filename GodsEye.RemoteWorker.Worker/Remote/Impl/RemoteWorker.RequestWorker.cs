@@ -71,7 +71,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         FrameBuffer = _streamingImageWorker.FrameBuffer,
                         StatisticsInformation = (cameraIp, cameraPort),
                         SearchedPersonBase64Img = message.MessageContent,
-                        OnBufferProcessed = async (r, startTime, endTime) =>
+                        OnBufferProcessed = (r, startTime, endTime) =>
                        {
                            //send the response only if the value is not null
                            if (r == null)
@@ -81,15 +81,16 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 
                            //publish the result message async
                            //person potentially found
-                           await _messageBus.PubSub
-                               .PublishAsync(new PersonFoundMessage<SearchForPersonResponse>
+                           _messageBus.PubSub
+                               // ReSharper disable once MethodSupportsCancellation
+                               .Publish(new PersonFoundMessage<SearchForPersonResponse>
                                {
                                    IsFound = r != null,
                                    MessageContent = r,
                                    IdentificationNumber = message.IdentificationNumber,
                                    StartTimeUtc = startTime,
                                    EndTimeUtc = endTime
-                               }, recognitionTaskCancellation.Token);
+                               });
                        }
                     },
                     recognitionTaskCancellation.Token);
