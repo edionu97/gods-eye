@@ -63,7 +63,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             {
                 //wait for buffer to become full
                 await WaitHelpers.WaitWhileAsync(() => frameBuffer.InputRate <= 0, cancellationToken);
-                
+
                 //wait until the buffer is full
                 if (_config.StartWorkerOnlyWhenBufferIsFull)
                 {
@@ -81,9 +81,11 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     logger.LogInformation(Constants.FarwWorkerStartedMessage);
 
                     //start the searching rounds
-                    var startTime = DateTime.UtcNow;
                     do
                     {
+                        //get the starting time of the round
+                        var startTime = DateTime.UtcNow;
+
                         //compute the response
                         var response = await
                             ProcessTheFrameBufferAsync(
@@ -105,7 +107,9 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                             return response;
                         }
 
+                        //repeat until the request is fulfilled or canceled
                     } while (!cancellationToken.IsCancellationRequested);
+
                 }
                 catch (Exception e)
                 {
@@ -149,13 +153,13 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             //get the working snapshot
             var snapShot = frameBuffer.TakeASnapshot();
 
-            //log the message
-            logger.LogDebug(string
-                .Format(Constants.FarwSnapshotedBufferMessage, snapShot.Count));
-
             //begin a logging scope
             using (logger.BeginScope(string.Format(Constants.FarwJobDetailsMessage, cameraIp, cameraPort)))
             {
+                //log the message
+                logger.LogInformation(string
+                    .Format(Constants.FarwSnapshotedBufferMessage, snapShot.Count));
+
                 //create a new watch
                 var watch = Stopwatch.StartNew();
 
@@ -187,6 +191,10 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                             frameBuffer.InputRate - totalProcessingTime,
                             frameProcessingTime);
                 }
+
+                //log the message
+                logger.LogInformation(string
+                    .Format(Constants.FarwRoundFinishedMessage, totalProcessingTime));
             }
 
             //null response

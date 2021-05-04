@@ -44,10 +44,10 @@ namespace ConsoleApp1
                 _ => { });
 
 
-            await queue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage
-            {
-                MessageContent = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
-            });
+            //await queue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage
+            //{
+            //    MessageContent = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
+            //});
 
 
             //await queue.PubSub.SubscribeAsync<PersonFoundMessage>(
@@ -57,10 +57,10 @@ namespace ConsoleApp1
             //        Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
             //    });
 
-            //await queue.PubSub.PublishAsync<IRequestResponseMessage>(new StopSearchingForPersonMessage
-            //{
-            //    MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt"))
-            //});
+            await queue.PubSub.PublishAsync<IRequestResponseMessage>(new StopSearchingForPersonMessage
+            {
+                MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt"))
+            });
 
             //var provider = new KeyBasicHashProvider();
 

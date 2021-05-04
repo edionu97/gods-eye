@@ -119,7 +119,7 @@ namespace GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl
             }
 
             //log the message
-            _logger.LogInformation(string
+            _logger.LogDebug(string
                 .Format(Constants
                     .FrameBufferAutoAdjustedMessage, 
                     _maxBufferSize, 

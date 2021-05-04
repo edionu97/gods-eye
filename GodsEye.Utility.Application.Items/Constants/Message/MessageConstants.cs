@@ -76,7 +76,9 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
             public static string FarwSnapshotedBufferMessage =>
                 "Snapshot-ed the frame buffer, the number of total frames read is: {0}\n";
 
-            public static string FarwJobDetailsMessage => "Job for camera {0}:{1}";
+            public static string FarwRoundFinishedMessage => "Buffer processed in {0} sec\n";
+
+            public static string FarwJobDetailsMessage => "AI job for camera {0}:{1}";
         }
 
         public static class LoadShedding
