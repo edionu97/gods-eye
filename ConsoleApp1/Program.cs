@@ -1,12 +1,15 @@
 ﻿using System;
-using EasyNetQ;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using ConsoleApp1.Config;
+using EasyNetQ;
+using GodsEye.RemoteWorker.Worker.Remote.Messages;
 using GodsEye.RemoteWorker.Workers.Messages;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
-using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using GodsEye.Utility.Application.Items.Constants.String;
+using Microsoft.Extensions.DependencyInjection;
+using SixLabors.ImageSharp.Formats.Bmp;
 
 namespace ConsoleApp1
 {
@@ -15,78 +18,52 @@ namespace ConsoleApp1
 
         public static async Task Main(string[] args)
         {
+            //get the service provider
+            var serviceProvider = Bootstrapper.Load();
 
-            //destruct the message or throw exception
-            var (username, password, host, port) = new RabbitMqConfig
+            //get the message queue
+            var messageQueue =
+                serviceProvider
+                    .GetService<IBus>()
+                ?? throw new ArgumentNullException();
+
+            //get the base64 image
+            var searchedFaceBase64Img =
+                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt");
+
+            //start the search for person message
+            await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage
             {
-                Username = "admin",
-                Password = "admin",
-                Host = "127.0.0.1",
-                Port = 5672
-            };
-
-            //create the queue
-            
-            var queue = RabbitHutch.CreateBus(
-                new ConnectionConfiguration
-                {
-                    UserName = username,
-                    Password = password,
-                    Hosts = new List<HostConfiguration>
-                    {
-                        new HostConfiguration
-                        {
-                            Host = host,
-                            Port = port
-                        }
-                    }
-                },
-                _ => { });
-
-
-            //await queue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage
-            //{
-            //    MessageContent = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
-            //});
-
-
-            //await queue.PubSub.SubscribeAsync<PersonFoundMessage>(
-            //    StringConstants.SlaveToMasterBusQueueName,
-            //    r =>
-            //    {
-            //        Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
-            //    });
-
-            await queue.PubSub.PublishAsync<IRequestResponseMessage>(new StopSearchingForPersonMessage
-            {
-                MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt"))
+                MessageContent = searchedFaceBase64Img
             });
 
-            //var provider = new KeyBasicHashProvider();
+            const int numberOfCycles = 10;
+            var runningCycles = 0;
 
-            //provider.RegisterKey("app key");
+            //this is called when we have an response
+            await messageQueue.PubSub.SubscribeAsync<PersonFoundMessage>(
+                StringConstants.SlaveToMasterBusQueueName,
+                async r =>
+                {
 
-            //var decryptor = new KeyBasedEncryptorDecryptor(provider);
+                    Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
 
-            ////get the address and the port
-            //var cameraIpAddress = IPAddress.Parse("192.168.0.101");
-            //var cameraIpEndPoint = new IPEndPoint(cameraIpAddress, 5001);
 
-            //using var s = new Socket(cameraIpEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
-            //{
-            //    Blocking = true
-            //};
+                    //if the number of running cycles is less then max number of cycles do nothing
+                    if (++runningCycles < numberOfCycles)
+                    {
+                        return;
+                    }
 
-            //s.Connect(cameraIpEndPoint);
+                    //send the cancellation request message
+                    await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new StopSearchingForPersonMessage
+                    {
+                        MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(searchedFaceBase64Img)
+                    });
+                });
 
-            //while (true)
-            //{
-            //    var message = 
-            //        await SendHelpers.ReceiveMessageAsync<NetworkImageFrameMessage>(s, decryptor);
-
-            //    Console.WriteLine(message.FrameName);
-            //}
-            Console.ReadLine();
+            Console.WriteLine("Press any key to stop...");
+            Console.ReadKey();
         }
     }
 }
