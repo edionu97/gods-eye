@@ -21,14 +21,18 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker
 
         public LoadSheddingPolicyType LoadSheddingPolicy { get; set; }
 
+        public bool StopWorkerOnFirstPositiveAnswer { get; set; }
+
         public HeuristicLoadSheddingConfig HeuristicLoadShedding { get; set; }
 
         public void Deconstruct(
             out bool startWorkerOnlyWhenBufferIsFull,
-            out LoadSheddingPolicyType loadSheddingPolicy)
+            out LoadSheddingPolicyType loadSheddingPolicy,
+            out bool stopWorkerOnFirstPositiveAnswer)
         {
             startWorkerOnlyWhenBufferIsFull = StartWorkerOnlyWhenBufferIsFull;
             loadSheddingPolicy = LoadSheddingPolicy;
+            stopWorkerOnFirstPositiveAnswer = StopWorkerOnFirstPositiveAnswer;
         }
     }
 }

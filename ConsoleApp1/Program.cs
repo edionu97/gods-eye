@@ -29,7 +29,7 @@ namespace ConsoleApp1
 
             //get the base64 image
             var searchedFaceBase64Img =
-                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt");
+                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\bica tanara.txt");
 
             //start the search for person message
             await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage

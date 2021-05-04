@@ -94,14 +94,15 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                                         personBase64Img,
                                         message.ImageBase64EncodedBytes,
                                         token),
-                                (r) => r.FaceRecognitionInfo.Any(),
+                                r =>
+                                    r.FaceRecognitionInfo.Any(),
                                 cancellationToken, (logger, cameraIp, cameraPort));
 
                         //invoke the method if is not null
                         onBufferProcessed?.Invoke(response, startTime, DateTime.UtcNow);
 
-                        //stop the cycle if we have the response
-                        if (response != null)
+                        //stop the cycle if we have the response and we are configured to do so
+                        if (response != null && _config.StopWorkerOnFirstPositiveAnswer)
                         {
                             return response;
                         }
@@ -127,6 +128,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
 
                 //return null 
                 return null;
+
             }, cancellationToken);
         }
 
