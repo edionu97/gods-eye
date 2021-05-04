@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
-using GodsEye.RemoteWorker.Worker.Remote.Messages.Requests;
-using GodsEye.RemoteWorker.Worker.Remote.Messages.Responses;
+using GodsEye.RemoteWorker.Worker.Remote.Messages;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
-using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
+using GodsEye.RemoteWorker.Workers.Messages;
+using GodsEye.RemoteWorker.Workers.Messages.Requests;
 
 namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
@@ -19,10 +19,12 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
         private readonly ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)> _currentActiveWorkersForSearching =
             new ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)>();
 
+        private readonly ConcurrentDictionary<string, IRequestResponseMessage> _cancelRequests 
+            = new ConcurrentDictionary<string, IRequestResponseMessage>();
 
-        private readonly ConcurrentDictionary<string, IMessage> _cancelRequests = new ConcurrentDictionary<string, IMessage>();
-
-        private void HandleTheSearchForPersonRequest(SearchForPersonMessage message, SiwInformation information, CancellationToken parentToken)
+        private void HandleTheSearchForPersonRequest(
+            SearchForPersonMessage message,
+            SiwInformation information, CancellationToken parentToken)
         {
             //get the service
             var facialAnalysisWorkerInstance =
@@ -95,7 +97,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
         /// Stops the search for a specific node
         /// </summary>
         /// <param name="message">the message </param>
-        private void HandleTheStopSearchingForPersonMessage(IMessage message)
+        private void HandleTheStopSearchingForPersonMessage(IRequestResponseMessage message)
         {
             //get the message id
             var id = message.MessageId;

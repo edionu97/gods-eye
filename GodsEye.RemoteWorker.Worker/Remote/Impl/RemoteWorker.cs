@@ -2,11 +2,10 @@
 using EasyNetQ;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using GodsEye.RemoteWorker.Worker.Remote.Messages.Requests;
 using GodsEye.RemoteWorker.Worker.Streaming;
+using GodsEye.RemoteWorker.Workers.Messages;
+using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
-using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
 
 namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
@@ -16,7 +15,6 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
         private readonly IServiceProvider _serviceProvider;
         private readonly IStreamingImageWorker _streamingImageWorker;
         private readonly CancellationTokenSource _parentCancellationTokenSource;
-        private readonly IList<ISubscriptionResult> _subscriptionResults = new List<ISubscriptionResult>();
 
         public RemoteWorker(
             IBus bus,
@@ -41,16 +39,12 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 await CheckForNewRequestAsync(notProcessedRequest, rwStartingInformation);
             }
 
-
-            //register all the handlers
-            //await RegisterHandlersAsync(cameraIp, cameraPort);
-
             //start the siw worker
             await _streamingImageWorker
                 .StartAsync(cameraPort, cameraIp, _parentCancellationTokenSource);
         }
 
-        public Task CheckForNewRequestAsync(IMessage requestMessage, RwStartingInformation rwStartingInformation)
+        public Task CheckForNewRequestAsync(IRequestResponseMessage requestMessage, RwStartingInformation rwStartingInformation)
         {
             //based on the request message type do the right action
             switch (requestMessage)
@@ -87,24 +81,6 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 
             //return a completed task
             return Task.CompletedTask;
-        }
-
-
-        private async Task RemoveUnusedQueuesAsync()
-        {
-            //delete the used queues
-            foreach (var subscriptionResult in _subscriptionResults)
-            {
-                //dispose all the queues
-                try
-                {
-                    await _messageBus.Advanced.QueueDeleteAsync(subscriptionResult.Queue);
-                }
-                catch (Exception)
-                {
-                    //queue disposed
-                }
-            }
         }
     }
 }

@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using EasyNetQ;
 using System.IO;
 using System.Threading.Tasks;
-using EasyNetQ;
-using GodsEye.RemoteWorker.Worker.Remote.Messages.Requests;
-using GodsEye.RemoteWorker.Worker.Remote.Messages.Responses;
-using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using System.Collections.Generic;
+using GodsEye.RemoteWorker.Workers.Messages;
+using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
-using GodsEye.Utility.Application.Items.Constants.String;
-using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
+using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 
 namespace ConsoleApp1
 {
@@ -46,10 +44,10 @@ namespace ConsoleApp1
                 _ => { });
 
 
-            //await queue.PubSub.PublishAsync<IMessage>(new SearchForPersonMessage
-            //{
-            //    MessageContent = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
-            //});
+            await queue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage
+            {
+                MessageContent = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
+            });
 
 
             //await queue.PubSub.SubscribeAsync<PersonFoundMessage>(
@@ -59,10 +57,10 @@ namespace ConsoleApp1
             //        Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
             //    });
 
-            await queue.PubSub.PublishAsync<IMessage>(new StopSearchingForPersonMessage
-            {
-                MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt"))
-            });
+            //await queue.PubSub.PublishAsync<IRequestResponseMessage>(new StopSearchingForPersonMessage
+            //{
+            //    MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt"))
+            //});
 
             //var provider = new KeyBasicHashProvider();
 

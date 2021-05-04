@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using EasyNetQ;
 using GodsEye.RemoteWorker.Worker.Remote;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
+using GodsEye.RemoteWorker.Workers.Messages;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Items.Messages.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
 
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
@@ -25,10 +25,11 @@ namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
 
         private readonly ISet<Task> _failedTasks = new HashSet<Task>();
 
-        private readonly ConcurrentBag<IMessage> _activeRequests = new ConcurrentBag<IMessage>();
+        private readonly ConcurrentBag<IRequestResponseMessage> _activeRequests 
+            = new ConcurrentBag<IRequestResponseMessage>();
+
         private readonly ConcurrentBag<(Task, IRemoteWorker, RwStartingInformation)> _activeWorkerTasks = 
             new ConcurrentBag<(Task, IRemoteWorker, RwStartingInformation)>();
-
 
         public RemoteWorkerCoordinator(
             IBus messageQueue,
@@ -48,7 +49,7 @@ namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
                       StringConstants.CameraToBussQueueName, OnMessageFromCamera);
 
             //register the handler for search for person message
-            await _messageBus.PubSub.SubscribeAsync<IMessage>(
+            await _messageBus.PubSub.SubscribeAsync<IRequestResponseMessage>(
                 StringConstants.MasterToSlaveBusQueueName,
                 async r =>
                 {
