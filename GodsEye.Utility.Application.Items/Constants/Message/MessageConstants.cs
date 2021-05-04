@@ -79,6 +79,19 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
             public static string FarwRoundFinishedMessage => "Buffer processed in {0} sec\n";
 
             public static string FarwJobDetailsMessage => "AI job for camera {0}:{1}";
+
+            public static string BroadcastingRequestMessage => "Broadcasting the request to all the available workers";
+
+            public static string RemoteWorkerLoggerName =>
+                "Remote logger is online, starting connection with camera('{0}':'{1}')";
+
+            public static string ProcessingRequestMessage => "Processing request '{0}'\n";
+
+            public static string PostponedTheRequestMessage =>
+                "There does not exist yet a worker for that request, postponed the cancellation...\n";
+
+            public static string BlacklistedRequest =>
+                "Identified that the searching request was cancelled, stopping its processing...\n";
         }
 
         public static class LoadShedding

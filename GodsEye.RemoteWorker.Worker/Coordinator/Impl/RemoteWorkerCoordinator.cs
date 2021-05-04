@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using EasyNetQ;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using GodsEye.RemoteWorker.Worker.Remote;
-using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using GodsEye.RemoteWorker.Workers.Messages;
-using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
+using Microsoft.Extensions.DependencyInjection;
+using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Items.Messages.Registration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
+using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
@@ -25,10 +24,10 @@ namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
 
         private readonly ISet<Task> _failedTasks = new HashSet<Task>();
 
-        private readonly ConcurrentBag<IRequestResponseMessage> _activeRequests 
+        private readonly ConcurrentBag<IRequestResponseMessage> _activeRequests
             = new ConcurrentBag<IRequestResponseMessage>();
 
-        private readonly ConcurrentBag<(Task, IRemoteWorker, RwStartingInformation)> _activeWorkerTasks = 
+        private readonly ConcurrentBag<(Task, IRemoteWorker, RwStartingInformation)> _activeWorkerTasks =
             new ConcurrentBag<(Task, IRemoteWorker, RwStartingInformation)>();
 
         public RemoteWorkerCoordinator(
@@ -55,6 +54,13 @@ namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
                 {
                     //add the request in bag for new workers
                     _activeRequests.Add(r);
+
+                    //log the message and the information
+                    _logger.LogInformation(JsonSerializerDeserializer<dynamic>.Serialize(new
+                    {
+                        RequestReceived = r?.GetType().Name,
+                        Message = LocalConstants.BroadcastingRequestMessage
+                    }) +'\n');
 
                     //distribute the work among the active workers
                     foreach (var (activeWorkerTask, worker, startingInformation) in _activeWorkerTasks)

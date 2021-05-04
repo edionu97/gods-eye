@@ -11,6 +11,9 @@ using GodsEye.RemoteWorker.Worker.Remote.Messages;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using GodsEye.RemoteWorker.Workers.Messages;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
+using Microsoft.Extensions.Logging;
+
+using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
@@ -88,6 +91,9 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             {
                 return;
             }
+
+            //log the information
+            _logger.LogInformation(Constants.BlacklistedRequest);
             
             //get stop the client
             HandleTheStopSearchingForPersonMessage(_cancelRequests[message.MessageId]);
@@ -114,6 +120,8 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             //if there is no worker that handles that request return nothing
             if (!_currentActiveWorkersForSearching.TryGetValue(id, out var recognitionDetails))
             {
+                //log the message
+                _logger.LogInformation(Constants.PostponedTheRequestMessage);
                 return;
             }
 
@@ -130,9 +138,10 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 _cancelRequests.TryRemove(id, out _);
                 _currentActiveWorkersForSearching.TryRemove(id, out _);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //ignore
+                //log the exception
+                _logger.LogCritical(e.Message);
             }
         }
     }
