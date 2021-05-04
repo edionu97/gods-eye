@@ -16,7 +16,7 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Hashing
         /// <param name="string">the string</param>
         /// <exception cref="ArgumentNullException">if the string is null or empty</exception>
         /// <returns>the checksum</returns>
-        public static string GetChecksumOfStringContentAsync(string @string)
+        public static string GetChecksumOfStringContent(string @string)
         {
             //check if the string is eligible
             if (string.IsNullOrEmpty(@string))

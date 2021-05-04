@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using GodsEye.RemoteWorker.Worker.Startup;
 using GodsEye.RemoteWorker.Startup.Config;
+using GodsEye.RemoteWorker.Worker.Coordinator;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GodsEye.RemoteWorker.Startup
@@ -14,7 +14,7 @@ namespace GodsEye.RemoteWorker.Startup
 
             //get the worker service
             var workerService = service
-                .GetService<IMessageQueueRemoteWorkerStarter>();
+                .GetService<IRemoteWorkerCoordinatorStarter>();
 
             //treat the null case
             if (workerService == null)

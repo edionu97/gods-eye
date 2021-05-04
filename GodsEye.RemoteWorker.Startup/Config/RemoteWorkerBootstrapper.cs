@@ -7,9 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using GodsEye.RemoteWorker.Worker.Remote;
-using GodsEye.RemoteWorker.Worker.Startup;
 using GodsEye.RemoteWorker.Worker.Streaming;
-using GodsEye.RemoteWorker.Worker.Startup.Impl;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;
@@ -25,6 +23,8 @@ using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl;
+using GodsEye.RemoteWorker.Worker.Coordinator;
+using GodsEye.RemoteWorker.Worker.Coordinator.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
@@ -226,7 +226,7 @@ namespace GodsEye.RemoteWorker.Startup.Config
 
                     //register the worker starter
                     services
-                        .AddSingleton<IMessageQueueRemoteWorkerStarter, MessageQueueRemoteWorkerStarter>();
+                        .AddSingleton<IRemoteWorkerCoordinatorStarter, RemoteWorkerCoordinator>();
                 })
                 .ConfigureLogging(logging =>
                 {

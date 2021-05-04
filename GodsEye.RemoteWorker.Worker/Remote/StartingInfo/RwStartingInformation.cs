@@ -1,4 +1,8 @@
-﻿namespace GodsEye.RemoteWorker.Worker.Remote.StartingInfo
+﻿using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using GodsEye.RemoteWorker.Worker.Remote.Messages;
+
+namespace GodsEye.RemoteWorker.Worker.Remote.StartingInfo
 {
     public class SiwInformation
     {
@@ -16,5 +20,7 @@
     public class RwStartingInformation
     {
         public SiwInformation Siw { get; set; }
+
+        public ConcurrentBag<IMessage> NotProcessedRequests { get; set; }
     }
 }

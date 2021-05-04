@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace GodsEye.RemoteWorker.Worker.Startup
+namespace GodsEye.RemoteWorker.Worker.Coordinator
 {
-    public interface IMessageQueueRemoteWorkerStarter
+    public interface IRemoteWorkerCoordinatorStarter
     {
         /// <summary>
         /// Starts the worker

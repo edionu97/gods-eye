@@ -6,61 +6,23 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
-using GodsEye.Utility.Application.Items.Constants.String;
-using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
 using GodsEye.RemoteWorker.Worker.Remote.Messages.Requests;
 using GodsEye.RemoteWorker.Worker.Remote.Messages.Responses;
+using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
 
 namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
     public partial class RemoteWorker
     {
-        private readonly ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)> _onlineRecognitionWorkers =
+        private readonly ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)> _currentActiveWorkersForSearching =
             new ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)>();
 
-        /// <summary>
-        /// Register the handlers for requests
-        /// </summary>
-        /// <param name="cameraIp">the ip of the camera</param>
-        /// <param name="cameraPort">the camera port</param>
-        private async Task RegisterHandlersAsync(string cameraIp, int cameraPort)
-        {
-            //create a new subscription id
-            var subscriptionId = Guid.NewGuid();
 
-            //get the cancellation token
-            var cancellationToken = _parentCancellationTokenSource.Token;
+        private readonly ConcurrentDictionary<string, IMessage> _cancelRequests = new ConcurrentDictionary<string, IMessage>();
 
-            //start listening for search for person messages
-            _subscriptionResults.Add(
-                await _messageBus.PubSub
-                .SubscribeAsync<SearchForPersonMessage>(
-                    StringConstants.MasterToSlaveBusQueueName + subscriptionId,
-                    r => StartSearchingPerson(r, cameraIp, cameraPort, cancellationToken),
-                    cancellationToken));
-
-            //start listening for cancellation messages
-            _subscriptionResults.Add(
-            await _messageBus.PubSub
-                .SubscribeAsync<StopSearchingForPersonMessage>(
-                    StringConstants.MasterToSlaveBusQueueName + subscriptionId,
-                    StopSearchingPerson, cancellationToken));
-        }
-
-        /// <summary>
-        /// Handle the search for person message
-        /// </summary>
-        /// <param name="message">the message itself</param>
-        /// <param name="cameraIp">the camera ip</param>
-        /// <param name="cameraPort">the camera port</param>
-        /// <param name="token">the cancellation token</param>
-        private void StartSearchingPerson(
-            SearchForPersonMessage message,
-            string cameraIp,
-            int cameraPort,
-            CancellationToken token)
+        private void HandleTheSearchForPersonRequest(SearchForPersonMessage message, SiwInformation information, CancellationToken parentToken)
         {
             //get the service
             var facialAnalysisWorkerInstance =
@@ -68,11 +30,14 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     .GetService<IFacialAnalysisAndRecognitionWorker>()
                 ?? throw new ArgumentNullException();
 
-            //create a linked token source, relative to the parent
+            //create a linked parentToken source, relative to the parent
             //if child gets cancelled => parent is alive
             //if parent gets cancelled => all children are cancelled 
-            var recognitionTaskCancellation =
-                CancellationTokenSource.CreateLinkedTokenSource(token);
+            var cancellationTokenSource =
+                CancellationTokenSource.CreateLinkedTokenSource(parentToken);
+
+            //destruct the camera ip and port
+            var (cameraIp, cameraPort) = information;
 
             //create a new recognition task
             var recognitionTask = facialAnalysisWorkerInstance
@@ -104,24 +69,33 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                });
                        }
                     },
-                    recognitionTaskCancellation.Token);
+                    cancellationTokenSource.Token);
 
             //if there is already a worker that handles the identification for a specific person do nothing
-            if (_onlineRecognitionWorkers.ContainsKey(message.MessageId))
+            if (_currentActiveWorkersForSearching.ContainsKey(message.MessageId))
             {
                 return;
             }
 
             //register the worker as online
-            _onlineRecognitionWorkers
-                .TryAdd(message.MessageId, (recognitionTask, recognitionTaskCancellation));
+            _currentActiveWorkersForSearching
+                .TryAdd(message.MessageId, (recognitionTask, cancellationTokenSource));
+
+            //handle the case in which the request is not canceled before start
+            if (!_cancelRequests.ContainsKey(message.MessageId))
+            {
+                return;
+            }
+            
+            //get stop the client
+            HandleTheStopSearchingForPersonMessage(_cancelRequests[message.MessageId]);
         }
 
         /// <summary>
         /// Stops the search for a specific node
         /// </summary>
         /// <param name="message">the message </param>
-        private void StopSearchingPerson(IMessage message)
+        private void HandleTheStopSearchingForPersonMessage(IMessage message)
         {
             //get the message id
             var id = message.MessageId;
@@ -132,8 +106,11 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 return;
             }
 
+            //add this into the dictionary
+            _cancelRequests.TryAdd(id, message);
+
             //if there is no worker that handles that request return nothing
-            if (!_onlineRecognitionWorkers.TryGetValue(id, out var recognitionDetails))
+            if (!_currentActiveWorkersForSearching.TryGetValue(id, out var recognitionDetails))
             {
                 return;
             }
@@ -144,7 +121,12 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             //cancel the recognition worker
             try
             {
+                //do the cancellation
                 cancellationTokenSource.Cancel();
+
+                //remove from the dictionary
+                _cancelRequests.TryRemove(id, out _);
+                _currentActiveWorkersForSearching.TryRemove(id, out _);
             }
             catch (Exception)
             {

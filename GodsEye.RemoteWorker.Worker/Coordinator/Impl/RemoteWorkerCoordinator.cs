@@ -10,24 +10,30 @@ using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Items.Messages.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
+using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
+
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
-namespace GodsEye.RemoteWorker.Worker.Startup.Impl
+namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
 {
-    public class MessageQueueRemoteWorkerStarter : IMessageQueueRemoteWorkerStarter
+    public class RemoteWorkerCoordinator : IRemoteWorkerCoordinatorStarter
     {
         private readonly IBus _messageBus;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<MessageQueueRemoteWorkerStarter> _logger;
+        private readonly ILogger<RemoteWorkerCoordinator> _logger;
 
         private readonly ISet<Task> _failedTasks = new HashSet<Task>();
-        private readonly ConcurrentBag<Task> _activeWorkerTasks = new ConcurrentBag<Task>();
+
+        private readonly ConcurrentBag<IMessage> _activeRequests = new ConcurrentBag<IMessage>();
+        private readonly ConcurrentBag<(Task, IRemoteWorker, RwStartingInformation)> _activeWorkerTasks = 
+            new ConcurrentBag<(Task, IRemoteWorker, RwStartingInformation)>();
 
 
-        public MessageQueueRemoteWorkerStarter(
+        public RemoteWorkerCoordinator(
             IBus messageQueue,
             IServiceProvider serviceProvider,
-            ILogger<MessageQueueRemoteWorkerStarter> logger)
+            ILogger<RemoteWorkerCoordinator> logger)
         {
             _logger = logger;
             _messageBus = messageQueue;
@@ -37,9 +43,34 @@ namespace GodsEye.RemoteWorker.Worker.Startup.Impl
         public async Task StartAsync()
         {
             //register the handler
-            _messageBus?.PubSub
-                 .SubscribeAsync<OnlineCameraMessage>(
-                     StringConstants.CameraToBussQueueName, OnMessageFromCamera);
+            await _messageBus.PubSub
+                  .SubscribeAsync<OnlineCameraMessage>(
+                      StringConstants.CameraToBussQueueName, OnMessageFromCamera);
+
+            //register the handler for search for person message
+            await _messageBus.PubSub.SubscribeAsync<IMessage>(
+                StringConstants.MasterToSlaveBusQueueName,
+                async r =>
+                {
+                    //add the request in bag for new workers
+                    _activeRequests.Add(r);
+
+                    //distribute the work among the active workers
+                    foreach (var (activeWorkerTask, worker, startingInformation) in _activeWorkerTasks)
+                    {
+                        //ignore the finished tasks
+                        if (activeWorkerTask.IsCanceled
+                            || activeWorkerTask.IsFaulted
+                            || activeWorkerTask.IsCompleted
+                            || activeWorkerTask.IsCompletedSuccessfully)
+                        {
+                            continue;
+                        }
+
+                        //distribute the work
+                        await worker.CheckForNewRequestAsync(r, startingInformation);
+                    }
+                });
 
             //log the message
             _logger
@@ -50,7 +81,7 @@ namespace GodsEye.RemoteWorker.Worker.Startup.Impl
             while (true)
             {
                 //wait until each worker finishes
-                foreach (var activeWorkerTask in _activeWorkerTasks)
+                foreach (var (activeWorkerTask, _, _) in _activeWorkerTasks)
                 {
                     //do not consider the failed processes
                     if (_failedTasks.Contains(activeWorkerTask))
@@ -105,16 +136,23 @@ namespace GodsEye.RemoteWorker.Worker.Startup.Impl
                     return;
                 }
 
-                //attempt to create the worker
-                _activeWorkerTasks.Add(remoteWorker
-                    .ConfigureWorkersAndStartAsync(new RwStartingInformation
+                //get the worker starting info
+                var workerStartingInformation = new RwStartingInformation
+                {
+                    Siw = new SiwInformation
                     {
-                        Siw = new SiwInformation
-                        {
-                            CameraIp = cameraIp,
-                            CameraPort = cameraPort
-                        }
-                    }));
+                        CameraIp = cameraIp,
+                        CameraPort = cameraPort
+                    },
+                    NotProcessedRequests = _activeRequests
+                };
+
+                //get the worker task
+                var workerTask = remoteWorker
+                    .ConfigureWorkersAndStartAsync(workerStartingInformation);
+
+                //attempt to create the worker
+                _activeWorkerTasks.Add((workerTask, remoteWorker, workerStartingInformation));
             }
             catch (Exception e)
             {

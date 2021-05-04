@@ -8,7 +8,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Messages.Requests
         public string MessageId
         {
             set => _messageId = value;
-            get => _messageId ??= StringContentHasherHelpers.GetChecksumOfStringContentAsync(MessageContent);
+            get => _messageId ??= StringContentHasherHelpers.GetChecksumOfStringContent(MessageContent);
         }
 
         public string MessageContent { get; set; }

@@ -6,8 +6,9 @@ using EasyNetQ;
 using GodsEye.RemoteWorker.Worker.Remote.Messages.Requests;
 using GodsEye.RemoteWorker.Worker.Remote.Messages.Responses;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
 using GodsEye.Utility.Application.Items.Constants.String;
-
+using IMessage = GodsEye.RemoteWorker.Worker.Remote.Messages.IMessage;
 
 namespace ConsoleApp1
 {
@@ -45,18 +46,23 @@ namespace ConsoleApp1
                 _ => { });
 
 
-            await queue.PubSub.PublishAsync(new SearchForPersonMessage
+            //await queue.PubSub.PublishAsync<IMessage>(new SearchForPersonMessage
+            //{
+            //    MessageContent = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
+            //});
+
+
+            //await queue.PubSub.SubscribeAsync<PersonFoundMessage>(
+            //    StringConstants.SlaveToMasterBusQueueName,
+            //    r =>
+            //    {
+            //        Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
+            //    });
+
+            await queue.PubSub.PublishAsync<IMessage>(new StopSearchingForPersonMessage
             {
-                MessageContent = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt")
+                MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\rob.txt"))
             });
-
-
-            await queue.PubSub.SubscribeAsync<PersonFoundMessage>(
-                StringConstants.SlaveToMasterBusQueueName,
-                r =>
-                {
-                    Console.WriteLine(r.EndTimeUtc +  " "  + r.StartTimeUtc + " " + r.IsFound);
-                });
 
             //var provider = new KeyBasicHashProvider();
 
