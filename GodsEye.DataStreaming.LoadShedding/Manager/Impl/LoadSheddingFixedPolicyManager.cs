@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Args;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.LoadShedding;
@@ -15,6 +16,8 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
         private readonly ILoadSheddingPolicy _loadSheddingPolicy;
         private readonly ILogger<ILoadSheddingFixedPolicyManager> _logger;
         private readonly INoLoadSheddingPolicy _noLoadSheddingPolicy;
+
+        public LoadSheddingPolicyArgs PolicyArgs { get; set; }
 
         public LoadSheddingFixedPolicyManager(
             ILogger<ILoadSheddingFixedPolicyManager> logger,
@@ -58,7 +61,7 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
 
                 //apply the no ls policy
                 return await _noLoadSheddingPolicy
-                    .ApplyPolicyAsync(remainingTuplesToProcess, remainingTuples);
+                    .ApplyPolicyAsync(remainingTuplesToProcess, remainingTuples, PolicyArgs);
             }
 
             //log the message
@@ -68,7 +71,8 @@ namespace GodsEye.DataStreaming.LoadShedding.Manager.Impl
                 availableTimeToProcessData, remainingTuples);
 
             //apply the ls policy
-            return await _loadSheddingPolicy.ApplyPolicyAsync(remainingTuplesToProcess, remainingTuples);
+            return await _loadSheddingPolicy
+                .ApplyPolicyAsync(remainingTuplesToProcess, remainingTuples, PolicyArgs);
         }
 
         private void LogTheNoLsMessage(int dataSize, double lastKnownTupleProcessingRate, double availableTimeToProcessData)

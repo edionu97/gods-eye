@@ -1,12 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Args;
 using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 
 namespace GodsEye.DataStreaming.LoadShedding.Manager
 {
     public interface ILoadSheddingFixedPolicyManager
     {
+        /// <summary>
+        /// These arguments will be used by the policies
+        /// </summary>
+        public LoadSheddingPolicyArgs PolicyArgs { get; set; }
+
         /// <summary>
         /// This function it is used for data load shedding. It uses one the following load shedding policies
         ///     NoLoadShedding => no shedding will be applied over data

@@ -23,6 +23,10 @@ using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl.EdgeRemovalPolicy;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl.FrameRemovalPolicy;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl.NoRemovalPolicy;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl.RandomRemovalPolicy;
 using GodsEye.RemoteWorker.Worker.Coordinator;
 using GodsEye.RemoteWorker.Worker.Coordinator.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
@@ -184,7 +188,9 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     services
                         .AddTransient<RandomLoadSheddingPolicy>();
                     services
-                        .AddTransient<HeuristicLoadSheddingPolicy>();
+                        .AddTransient<HeuristicImageComparisonLoadSheddingPolicy>();
+                    services
+                        .AddTransient<HeuristicImageSimilarityLoadSheddingPolicy>();
 
                     //register also the no load shedding policy as INoLoadSheddingPolicy
                     services.AddTransient<INoLoadSheddingPolicy>(serviceProvider =>
@@ -212,8 +218,13 @@ namespace GodsEye.RemoteWorker.Startup.Config
                             //handle the random load shedding policy
                             LoadSheddingPolicyType.RandomLoadShedding => serviceProvider.GetService<RandomLoadSheddingPolicy>(),
 
-                            //handle the case of heuristic load shedding
-                            LoadSheddingPolicyType.HeuristicLoadShedding => serviceProvider.GetService<HeuristicLoadSheddingPolicy>(),
+                            //handle the case of heuristic image similarity
+                            LoadSheddingPolicyType.HeuristicImageSimilarityLoadShedding => 
+                                serviceProvider.GetService<HeuristicImageSimilarityLoadSheddingPolicy>(),
+
+                            //handle the case of heuristic image comparation
+                            LoadSheddingPolicyType.HeuristicImageComparisionLoadShedding =>
+                                serviceProvider.GetService<HeuristicImageComparisonLoadSheddingPolicy>(),
 
                             //throw exception if the policy is not known
                             _ => throw new ArgumentOutOfRangeException(sheddingPolicy?.LoadSheddingPolicy.ToString())

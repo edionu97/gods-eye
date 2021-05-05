@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Args;
 using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
@@ -78,6 +79,12 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                 {
                     //log the starting message
                     logger.LogInformation(Constants.FarwWorkerStartedMessage);
+
+                    //set the extra args for the ls policy
+                    _policyManager.PolicyArgs = new LoadSheddingPolicyArgs
+                    {
+                        SearchedImageBase64 = personBase64Img
+                    };
 
                     //start the searching rounds
                     do

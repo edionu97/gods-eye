@@ -30,7 +30,10 @@ namespace ConsoleApp1
 
             //get the base64 image
             var searchedFaceBase64Img =
-                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\bica tanara.txt");
+                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\eduard.txt");
+
+            //get the hash value
+            var hashValue = StringContentHasherHelpers.GetChecksumOfStringContent(searchedFaceBase64Img);
 
             //start the search for person message
             await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage
@@ -49,6 +52,13 @@ namespace ConsoleApp1
                 StringConstants.SlaveToMasterBusQueueName,
                 async r =>
                 {
+                    Console.WriteLine(r.MessageId);
+                    //get the messages only for his request
+                    if (r.MessageId != hashValue)
+                    {
+                        return;
+                    }
+
                     Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
 
                     //sync the values

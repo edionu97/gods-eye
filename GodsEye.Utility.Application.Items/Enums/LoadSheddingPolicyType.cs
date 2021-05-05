@@ -4,6 +4,7 @@
     {
         NoLoadShedding,
         RandomLoadShedding,
-        HeuristicLoadShedding,
+        HeuristicImageSimilarityLoadShedding,
+        HeuristicImageComparisionLoadShedding
     }
 }

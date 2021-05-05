@@ -3,10 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Args;
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.LoadShedding;
 
 
-namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
+namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl.RandomRemovalPolicy
 {
     public class RandomLoadSheddingPolicy : ILoadSheddingPolicy
     {
@@ -17,7 +18,11 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
             _randomGenerator = new Random();
         }
 
-        public Task<Queue<(DateTime, NetworkImageFrameMessage)>> ApplyPolicyAsync(IEnumerable<(DateTime, NetworkImageFrameMessage)> dataToProcess, int itemsToKeep)
+        public Task<Queue<(DateTime, NetworkImageFrameMessage)>> 
+            ApplyPolicyAsync(
+                IEnumerable<(DateTime, NetworkImageFrameMessage)> dataToProcess, 
+                int itemsToKeep,
+                LoadSheddingPolicyArgs _)
         {
             //convert the IEnumerable in list 
             var data = dataToProcess.ToList();
@@ -34,7 +39,8 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
             return Task.FromResult(new Queue<(DateTime, NetworkImageFrameMessage)>(dataAfterLoadShedding));
         }
 
-        private IEnumerable<int> GeneratePositionsThatWillBeKept(int maxPositionValue, int itemsCount)
+        private IEnumerable<int> 
+            GeneratePositionsThatWillBeKept(int maxPositionValue, int itemsCount)
         {
             //keeps track of generated numbers
             var generatedNumbers = new HashSet<int>();
