@@ -10,6 +10,13 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
 {
     public class RandomLoadSheddingPolicy : ILoadSheddingPolicy
     {
+        private readonly Random _randomGenerator;
+
+        public RandomLoadSheddingPolicy()
+        {
+            _randomGenerator = new Random();
+        }
+
         public Task<Queue<(DateTime, NetworkImageFrameMessage)>> ApplyPolicyAsync(IEnumerable<(DateTime, NetworkImageFrameMessage)> dataToProcess, int itemsToKeep)
         {
             //convert the IEnumerable in list 
@@ -27,11 +34,8 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
             return Task.FromResult(new Queue<(DateTime, NetworkImageFrameMessage)>(dataAfterLoadShedding));
         }
 
-        private static IEnumerable<int> GeneratePositionsThatWillBeKept(int maxPositionValue, int itemsCount)
+        private IEnumerable<int> GeneratePositionsThatWillBeKept(int maxPositionValue, int itemsCount)
         {
-            //create the random generator
-            var randomGenerator = new Random();
-
             //keeps track of generated numbers
             var generatedNumbers = new HashSet<int>();
 
@@ -46,7 +50,7 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
             while(generatedNumbers.Count != itemsCount)
             {
                 //generate a new number
-                var item = randomGenerator.Next(maxPositionValue);
+                var item = _randomGenerator.Next(maxPositionValue);
 
                 //if the number was already generated skip
                 if (generatedNumbers.Contains(item))

@@ -180,18 +180,18 @@ namespace GodsEye.RemoteWorker.Startup.Config
 
                     //register the load shedding policies
                     services
-                        .AddSingleton<NoLoadSheddingPolicy>();
+                        .AddTransient<NoLoadSheddingPolicy>();
                     services
-                        .AddSingleton<RandomLoadSheddingPolicy>();
+                        .AddTransient<RandomLoadSheddingPolicy>();
                     services
-                        .AddSingleton<HeuristicLoadSheddingPolicy>();
+                        .AddTransient<HeuristicLoadSheddingPolicy>();
 
                     //register also the no load shedding policy as INoLoadSheddingPolicy
-                    services.AddSingleton<INoLoadSheddingPolicy>(serviceProvider =>
+                    services.AddTransient<INoLoadSheddingPolicy>(serviceProvider =>
                         serviceProvider.GetService<NoLoadSheddingPolicy>());
 
                     //register the used load shedding policy
-                    services.AddSingleton<ILoadSheddingPolicy>(serviceProvider =>
+                    services.AddTransient<ILoadSheddingPolicy>(serviceProvider =>
                     {
                         //get the configuration
                         var configuration =
@@ -222,7 +222,7 @@ namespace GodsEye.RemoteWorker.Startup.Config
 
                     //register the policy manager
                     services
-                        .AddSingleton<ILoadSheddingFixedPolicyManager, LoadSheddingFixedPolicyManager>();
+                        .AddTransient<ILoadSheddingFixedPolicyManager, LoadSheddingFixedPolicyManager>();
 
                     //register the worker starter
                     services

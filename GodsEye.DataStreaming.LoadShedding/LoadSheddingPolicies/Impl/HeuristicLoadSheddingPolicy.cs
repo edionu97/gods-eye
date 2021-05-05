@@ -15,6 +15,7 @@ namespace GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl
     {
         private readonly ILogger<HeuristicLoadSheddingPolicy> _logger;
         private readonly HeuristicLoadSheddingConfig _heuristicConfig;
+
         public HeuristicLoadSheddingPolicy(IConfig config, ILogger<HeuristicLoadSheddingPolicy> logger)
         {
             _heuristicConfig = config.Get<HeuristicLoadSheddingConfig>();
