@@ -52,7 +52,6 @@ namespace ConsoleApp1
                 StringConstants.SlaveToMasterBusQueueName,
                 async r =>
                 {
-                    Console.WriteLine(r.MessageId);
                     //get the messages only for his request
                     if (r.MessageId != hashValue)
                     {
