@@ -58,7 +58,9 @@ namespace ConsoleApp1
                         return;
                     }
 
+
                     Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
+                    Console.WriteLine(r.MessageContent.ToString());
 
                     //sync the values
                     lock (SyncPrimitive)
