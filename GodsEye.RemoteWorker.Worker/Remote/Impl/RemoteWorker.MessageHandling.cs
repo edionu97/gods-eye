@@ -57,7 +57,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                            //send the response only if the value is not null
                            if (r == null)
                            {
-                               //return;
+                               return;
                            }
 
                            //publish the result message async
@@ -66,7 +66,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                // ReSharper disable once MethodSupportsCancellation
                                .Publish(new PersonFoundMessage
                                {
-                                   IsFound = r != null,
+                                   IsFound = true,
                                    MessageContent = r,
                                    MessageId = message.MessageId,
                                    StartTimeUtc = startTime,
