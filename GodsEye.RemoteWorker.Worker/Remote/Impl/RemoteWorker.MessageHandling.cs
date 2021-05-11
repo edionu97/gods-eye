@@ -53,42 +53,15 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         FrameBuffer = _streamingImageWorker.FrameBuffer,
                         StatisticsInformation = (cameraIp, cameraPort),
                         SearchedPersonBase64Img = message.MessageContent,
-                        OnBufferProcessed = async (response, startTime, endTime) =>
+                        OnBufferProcessed = (response, startTime, endTime) =>
                         {
-                            //destruct the response
-                            var (r, foundInFrame) = response;
-
-                            //send the response only if the value is not null
-                            if (r == null)
-                            {
-                                return;
-                            }
-
-                            //do the facial attribute analysis
-                            FacialAttributeAnalysisResponse analysisResponse = null;
-                            try
-                            {
-                                //get the response of the facial analysis
-                                analysisResponse = await facialAnalysisWorkerInstance
-                                     .AnalyzeFaceAndExtractFacialAttributesAsync(
-                                         foundInFrame,
-                                         r.FaceRecognitionInfo.First().FaceBoundingBox,
-                                         cancellationTokenSource.Token);
-                            }
-                            catch (Exception e)
-                            {
-                                _logger?.LogError(e.Message);
-                            }
-
-                            //publish the result message async
                             //person potentially found
                             _messageBus.PubSub
                                  // ReSharper disable once MethodSupportsCancellation
-                                 // ReSharper disable once MethodHasAsyncOverload
                                  .Publish(new PersonFoundMessage
                                  {
                                      IsFound = true,
-                                     MessageContent = (r, analysisResponse, foundInFrame),
+                                     MessageContent = response,
                                      MessageId = message.MessageId,
                                      StartTimeUtc = startTime,
                                      EndTimeUtc = endTime

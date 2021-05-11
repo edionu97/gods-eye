@@ -10,6 +10,6 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Messages
         public DateTime StartTimeUtc { get; set; }
         public DateTime EndTimeUtc { get; set; }
         public bool IsFound { get; set; }
-        public (SearchForPersonResponse, FacialAttributeAnalysisResponse, string) MessageContent { get; set; }
+        public (SearchForPersonResponse, string) MessageContent { get; set; }
     }
 }

@@ -12,6 +12,9 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo
 
         public (string UsingCameraIp, int UsingCameraPort) StatisticsInformation { get; set; }
 
+        /// <summary>
+        /// This is a callback that is executed on the caller's thread
+        /// </summary>
         public Action<(SearchForPersonResponse, string), DateTime, DateTime> OnBufferProcessed { get; set; }
 
         public void Deconstruct(

@@ -4,17 +4,14 @@ using System.Threading;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Gods.Eye.Server.Artificial.Intelligence.Messaging;
-using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Args;
 using GodsEye.DataStreaming.LoadShedding.Manager;
-using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
+using GodsEye.Utility.Application.Config.BaseConfig;
+using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
 using GodsEye.Utility.Application.Helpers.Helpers.Threading;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
-using GodsEye.Utility.Application.Config.BaseConfig;
+using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Args;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
-using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
-
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
@@ -41,6 +38,14 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             _config = config.Get<FacialAnalysisAndRecognitionWorkerConfig>();
         }
 
+        public Task<FacialAttributeAnalysisResponse>
+            AnalyzeFaceAndExtractFacialAttributesAsync(
+                string base64Image, 
+                FaceLocationBoundingBox faceLocation, CancellationToken token)
+        {
+            return _facialAnalysisService.AnalyseFaceAsync(base64Image, faceLocation, token);
+        }
+
         public Task<SearchForPersonResponse>
             StartSearchingForPersonAsync(FarwStartingInformation startingInformation, CancellationToken cancellationToken)
         {
@@ -50,8 +55,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             //deconstruct the object
             var (frameBuffer,
                  personBase64Img,
-                 (cameraIp, cameraPort),
-                 onBufferProcessed) = AnalysisSummary;
+                 (cameraIp, cameraPort), _) = AnalysisSummary;
 
             //create the logger fot the 
             var logger = _loggerFactory
@@ -89,24 +93,8 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     //start the searching rounds
                     do
                     {
-                        //get the starting time of the round
-                        var startTime = DateTime.UtcNow;
-
                         //compute the response
-                        var (response, img) = await
-                            ProcessTheFrameBufferAsync(
-                                frameBuffer,
-                                (message, token) =>
-                                    _facialAnalysisService.SearchPersonInImageAsync(
-                                        personBase64Img,
-                                        message.ImageBase64EncodedBytes,
-                                        token),
-                                r =>
-                                    r.FaceRecognitionInfo.Any(),
-                                cancellationToken, (logger, cameraIp, cameraPort));
-
-                        //invoke the method if is not null
-                        onBufferProcessed?.Invoke((response, img), startTime, DateTime.UtcNow);
+                        var (response, _) = await ProcessTheFrameBufferAsync(logger, cancellationToken);
 
                         //stop the cycle if we have the response and we are configured to do so
                         if (response != null && _config.StopWorkerOnFirstPositiveAnswer)
@@ -139,35 +127,29 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             }, cancellationToken);
         }
 
-        public Task<FacialAttributeAnalysisResponse>
-            AnalyzeFaceAndExtractFacialAttributesAsync(
-                string base64Image, 
-                FaceLocationBoundingBox faceLocation, CancellationToken token)
-        {
-            return _facialAnalysisService.AnalyseFaceAsync(base64Image, faceLocation, token);
-        }
-
         /// <summary>
         /// This method it is used for processing the frame buffer
         /// </summary>
-        /// <typeparam name="T">type of the response</typeparam>
-        /// <param name="frameBuffer">the instance of the frame buffer</param>
-        /// <param name="bufferProcessor">the function that processes the buffer</param>
-        /// <param name="stoppingPredicate">the stopping condition</param>
-        /// <param name="token">the cancellation token</param>
-        /// <param name="loggingInfo">the logging information</param>
+        /// <param name="logger">the logger used for logging the messages</param>
+        /// <param name="cancellationToken">the cancellation token</param>
         /// <returns>a task containing the result or null if nothing could not be found</returns>
-        public async Task<(T, string)> ProcessTheFrameBufferAsync<T>(
-            IFrameBuffer frameBuffer,
-            Func<NetworkImageFrameMessage, CancellationToken, Task<T>> bufferProcessor,
-            Predicate<T> stoppingPredicate,
-            CancellationToken token, (ILogger, string, int) loggingInfo) where T : class
+        private async Task<(SearchForPersonResponse, string)> 
+            ProcessTheFrameBufferAsync(ILogger logger, CancellationToken cancellationToken)
         {
-            //deconstruct the logging information
-            var (logger, cameraIp, cameraPort) = loggingInfo;
+            //get the starting time of the round
+            var startTime = DateTime.UtcNow;
+
+            //destruct the object
+            var (frameBuffer,
+                searchedPersonImage,
+                (cameraIp, cameraPort),
+                onBufferProcessed) = AnalysisSummary;
 
             //get the working snapshot
             var snapShot = frameBuffer.TakeASnapshot();
+
+            //create the last positive response
+            (SearchForPersonResponse, string) lastPositiveResponse = (null, null);
 
             //begin a logging scope
             using (logger.BeginScope(string.Format(Constants.FarwJobDetailsMessage, cameraIp, cameraPort)))
@@ -181,20 +163,39 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
 
                 //start the searching
                 var totalProcessingTime = .0;
-                while (snapShot.Any() && !token.IsCancellationRequested)
+                while (snapShot.Any() && !cancellationToken.IsCancellationRequested)
                 {
                     //unpack the data tuple value
                     var (_, message) = snapShot.Dequeue();
 
-                    //do the buffer processing and count the times
+                    //count the initial time
                     var beforeElapsed = watch.Elapsed;
-                    var response = await bufferProcessor(message, token);
+
+                    //do the server call
+                    var response = await _facialAnalysisService
+                        .SearchPersonInImageAsync(
+                            searchedPersonImage,
+                            message.ImageBase64EncodedBytes,
+                            cancellationToken);
+
+                    //count the elapsed time in seconds
                     var frameProcessingTime = (watch.Elapsed - beforeElapsed).TotalSeconds;
 
-                    //continue with next frames if the person is not found
-                    if (stoppingPredicate?.Invoke(response) == true)
+                    //if the there is a match
+                    if (response.FaceRecognitionInfo.Any())
                     {
-                        return (response, message.ImageBase64EncodedBytes);
+                        //compute the last positive response
+                        lastPositiveResponse = (response, message.ImageBase64EncodedBytes);
+
+                        //invoke the callback on positive response
+                        onBufferProcessed?.Invoke(lastPositiveResponse, startTime, DateTime.UtcNow);
+                    }
+
+                    //stop the buffer processing if we discover an result 
+                    //only if this is enabled from config
+                    if (response.FaceRecognitionInfo.Any() && _config.StopWorkerOnFirstPositiveAnswer)
+                    {
+                        return lastPositiveResponse;
                     }
 
                     //increment the total processing time
@@ -214,7 +215,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             }
 
             //null response
-            return (null, null);
+            return lastPositiveResponse;
         }
     }
 }
