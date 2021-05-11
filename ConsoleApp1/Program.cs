@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ConsoleApp1.Config;
 using EasyNetQ;
@@ -30,7 +31,7 @@ namespace ConsoleApp1
 
             //get the base64 image
             var searchedFaceBase64Img =
-                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\sorina.txt");
+                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\eduard.txt");
 
             //get the hash value
             var hashValue = StringContentHasherHelpers.GetChecksumOfStringContent(searchedFaceBase64Img);
@@ -90,6 +91,17 @@ namespace ConsoleApp1
                     });
                 });
 
+            await messageQueue.PubSub.SubscribeAsync<ActiveWorkerMessage>(StringConstants.SlaveToMasterBusQueueName,
+                m =>
+                {
+                    Console.WriteLine(m.MessageContent.Item1 + " " + m.MessageContent.Item2.Count);
+                });
+
+
+            await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new ActiveWorkersMessage
+            {
+                MessageId = "this"
+            });
 
             Console.WriteLine("Press any key to stop...");
             Console.ReadKey();

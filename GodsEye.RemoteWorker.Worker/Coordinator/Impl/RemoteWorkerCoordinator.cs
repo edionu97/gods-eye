@@ -8,6 +8,7 @@ using GodsEye.RemoteWorker.Worker.Remote;
 using GodsEye.RemoteWorker.Workers.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
+using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Items.Messages.Registration;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
@@ -53,7 +54,11 @@ namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
                 async r =>
                 {
                     //add the request in bag for new workers
-                    _activeRequests.Add(r);
+                    //add only the requests that need that workers to not be online
+                    if (!(r is ActiveWorkersMessage))
+                    {
+                        _activeRequests.Add(r);
+                    }
 
                     //log the message and the information
                     _logger.LogInformation(JsonSerializerDeserializer<dynamic>.Serialize(new

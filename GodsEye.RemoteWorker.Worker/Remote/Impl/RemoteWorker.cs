@@ -14,13 +14,15 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
     public partial class RemoteWorker : IRemoteWorker
     {
+        private readonly Guid _workerIdentificationNumber;
+        private readonly CancellationTokenSource _parentCancellationTokenSource;
+
         private ILogger _logger;
         private readonly IBus _messageBus;
         private readonly IJobExecutor _jobExecutor;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IStreamingImageWorker _streamingImageWorker;
-        private readonly CancellationTokenSource _parentCancellationTokenSource;
 
         public RemoteWorker(
             IBus bus,
@@ -29,6 +31,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             IServiceProvider serviceProvider,
             IStreamingImageWorker streamingImageWorker)
         {
+            _workerIdentificationNumber = Guid.NewGuid();
             _parentCancellationTokenSource = new CancellationTokenSource();
 
             _messageBus = bus;
@@ -93,7 +96,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                             {
                                 break;
                             }
-                            
+
                             //remove the precedent task because is no longer active
                             _currentActiveWorkersForSearching.TryRemove(searchForPersonMessage.MessageId, out _);
                         }
@@ -119,6 +122,17 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 
                         //handle the stop searching for person
                         HandleTheStopSearchingForPersonMessage(stopSearchingForPersonMessage);
+                        break;
+                    }
+
+                //handle the active workers message
+                case ActiveWorkersMessage activeWorkersMessage:
+                    {
+                        //processing request
+                        _logger.LogInformation(
+                            Constants.ProcessingRequestMessage, nameof(ActiveWorkersMessage));
+
+                        HandleTheActiveWorkersMessage(activeWorkersMessage);
                         break;
                     }
 

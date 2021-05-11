@@ -3,6 +3,7 @@ using EasyNetQ;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;
@@ -162,6 +163,35 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 //log the exception
                 _logger.LogCritical(e.Message);
             }
+        }
+
+        private void HandleTheActiveWorkersMessage(IRequestResponseMessage requestMessage)
+        {
+            //get the id of the workers
+            var workersJobs = new List<string>();
+
+            //iterate the active workers
+            foreach (var (hashId, (task, _)) in _currentActiveWorkersForSearching)
+            {
+                //skip if the task is not running
+                if (task.IsFaulted || task.IsCanceled || task.IsCompleted || task.IsCompletedSuccessfully)
+                {
+                    continue;
+                }
+
+                //add the hash id in the list
+                workersJobs.Add(hashId);
+            }
+
+            //person potentially found
+            _messageBus.PubSub
+                // ReSharper disable once MethodSupportsCancellation
+                // ReSharper disable once MethodHasAsyncOverload
+                .Publish(new ActiveWorkerMessage
+                {
+                    MessageId = requestMessage.MessageId,
+                    MessageContent = (_workerIdentificationNumber, workersJobs)
+                });
         }
     }
 }
