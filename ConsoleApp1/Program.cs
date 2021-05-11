@@ -58,10 +58,9 @@ namespace ConsoleApp1
                         return;
                     }
 
-
                     Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
 
-                    var (response, analysis, _) = r.MessageContent;
+                    var (response, _, analysis) = r.MessageContent;
                     Console.WriteLine(analysis.ToString());
 
                     //sync the values

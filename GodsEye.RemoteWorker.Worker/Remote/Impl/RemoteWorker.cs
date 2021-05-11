@@ -7,7 +7,7 @@ using GodsEye.RemoteWorker.Worker.Streaming;
 using GodsEye.RemoteWorker.Workers.Messages;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
-
+using GodsEye.Utility.Application.Items.Executors;
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 
 namespace GodsEye.RemoteWorker.Worker.Remote.Impl
@@ -16,6 +16,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
     {
         private ILogger _logger;
         private readonly IBus _messageBus;
+        private readonly IJobExecutor _jobExecutor;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IStreamingImageWorker _streamingImageWorker;
@@ -23,6 +24,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 
         public RemoteWorker(
             IBus bus,
+            IJobExecutor jobExecutor,
             ILoggerFactory loggerFactory,
             IServiceProvider serviceProvider,
             IStreamingImageWorker streamingImageWorker)
@@ -30,6 +32,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             _parentCancellationTokenSource = new CancellationTokenSource();
 
             _messageBus = bus;
+            _jobExecutor = jobExecutor;
             _loggerFactory = loggerFactory;
             _serviceProvider = serviceProvider;
             _streamingImageWorker = streamingImageWorker;
@@ -50,9 +53,25 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 await CheckForNewRequestAsync(notProcessedRequest, rwStartingInformation);
             }
 
-            //start the siw worker
-            await _streamingImageWorker
-                .StartAsync(cameraPort, cameraIp, _parentCancellationTokenSource);
+            try
+            {
+
+                //start the siw worker
+                await _streamingImageWorker
+                    .StartAsync(cameraPort, cameraIp, _parentCancellationTokenSource);
+            }
+            finally
+            {
+                //stop the job executor for current instance 
+                try
+                {
+                    _jobExecutor.StopJobExecution();
+                }
+                catch (Exception e)
+                {
+                    _logger?.LogCritical(e.Message);
+                }
+            }
         }
 
         public Task CheckForNewRequestAsync(IRequestResponseMessage requestMessage, RwStartingInformation rwStartingInformation)

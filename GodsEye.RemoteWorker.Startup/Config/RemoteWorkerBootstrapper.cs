@@ -33,6 +33,8 @@ using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 using GodsEye.Utility.Application.Items.Enums;
+using GodsEye.Utility.Application.Items.Executors;
+using GodsEye.Utility.Application.Items.Executors.Impl;
 using GodsEye.Utility.Application.Items.Statistics.Time.ElapsedTime;
 using GodsEye.Utility.Application.Items.Statistics.Time.ElapsedTime.Impl;
 using GodsEye.Utility.Application.Resources.Manager;
@@ -179,6 +181,10 @@ namespace GodsEye.RemoteWorker.Startup.Config
                     services
                         .AddTransient<IFacialAnalysisAndRecognitionWorker, FacialAnalysisAndRecognitionWorker>();
 
+                    //add the job executor
+                    services
+                        .AddTransient<IJobExecutor, SingleThreadBlockingJobExecutor>();
+
                     //register the remote worker
                     services.AddTransient<IRemoteWorker, RemoteWorkerImpl>();
 
@@ -222,7 +228,7 @@ namespace GodsEye.RemoteWorker.Startup.Config
                             LoadSheddingPolicyType.HeuristicImageSimilarityLoadShedding => 
                                 serviceProvider.GetService<HeuristicImageSimilarityLoadSheddingPolicy>(),
 
-                            //handle the case of heuristic image comparation
+                            //handle the case of heuristic image comparison
                             LoadSheddingPolicyType.HeuristicImageComparisionLoadShedding =>
                                 serviceProvider.GetService<HeuristicImageComparisonLoadSheddingPolicy>(),
 

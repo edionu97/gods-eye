@@ -55,17 +55,42 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         SearchedPersonBase64Img = message.MessageContent,
                         OnBufferProcessed = (response, startTime, endTime) =>
                         {
-                            //person potentially found
-                            _messageBus.PubSub
-                                 // ReSharper disable once MethodSupportsCancellation
-                                 .Publish(new PersonFoundMessage
-                                 {
-                                     IsFound = true,
-                                     MessageContent = response,
-                                     MessageId = message.MessageId,
-                                     StartTimeUtc = startTime,
-                                     EndTimeUtc = endTime
-                                 });
+                            //unpack the object
+                            var (detectionInfo, frameInfo) = response;
+
+                            //create a new job and pass it to the job executor
+                            _jobExecutor.QueueJob(async () =>
+                            {
+                                //get the analysis response
+                                FacialAttributeAnalysisResponse analysisResponse = null;
+                                try
+                                {
+                                    //get the response of the facial analysis
+                                    analysisResponse = await facialAnalysisWorkerInstance
+                                        .AnalyzeFaceAndExtractFacialAttributesAsync(
+                                            frameInfo,
+                                            detectionInfo.FaceRecognitionInfo.First().FaceBoundingBox,
+                                            cancellationTokenSource.Token);
+                                }
+                                catch (Exception e)
+                                {
+                                    _logger?.LogCritical(e.Message);
+                                }
+
+                                //person potentially found
+                                _messageBus.PubSub
+                                    // ReSharper disable once MethodSupportsCancellation
+                                    // ReSharper disable once MethodHasAsyncOverload
+                                    .Publish(new PersonFoundMessage
+                                    {
+                                        IsFound = true,
+                                        MessageContent = (detectionInfo, frameInfo, analysisResponse),
+                                        MessageId = message.MessageId,
+                                        StartTimeUtc = startTime,
+                                        EndTimeUtc = endTime
+                                    });
+
+                            });
                         }
                     },
                     cancellationTokenSource.Token);
