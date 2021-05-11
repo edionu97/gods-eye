@@ -91,7 +91,8 @@ namespace ConsoleApp1
                     });
                 });
 
-            await messageQueue.PubSub.SubscribeAsync<ActiveWorkerMessage>(StringConstants.SlaveToMasterBusQueueName,
+            await messageQueue.PubSub.SubscribeAsync<ActiveWorkerMessage>(
+                StringConstants.SlaveToMasterBusQueueName,
                 m =>
                 {
                     Console.WriteLine(m.MessageContent.Item1 + " " + m.MessageContent.Item2.Count);
