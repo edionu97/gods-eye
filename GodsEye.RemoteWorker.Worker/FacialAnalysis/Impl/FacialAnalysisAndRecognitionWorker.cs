@@ -93,7 +93,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                         var startTime = DateTime.UtcNow;
 
                         //compute the response
-                        var response = await
+                        var (response, img) = await
                             ProcessTheFrameBufferAsync(
                                 frameBuffer,
                                 (message, token) =>
@@ -106,7 +106,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                                 cancellationToken, (logger, cameraIp, cameraPort));
 
                         //invoke the method if is not null
-                        onBufferProcessed?.Invoke(response, startTime, DateTime.UtcNow);
+                        onBufferProcessed?.Invoke((response, img), startTime, DateTime.UtcNow);
 
                         //stop the cycle if we have the response and we are configured to do so
                         if (response != null && _config.StopWorkerOnFirstPositiveAnswer)
@@ -139,6 +139,14 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             }, cancellationToken);
         }
 
+        public Task<FacialAttributeAnalysisResponse>
+            AnalyzeFaceAndExtractFacialAttributesAsync(
+                string base64Image, 
+                FaceLocationBoundingBox faceLocation, CancellationToken token)
+        {
+            return _facialAnalysisService.AnalyseFaceAsync(base64Image, faceLocation, token);
+        }
+
         /// <summary>
         /// This method it is used for processing the frame buffer
         /// </summary>
@@ -149,7 +157,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
         /// <param name="token">the cancellation token</param>
         /// <param name="loggingInfo">the logging information</param>
         /// <returns>a task containing the result or null if nothing could not be found</returns>
-        public async Task<T> ProcessTheFrameBufferAsync<T>(
+        public async Task<(T, string)> ProcessTheFrameBufferAsync<T>(
             IFrameBuffer frameBuffer,
             Func<NetworkImageFrameMessage, CancellationToken, Task<T>> bufferProcessor,
             Predicate<T> stoppingPredicate,
@@ -186,7 +194,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     //continue with next frames if the person is not found
                     if (stoppingPredicate?.Invoke(response) == true)
                     {
-                        return response;
+                        return (response, message.ImageBase64EncodedBytes);
                     }
 
                     //increment the total processing time
@@ -206,7 +214,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
             }
 
             //null response
-            return null;
+            return (null, null);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace ConsoleApp1
 
             //get the base64 image
             var searchedFaceBase64Img =
-                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\eduard.txt");
+                await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\sorina.txt");
 
             //get the hash value
             var hashValue = StringContentHasherHelpers.GetChecksumOfStringContent(searchedFaceBase64Img);
@@ -60,7 +60,9 @@ namespace ConsoleApp1
 
 
                     Console.WriteLine(r.EndTimeUtc + " " + r.StartTimeUtc + " " + r.IsFound);
-                    Console.WriteLine(r.MessageContent.ToString());
+
+                    var (response, analysis, _) = r.MessageContent;
+                    Console.WriteLine(analysis.ToString());
 
                     //sync the values
                     lock (SyncPrimitive)

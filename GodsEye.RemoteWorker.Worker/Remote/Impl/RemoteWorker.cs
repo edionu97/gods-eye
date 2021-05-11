@@ -66,7 +66,17 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         //if there is already a thread that handles the searching request do nothing
                         if (_currentActiveWorkersForSearching.ContainsKey(searchForPersonMessage.MessageId))
                         {
-                            break;
+                            //get the active task that handles the search for person request
+                            var (task, _) = _currentActiveWorkersForSearching[searchForPersonMessage.MessageId];
+
+                            //if the task is still running 
+                            if (!(task.IsFaulted || task.IsCanceled || task.IsCompleted || task.IsCompletedSuccessfully))
+                            {
+                                break;
+                            }
+                            
+                            //remove the precedent task because is no longer active
+                            _currentActiveWorkersForSearching.TryRemove(searchForPersonMessage.MessageId, out _);
                         }
 
                         //processing request

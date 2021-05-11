@@ -3,6 +3,7 @@ using EasyNetQ;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
@@ -22,7 +23,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
         private readonly ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)> _currentActiveWorkersForSearching =
             new ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)>();
 
-        private readonly ConcurrentDictionary<string, IRequestResponseMessage> _cancelRequests 
+        private readonly ConcurrentDictionary<string, IRequestResponseMessage> _cancelRequests
             = new ConcurrentDictionary<string, IRequestResponseMessage>();
 
         private void HandleTheSearchForPersonRequest(
@@ -52,27 +53,47 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         FrameBuffer = _streamingImageWorker.FrameBuffer,
                         StatisticsInformation = (cameraIp, cameraPort),
                         SearchedPersonBase64Img = message.MessageContent,
-                        OnBufferProcessed = (r, startTime, endTime) =>
-                       {
-                           //send the response only if the value is not null
-                           if (r == null)
-                           {
-                               return;
-                           }
+                        OnBufferProcessed = async (response, startTime, endTime) =>
+                        {
+                            //destruct the response
+                            var (r, foundInFrame) = response;
 
-                           //publish the result message async
-                           //person potentially found
-                           _messageBus.PubSub
-                               // ReSharper disable once MethodSupportsCancellation
-                               .Publish(new PersonFoundMessage
-                               {
-                                   IsFound = true,
-                                   MessageContent = r,
-                                   MessageId = message.MessageId,
-                                   StartTimeUtc = startTime,
-                                   EndTimeUtc = endTime
-                               });
-                       }
+                            //send the response only if the value is not null
+                            if (r == null)
+                            {
+                                return;
+                            }
+
+                            //do the facial attribute analysis
+                            FacialAttributeAnalysisResponse analysisResponse = null;
+                            try
+                            {
+                                //get the response of the facial analysis
+                                analysisResponse = await facialAnalysisWorkerInstance
+                                     .AnalyzeFaceAndExtractFacialAttributesAsync(
+                                         foundInFrame,
+                                         r.FaceRecognitionInfo.First().FaceBoundingBox,
+                                         cancellationTokenSource.Token);
+                            }
+                            catch (Exception e)
+                            {
+                                _logger?.LogError(e.Message);
+                            }
+
+                            //publish the result message async
+                            //person potentially found
+                            _messageBus.PubSub
+                                 // ReSharper disable once MethodSupportsCancellation
+                                 // ReSharper disable once MethodHasAsyncOverload
+                                 .Publish(new PersonFoundMessage
+                                 {
+                                     IsFound = true,
+                                     MessageContent = (r, analysisResponse, foundInFrame),
+                                     MessageId = message.MessageId,
+                                     StartTimeUtc = startTime,
+                                     EndTimeUtc = endTime
+                                 });
+                        }
                     },
                     cancellationTokenSource.Token);
 
@@ -94,7 +115,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 
             //log the information
             _logger.LogInformation(Constants.BlacklistedRequest);
-            
+
             //get stop the client
             HandleTheStopSearchingForPersonMessage(_cancelRequests[message.MessageId]);
         }

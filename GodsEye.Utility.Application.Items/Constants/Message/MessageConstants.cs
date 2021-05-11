@@ -80,6 +80,8 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
 
             public static string FarwJobDetailsMessage => "AI job for camera {0}:{1}";
 
+            public static string FarwFacialAnalysisStarted => "Facial analysis started";
+
             public static string BroadcastingRequestMessage => "Broadcasting the request to all the available workers";
 
             public static string RemoteWorkerLoggerName =>
