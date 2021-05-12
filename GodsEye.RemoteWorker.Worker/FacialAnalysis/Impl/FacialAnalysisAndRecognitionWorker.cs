@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 using GodsEye.DataStreaming.LoadShedding.Manager;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
-using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
 using GodsEye.Utility.Application.Helpers.Helpers.Threading;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Args;
+using GodsEye.RemoteWorkers.Interoperability.Grpc.Proxy;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
 

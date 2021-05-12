@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using static Gods.Eye.Server.Artificial.Intelligence.Messaging.FacialRecognitionAndAnalysis;
 
-namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy.Impl
+namespace GodsEye.RemoteWorkers.Interoperability.Grpc.Proxy.Impl
 {
     public class FacialRecognitionAndAnalysisService : IFacialRecognitionAndAnalysisService
     {

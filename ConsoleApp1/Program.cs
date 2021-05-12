@@ -1,16 +1,14 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using ConsoleApp1.Config;
 using EasyNetQ;
-using GodsEye.RemoteWorker.Worker.Remote.Messages;
+using System.IO;
+using ConsoleApp1.Config;
+using System.Threading.Tasks;
 using GodsEye.RemoteWorker.Workers.Messages;
+using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
+using GodsEye.RemoteWorker.Workers.Messages.Responses;
 using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
 using GodsEye.Utility.Application.Items.Constants.String;
-using Microsoft.Extensions.DependencyInjection;
-using SixLabors.ImageSharp.Formats.Bmp;
 
 namespace ConsoleApp1
 {
@@ -37,7 +35,7 @@ namespace ConsoleApp1
             var hashValue = StringContentHasherHelpers.GetChecksumOfStringContent(searchedFaceBase64Img);
 
             //start the search for person message
-            await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessage
+            await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new SearchForPersonMessageRequest
             {
                 MessageContent = searchedFaceBase64Img
             });
@@ -49,7 +47,7 @@ namespace ConsoleApp1
             var numberOfCasesFound = .0;
 
             //this is called when we have an response
-            await messageQueue.PubSub.SubscribeAsync<PersonFoundMessage>(
+            await messageQueue.PubSub.SubscribeAsync<PersonFoundMessageResponse>(
                 StringConstants.SlaveToMasterBusQueueName,
                 async r =>
                 {
@@ -85,13 +83,13 @@ namespace ConsoleApp1
                     Console.WriteLine($"The success probability is {(numberOfCasesFound / runningCycles) * 100}%");
 
                     //send the cancellation request message
-                    await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new StopSearchingForPersonMessage
+                    await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new StopSearchingForPersonMessageRequest
                     {
                         MessageId = StringContentHasherHelpers.GetChecksumOfStringContent(searchedFaceBase64Img)
                     });
                 });
 
-            await messageQueue.PubSub.SubscribeAsync<ActiveWorkerMessage>(
+            await messageQueue.PubSub.SubscribeAsync<ActiveWorkerMessageResponse>(
                 StringConstants.SlaveToMasterBusQueueName,
                 m =>
                 {
@@ -99,7 +97,7 @@ namespace ConsoleApp1
                 });
 
 
-            await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new ActiveWorkersMessage
+            await messageQueue.PubSub.PublishAsync<IRequestResponseMessage>(new GetActiveWorkersMessageRequest
             {
                 MessageId = "this"
             });

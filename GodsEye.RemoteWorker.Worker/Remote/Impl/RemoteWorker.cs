@@ -83,7 +83,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             switch (requestMessage)
             {
                 //handle the search for person response message
-                case SearchForPersonMessage searchForPersonMessage:
+                case SearchForPersonMessageRequest searchForPersonMessage:
                     {
                         //if there is already a thread that handles the searching request do nothing
                         if (_currentActiveWorkersForSearching.ContainsKey(searchForPersonMessage.MessageId))
@@ -103,7 +103,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 
                         //processing request
                         _logger.LogInformation(
-                            Constants.ProcessingRequestMessage, nameof(SearchForPersonMessage));
+                            Constants.ProcessingRequestMessage, nameof(SearchForPersonMessageRequest));
 
                         //handle the search person request
                         HandleTheSearchForPersonRequest(
@@ -114,11 +114,11 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     }
 
                 //handle the stop searching for person message
-                case StopSearchingForPersonMessage stopSearchingForPersonMessage:
+                case StopSearchingForPersonMessageRequest stopSearchingForPersonMessage:
                     {
                         //processing request
                         _logger.LogInformation(
-                            Constants.ProcessingRequestMessage, nameof(StopSearchingForPersonMessage));
+                            Constants.ProcessingRequestMessage, nameof(StopSearchingForPersonMessageRequest));
 
                         //handle the stop searching for person
                         HandleTheStopSearchingForPersonMessage(stopSearchingForPersonMessage);
@@ -126,11 +126,11 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     }
 
                 //handle the active workers message
-                case ActiveWorkersMessage activeWorkersMessage:
+                case GetActiveWorkersMessageRequest activeWorkersMessage:
                     {
                         //processing request
                         _logger.LogInformation(
-                            Constants.ProcessingRequestMessage, nameof(ActiveWorkersMessage));
+                            Constants.ProcessingRequestMessage, nameof(GetActiveWorkersMessageRequest));
 
                         HandleTheActiveWorkersMessage(activeWorkersMessage);
                         break;

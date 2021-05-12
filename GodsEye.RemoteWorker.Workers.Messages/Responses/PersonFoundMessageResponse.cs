@@ -1,10 +1,9 @@
 ﻿using System;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
-using GodsEye.RemoteWorker.Workers.Messages;
 
-namespace GodsEye.RemoteWorker.Worker.Remote.Messages
+namespace GodsEye.RemoteWorker.Workers.Messages.Responses
 {
-    public class PersonFoundMessage : IRequestResponseMessage
+    public class PersonFoundMessageResponse : IRequestResponseMessage
     {
         public string MessageId { get; set; }
         public DateTime StartTimeUtc { get; set; }

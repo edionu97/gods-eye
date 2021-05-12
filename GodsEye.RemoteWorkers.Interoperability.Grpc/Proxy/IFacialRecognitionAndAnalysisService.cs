@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 
-namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy
+namespace GodsEye.RemoteWorkers.Interoperability.Grpc.Proxy
 {
     public interface IFacialRecognitionAndAnalysisService
     {
@@ -29,6 +29,5 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy
         /// <returns>an instance of the FacialAttributeAnalysisResponse containing the required information</returns>
         public Task<FacialAttributeAnalysisResponse> AnalyseFaceAsync(
             string base64FaceImage, FaceLocationBoundingBox faceBoundingBox, CancellationToken token);
-      
     }
 }

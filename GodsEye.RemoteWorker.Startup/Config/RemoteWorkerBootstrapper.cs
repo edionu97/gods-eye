@@ -15,9 +15,7 @@ using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl;
 using GodsEye.DataStreaming.LoadShedding.Manager.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer;
-using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy;
 using GodsEye.RemoteWorker.Worker.Streaming.FrameBuffer.Impl;
-using GodsEye.RemoteWorker.Worker.FacialAnalysis.GrpcProxy.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming.Impl;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket;
 using GodsEye.RemoteWorker.Worker.Streaming.WebSocket.Impl;
@@ -29,6 +27,8 @@ using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl.NoRemovalPoli
 using GodsEye.DataStreaming.LoadShedding.LoadSheddingPolicies.Impl.RandomRemovalPolicy;
 using GodsEye.RemoteWorker.Worker.Coordinator;
 using GodsEye.RemoteWorker.Worker.Coordinator.Impl;
+using GodsEye.RemoteWorkers.Interoperability.Grpc.Proxy;
+using GodsEye.RemoteWorkers.Interoperability.Grpc.Proxy.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RemoteWorker;

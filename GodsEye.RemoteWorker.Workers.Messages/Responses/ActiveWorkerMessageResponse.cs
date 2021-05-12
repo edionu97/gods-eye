@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GodsEye.RemoteWorker.Workers.Messages;
 
-namespace GodsEye.RemoteWorker.Worker.Remote.Messages
+namespace GodsEye.RemoteWorker.Workers.Messages.Responses
 {
-    public class ActiveWorkerMessage : IRequestResponseMessage
+    public class ActiveWorkerMessageResponse : IRequestResponseMessage
     {
         public string MessageId { get; set; }
 

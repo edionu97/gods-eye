@@ -9,10 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
-using GodsEye.RemoteWorker.Worker.Remote.Messages;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using GodsEye.RemoteWorker.Workers.Messages;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
+using GodsEye.RemoteWorker.Workers.Messages.Responses;
 using Microsoft.Extensions.Logging;
 
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
@@ -28,7 +28,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             = new ConcurrentDictionary<string, IRequestResponseMessage>();
 
         private void HandleTheSearchForPersonRequest(
-            SearchForPersonMessage message,
+            SearchForPersonMessageRequest messageRequest,
             SiwInformation information, CancellationToken parentToken)
         {
             //get the service
@@ -53,7 +53,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     {
                         FrameBuffer = _streamingImageWorker.FrameBuffer,
                         StatisticsInformation = (cameraIp, cameraPort),
-                        SearchedPersonBase64Img = message.MessageContent,
+                        SearchedPersonBase64Img = messageRequest.MessageContent,
                         OnBufferProcessed = (response, startTime, endTime) =>
                         {
                             //unpack the object
@@ -82,11 +82,11 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                 _messageBus.PubSub
                                     // ReSharper disable once MethodSupportsCancellation
                                     // ReSharper disable once MethodHasAsyncOverload
-                                    .Publish(new PersonFoundMessage
+                                    .Publish(new PersonFoundMessageResponse
                                     {
                                         IsFound = true,
                                         MessageContent = (detectionInfo, frameInfo, analysisResponse),
-                                        MessageId = message.MessageId,
+                                        MessageId = messageRequest.MessageId,
                                         StartTimeUtc = startTime,
                                         EndTimeUtc = endTime
                                     });
@@ -97,17 +97,17 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     cancellationTokenSource.Token);
 
             //if there is already a worker that handles the identification for a specific person do nothing
-            if (_currentActiveWorkersForSearching.ContainsKey(message.MessageId))
+            if (_currentActiveWorkersForSearching.ContainsKey(messageRequest.MessageId))
             {
                 return;
             }
 
             //register the worker as online
             _currentActiveWorkersForSearching
-                .TryAdd(message.MessageId, (recognitionTask, cancellationTokenSource));
+                .TryAdd(messageRequest.MessageId, (recognitionTask, cancellationTokenSource));
 
             //handle the case in which the request is not canceled before start
-            if (!_cancelRequests.ContainsKey(message.MessageId))
+            if (!_cancelRequests.ContainsKey(messageRequest.MessageId))
             {
                 return;
             }
@@ -116,7 +116,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             _logger.LogInformation(Constants.BlacklistedRequest);
 
             //get stop the client
-            HandleTheStopSearchingForPersonMessage(_cancelRequests[message.MessageId]);
+            HandleTheStopSearchingForPersonMessage(_cancelRequests[messageRequest.MessageId]);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             _messageBus.PubSub
                 // ReSharper disable once MethodSupportsCancellation
                 // ReSharper disable once MethodHasAsyncOverload
-                .Publish(new ActiveWorkerMessage
+                .Publish(new ActiveWorkerMessageResponse
                 {
                     MessageId = requestMessage.MessageId,
                     MessageContent = (_workerIdentificationNumber, workersJobs)

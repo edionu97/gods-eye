@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GodsEye.RemoteWorkers.Interoperability.Grpc\GodsEye.RemoteWorkers.Interoperability.Grpc.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj" />
   </ItemGroup>
 

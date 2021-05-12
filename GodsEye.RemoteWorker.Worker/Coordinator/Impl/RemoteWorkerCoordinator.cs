@@ -55,7 +55,7 @@ namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
                 {
                     //add the request in bag for new workers
                     //add only the requests that need that workers to not be online
-                    if (!(r is ActiveWorkersMessage))
+                    if (!(r is GetActiveWorkersMessageRequest))
                     {
                         _activeRequests.Add(r);
                     }

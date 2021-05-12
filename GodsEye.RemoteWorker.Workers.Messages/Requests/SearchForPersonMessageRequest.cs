@@ -2,7 +2,7 @@
 
 namespace GodsEye.RemoteWorker.Workers.Messages.Requests
 {
-    public class SearchForPersonMessage : IRequestResponseMessage
+    public class SearchForPersonMessageRequest : IRequestResponseMessage
     {
         private string _messageId;
         public string MessageId
