@@ -109,6 +109,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         HandleTheSearchForPersonRequest(
                             searchForPersonMessage,
                             rwStartingInformation.Siw,
+                            rwStartingInformation.CameraGeolocation,
                             _parentCancellationTokenSource.Token);
                         break;
                     }

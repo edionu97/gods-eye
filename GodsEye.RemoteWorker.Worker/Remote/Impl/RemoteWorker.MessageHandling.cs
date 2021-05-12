@@ -13,6 +13,7 @@ using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using GodsEye.RemoteWorker.Workers.Messages;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.RemoteWorker.Workers.Messages.Responses;
+using GodsEye.Utility.Application.Items.Geolocation.Model;
 using Microsoft.Extensions.Logging;
 
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
@@ -29,7 +30,9 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 
         private void HandleTheSearchForPersonRequest(
             SearchForPersonMessageRequest messageRequest,
-            SiwInformation information, CancellationToken parentToken)
+            SiwInformation information, 
+            GeolocationInfo cameraGeolocation,
+            CancellationToken parentToken)
         {
             //get the service
             var facialAnalysisWorkerInstance =
@@ -88,7 +91,8 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                         MessageContent = (detectionInfo, frameInfo, analysisResponse),
                                         MessageId = messageRequest.MessageId,
                                         StartTimeUtc = startTime,
-                                        EndTimeUtc = endTime
+                                        EndTimeUtc = endTime,
+                                        FromLocation = cameraGeolocation
                                     });
 
                             });

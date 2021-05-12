@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Diagnostics;
 using EasyNetQ;
 using System.Net.Sockets;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using GodsEye.Utility.Application.Items.Geolocation;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Security.Encryption;
+using GodsEye.Utility.Application.Items.Geolocation.Model;
 using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Application.Config.Configuration.Sections.Camera;
 using LocalConstants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.CameraDevice;
@@ -15,8 +17,10 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
     public partial class SingleConnectionCameraDevice : ICameraDevice
     {
         private readonly IBus _registrationQueue;
+        private readonly IGeoLocator _geoLocator;
 
         public SingleConnectionCameraDevice(
+            IGeoLocator geoLocator,
             IImageProvider imageProvider,
             ILoggerFactory loggerFactory,
             IEncryptorDecryptor encryptor,
@@ -27,6 +31,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             _applicationConfig = configuration;
 
             _imageProvider = imageProvider;
+            _geoLocator = geoLocator;
             _encryptor = encryptor;
             _loggerFactory = loggerFactory;
 
@@ -36,7 +41,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
         public Task StartSendingImageFrames(string deviceId)
         {
             //get the network config
-            var (imageType, cameraAddress) = _applicationConfig
+            var (imageType, cameraAddress, sendGeolocation) = _applicationConfig
                 .Get<NetworkSectionConfig>();
 
             //get the image resolution section config
@@ -53,6 +58,29 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
             //create a new task on thread pool
             return Task.Run(async () =>
             {
+                GeolocationInfo geolocation = null;
+
+                //if the geolocation is enabled
+                if (sendGeolocation)
+                {
+                    try
+                    {
+                        //log the information
+                        logger.LogInformation(LocalConstants.GettingCameraGeolocationMessage);
+
+                        //get the camera geolocation
+                        geolocation = await _geoLocator.GetLocationAsync();
+
+                        //log the information
+                        logger.LogInformation(LocalConstants.CameraLocationSuccessfullyDeterminedMessage);
+                    }
+                    catch (Exception e)
+                    {
+                        //log the exception
+                        logger.LogWarning(LocalConstants.LocationCouldNotBeDeterminedMessage, e.Message);
+                    }
+                }
+
                 //if the existing connection fails => accept other client
                 while (true)
                 {
@@ -70,7 +98,7 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                     try
                     {
                         //register the camera
-                        RegisterThisCamera(cameraAddress, streamingPort);
+                        await RegisterThisCamera(cameraAddress, streamingPort, geolocation);
 
                         //wait for a single connection
                         using var client = await clientListener.AcceptSocketAsync();

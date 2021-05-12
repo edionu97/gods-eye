@@ -11,6 +11,8 @@ using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using GodsEye.Utility.Application.Items.Geolocation;
+using GodsEye.Utility.Application.Items.Geolocation.Impl;
 using GodsEye.Utility.Application.Security.Encryption;
 using GodsEye.Utility.Application.Security.Encryption.Impl;
 using GodsEye.Utility.Application.Security.KeyProvider;
@@ -109,6 +111,9 @@ namespace GodsEye.Camera.Startup.Config
 
                     //register the image provider as transient (new instance every time)
                     services.AddTransient<IImageProvider, ContinuouslyImageProvider>();
+
+                    //register the geo locator as singleton
+                    services.AddSingleton<IGeoLocator, IpBasedGeoLocator>();
 
                     //register the camera as transient (new instance every time)
                     services.AddTransient<ICameraDevice, SingleConnectionCameraDevice>();

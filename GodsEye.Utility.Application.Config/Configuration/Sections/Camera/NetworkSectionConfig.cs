@@ -7,13 +7,16 @@ namespace GodsEye.Utility.Application.Config.Configuration.Sections.Camera
     {
         public ImageType ImageStreamingFormat { get; set; }
         public string CamerasLocation { get; set; }
+        public bool SendTheGeolocation { get; set; }
 
         public void Deconstruct(
             out ImageType type, 
-            out string camerasLocation)
+            out string camerasLocation,
+            out bool sendTheGeolocation)
         {
             type = ImageStreamingFormat;
             camerasLocation = CamerasLocation;
+            sendTheGeolocation = SendTheGeolocation;
         }
     }
 }

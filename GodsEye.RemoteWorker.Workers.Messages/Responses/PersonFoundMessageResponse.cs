@@ -1,5 +1,6 @@
 ﻿using System;
 using Gods.Eye.Server.Artificial.Intelligence.Messaging;
+using GodsEye.Utility.Application.Items.Geolocation.Model;
 
 namespace GodsEye.RemoteWorker.Workers.Messages.Responses
 {
@@ -9,6 +10,7 @@ namespace GodsEye.RemoteWorker.Workers.Messages.Responses
         public DateTime StartTimeUtc { get; set; }
         public DateTime EndTimeUtc { get; set; }
         public bool IsFound { get; set; }
+        public GeolocationInfo FromLocation { get; set; }
         public (SearchForPersonResponse, string, FacialAttributeAnalysisResponse) MessageContent { get; set; }
     }
 }

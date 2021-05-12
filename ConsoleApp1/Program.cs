@@ -8,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.RemoteWorker.Workers.Messages.Responses;
 using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
+using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Items.Constants.String;
+using GodsEye.Utility.Application.Items.Geolocation.Model;
 
 namespace ConsoleApp1
 {
@@ -61,6 +63,8 @@ namespace ConsoleApp1
 
                     var (response, _, analysis) = r.MessageContent;
                     Console.WriteLine(analysis.ToString());
+
+                    Console.WriteLine(JsonSerializerDeserializer<GeolocationInfo>.Serialize(r.FromLocation));
 
                     //sync the values
                     lock (SyncPrimitive)

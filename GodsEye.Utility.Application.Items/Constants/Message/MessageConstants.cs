@@ -40,6 +40,12 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
             public static string CameraIsStreamingImagesMessage => "Streaming location found, started streaming images. Camera details: {0}\n";
 
             public static string StreamingLocationLostMessage => "The communication with streaming location lost.\n";
+
+            public static string GettingCameraGeolocationMessage => "Computing camera geographical location...\n";
+
+            public static string CameraLocationSuccessfullyDeterminedMessage => "Camera geolocation successfully determined\n";
+
+            public static string LocationCouldNotBeDeterminedMessage => "Location could not be determined, due to {0}\n";
         }
 
         public static class Workers

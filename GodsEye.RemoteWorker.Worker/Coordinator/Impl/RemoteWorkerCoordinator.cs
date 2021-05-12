@@ -156,7 +156,8 @@ namespace GodsEye.RemoteWorker.Worker.Coordinator.Impl
                         CameraIp = cameraIp,
                         CameraPort = cameraPort
                     },
-                    NotProcessedRequests = _activeRequests
+                    NotProcessedRequests = _activeRequests,
+                    CameraGeolocation = message.CameraGeolocation
                 };
 
                 //get the worker task

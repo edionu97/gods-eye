@@ -10,6 +10,7 @@ using GodsEye.Camera.ImageStreaming.ImageSource.ImageProvider;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
 using GodsEye.Utility.Application.Items.Enums;
+using GodsEye.Utility.Application.Items.Geolocation.Model;
 using GodsEye.Utility.Application.Items.Messages.CameraToWorker;
 using GodsEye.Utility.Application.Items.Messages.Registration;
 
@@ -50,12 +51,13 @@ namespace GodsEye.Camera.ImageStreaming.Camera.Impl
                 LocalConstants.CameraIsStreamingImagesMessage, message);
         }
 
-        private void RegisterThisCamera(string cameraAddress, int cameraPort)
+        private async Task RegisterThisCamera(string cameraAddress, int cameraPort, GeolocationInfo geolocation)
         {
-            _registrationQueue?.PubSub.PublishAsync(new OnlineCameraMessage
+            await _registrationQueue.PubSub.PublishAsync(new OnlineCameraMessage
             {
                 CameraIp = cameraAddress,
-                CameraPort = cameraPort
+                CameraPort = cameraPort,
+                CameraGeolocation = geolocation
             });
         }
 
