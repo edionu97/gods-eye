@@ -94,6 +94,8 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
 
             public static string BlacklistedRequest =>
                 "Identified that the searching request was cancelled, stopping its processing...\n";
+
+            public static string ExtraTimeMessage => "The extra-time that will be added to next round is: {0}s\n";
         }
 
         public static class LoadShedding

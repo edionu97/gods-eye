@@ -91,10 +91,18 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     };
 
                     //start the searching rounds
+                    var nextRoundExtraTime = .0;
                     do
                     {
                         //compute the response
-                        var (response, _) = await ProcessTheFrameBufferAsync(logger, cancellationToken);
+                        var ((response, _), currentRoundRemainingTime) = await 
+                            ProcessTheFrameBufferAsync(logger, nextRoundExtraTime, cancellationToken);
+
+                        //set the extra time for the next round
+                        nextRoundExtraTime = currentRoundRemainingTime;
+
+                        //log the message
+                        logger.LogInformation(Constants.ExtraTimeMessage, nextRoundExtraTime);
 
                         //stop the cycle if we have the response and we are configured to do so
                         if (response != null && _config.StopWorkerOnFirstPositiveAnswer)
@@ -131,10 +139,11 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
         /// This method it is used for processing the frame buffer
         /// </summary>
         /// <param name="logger">the logger used for logging the messages</param>
+        /// <param name="previousRoundExtraTime">a round can be finished quicker that the previous one, so processing time should get amortized over time</param>
         /// <param name="cancellationToken">the cancellation token</param>
         /// <returns>a task containing the result or null if nothing could not be found</returns>
-        private async Task<(SearchForPersonResponse, string)> 
-            ProcessTheFrameBufferAsync(ILogger logger, CancellationToken cancellationToken)
+        private async Task<((SearchForPersonResponse, string), double)> 
+            ProcessTheFrameBufferAsync(ILogger logger, double previousRoundExtraTime, CancellationToken cancellationToken)
         {
             //get the starting time of the round
             var startTime = DateTime.UtcNow;
@@ -195,7 +204,7 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     //only if this is enabled from config
                     if (response.FaceRecognitionInfo.Any() && _config.StopWorkerOnFirstPositiveAnswer)
                     {
-                        return lastPositiveResponse;
+                        return (lastPositiveResponse, Math.Max(0, frameBuffer.InputRate - totalProcessingTime));
                     }
 
                     //increment the total processing time
@@ -205,17 +214,17 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                     snapShot = await _policyManager
                         .ApplyLoadSheddingPolicyAsync(
                             snapShot,
-                            frameBuffer.InputRate - totalProcessingTime,
+                            frameBuffer.InputRate + previousRoundExtraTime - totalProcessingTime,
                             frameProcessingTime);
                 }
 
                 //log the message
                 logger.LogInformation(string
                     .Format(Constants.FarwRoundFinishedMessage, totalProcessingTime));
-            }
 
-            //null response
-            return lastPositiveResponse;
+                //get the response
+                return (lastPositiveResponse, Math.Max(0, frameBuffer.InputRate - totalProcessingTime));
+            }
         }
     }
 }
