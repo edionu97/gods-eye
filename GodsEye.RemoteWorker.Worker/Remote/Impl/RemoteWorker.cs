@@ -133,7 +133,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         _logger.LogInformation(
                             Constants.ProcessingRequestMessage, nameof(GetActiveWorkersMessageRequest));
 
-                        HandleTheActiveWorkersMessage(activeWorkersMessage);
+                        HandleTheActiveWorkersMessage(activeWorkersMessage, rwStartingInformation.CameraGeolocation);
                         break;
                     }
 

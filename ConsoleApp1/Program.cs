@@ -97,7 +97,8 @@ namespace ConsoleApp1
                 StringConstants.SlaveToMasterBusQueueName,
                 m =>
                 {
-                    Console.WriteLine(m.MessageContent.Item1 + " " + m.MessageContent.Item2.Count);
+                    Console.WriteLine(m.MessageContent.Item1 + " " + m.MessageContent.Item2.Count );
+                    Console.WriteLine(JsonSerializerDeserializer<GeolocationInfo>.Serialize(m.Geolocation));
                 });
 
 

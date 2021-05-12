@@ -169,7 +169,8 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             }
         }
 
-        private void HandleTheActiveWorkersMessage(IRequestResponseMessage requestMessage)
+        private void HandleTheActiveWorkersMessage(
+            IRequestResponseMessage requestMessage, GeolocationInfo geolocation)
         {
             //get the id of the workers
             var workersJobs = new List<string>();
@@ -194,6 +195,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 .Publish(new ActiveWorkerMessageResponse
                 {
                     MessageId = requestMessage.MessageId,
+                    Geolocation = geolocation,
                     MessageContent = (_workerIdentificationNumber, workersJobs)
                 });
         }
