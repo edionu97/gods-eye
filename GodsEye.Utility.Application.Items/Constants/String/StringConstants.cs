@@ -12,5 +12,12 @@
         {
             public static string GeneratedWsClientNameFormat => "gen-ws-client-for_{0}_{1}.html";
         }
+
+        public static class Apis
+        {
+            public static string GetRealIpAddressApi => "https://api.ipify.org";
+
+            public static string GetGeolocationApi => "https://reallyfreegeoip.org/json/{0}";
+        }
     }
 }
