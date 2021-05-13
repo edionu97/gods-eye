@@ -30,7 +30,11 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                             WorkerInfo = new
                             {
                                 WorkerId = guid,
-                                ActiveSearchingJobs = activeJobs.Count
+                                ActiveSearchingJobs = new
+                                {
+                                    activeJobs.Count,
+                                    Jobs = activeJobs
+                                }
                             }
                         });
                     }
