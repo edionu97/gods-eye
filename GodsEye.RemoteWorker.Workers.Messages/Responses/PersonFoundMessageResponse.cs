@@ -7,6 +7,7 @@ namespace GodsEye.RemoteWorker.Workers.Messages.Responses
     public class PersonFoundMessageResponse : IRequestResponseMessage
     {
         public string MessageId { get; set; }
+        public string UserId { get; set; }
         public DateTime StartTimeUtc { get; set; }
         public DateTime EndTimeUtc { get; set; }
         public bool IsFound { get; set; }

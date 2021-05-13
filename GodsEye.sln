@@ -31,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.DataStreaming.LoadS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.RemoteWorker.Workers.Messages", "GodsEye.RemoteWorker.Workers.Messages\GodsEye.RemoteWorker.Workers.Messages.csproj", "{A2775838-10A1-4206-B91C-F4D5EB64DD11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.RemoteWorkers.Interoperability.Grpc", "GodsEye.RemoteWorkers.Interoperability.Grpc\GodsEye.RemoteWorkers.Interoperability.Grpc.csproj", "{4C4E9278-988D-434D-9F57-A6BAE355D140}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodsEye.RemoteWorkers.Interoperability.Grpc", "GodsEye.RemoteWorkers.Interoperability.Grpc\GodsEye.RemoteWorkers.Interoperability.Grpc.csproj", "{4C4E9278-988D-434D-9F57-A6BAE355D140}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodsEye.Application.Middleware", "GodsEye.Application.Middleware\GodsEye.Application.Middleware.csproj", "{3D5FA289-8532-480D-9D88-81F0A3F0E3CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +101,10 @@ Global
 		{4C4E9278-988D-434D-9F57-A6BAE355D140}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C4E9278-988D-434D-9F57-A6BAE355D140}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C4E9278-988D-434D-9F57-A6BAE355D140}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D5FA289-8532-480D-9D88-81F0A3F0E3CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D5FA289-8532-480D-9D88-81F0A3F0E3CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D5FA289-8532-480D-9D88-81F0A3F0E3CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D5FA289-8532-480D-9D88-81F0A3F0E3CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

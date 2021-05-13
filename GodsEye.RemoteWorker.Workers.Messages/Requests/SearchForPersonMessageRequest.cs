@@ -12,6 +12,8 @@ namespace GodsEye.RemoteWorker.Workers.Messages.Requests
                 .GetChecksumOfStringContent(MessageContent);
         }
 
+        public string UserId { get; set; }
+
         public string MessageContent { get; set; }
     }
 }

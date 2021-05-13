@@ -3,5 +3,6 @@
     public class GetActiveWorkersMessageRequest : IRequestResponseMessage
     {
         public string MessageId { get; set; }
+        public string UserId { get; set; }
     }
 }

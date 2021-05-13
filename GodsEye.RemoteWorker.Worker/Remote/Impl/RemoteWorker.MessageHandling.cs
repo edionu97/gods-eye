@@ -90,6 +90,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                         IsFound = true,
                                         MessageContent = (detectionInfo, frameInfo, analysisResponse),
                                         MessageId = messageRequest.MessageId,
+                                        UserId = messageRequest.UserId,
                                         StartTimeUtc = startTime,
                                         EndTimeUtc = endTime,
                                         FromLocation = cameraGeolocation
@@ -195,6 +196,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 .Publish(new ActiveWorkerMessageResponse
                 {
                     MessageId = requestMessage.MessageId,
+                    UserId =  requestMessage.UserId,
                     Geolocation = geolocation,
                     MessageContent = (_workerIdentificationNumber, workersJobs)
                 });

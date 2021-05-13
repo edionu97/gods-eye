@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using EasyNetQ;
+using GodsEye.Application.Middleware;
+using GodsEye.Application.Middleware.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
@@ -64,6 +66,9 @@ namespace ConsoleApp1.Config
                             },
                             _ => { });
                     });
+
+                    //add the master middleware
+                    services.AddSingleton<IWorkersMasterMiddleware, WorkersMasterMiddleware>();
                 })
                 .Build()
                 .Services;
