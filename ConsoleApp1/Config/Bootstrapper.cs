@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using EasyNetQ;
 using GodsEye.Application.Middleware;
-using GodsEye.Application.Middleware.Impl;
+using GodsEye.Application.Middleware.MessageBroadcaster;
+using GodsEye.Application.Middleware.MessageBroadcaster.Impl;
+using GodsEye.Application.Middleware.WorkersMaster;
+using GodsEye.Application.Middleware.WorkersMaster.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WatsonWebsocket;
 
 namespace ConsoleApp1.Config
 {
@@ -69,6 +73,21 @@ namespace ConsoleApp1.Config
 
                     //add the master middleware
                     services.AddSingleton<IWorkersMasterMiddleware, WorkersMasterMiddleware>();
+
+                    services.AddSingleton(_ =>
+                    {
+                        //create the server 
+                        var server = new WatsonWsServer();
+
+                        //start the server
+                        server.Start();
+
+                        //return the server instance
+                        return server;
+                    });
+
+                    services.AddSingleton<IMessageBroadcasterMiddleware, MessageBroadcasterMiddleware>();
+
                 })
                 .Build()
                 .Services;

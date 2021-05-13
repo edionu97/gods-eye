@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using GodsEye.RemoteWorker.Workers.Messages;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.RemoteWorker.Workers.Messages.Responses;
+using GodsEye.Application.Middleware.MessageBroadcaster;
+using GodsEye.Utility.Application.Items.Constants.String;
 using GodsEye.Utility.Application.Helpers.Helpers.Hashing;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
-using GodsEye.Utility.Application.Items.Constants.String;
 
-namespace GodsEye.Application.Middleware.Impl
+namespace GodsEye.Application.Middleware.WorkersMaster.Impl
 {
     public class WorkersMasterMiddleware : IWorkersMasterMiddleware
     {
@@ -16,9 +17,12 @@ namespace GodsEye.Application.Middleware.Impl
 
         public Func<IRequestResponseMessage, Task> OnMessageCallback { get; private set; }
 
-        public WorkersMasterMiddleware(IBus messageBus)
+        public WorkersMasterMiddleware(IBus messageBus, IMessageBroadcasterMiddleware messageBroadcaster)
         {
             _messageBus = messageBus;
+
+            //set the message callback
+            SetTheMessageCallbackAsync(messageBroadcaster.BroadcastMessageAsync).Wait();
         }
 
         public async Task SetTheMessageCallbackAsync(Func<IRequestResponseMessage, Task> callback)

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using GodsEye.RemoteWorker.Workers.Messages;
 
-namespace GodsEye.Application.Middleware
+namespace GodsEye.Application.Middleware.WorkersMaster
 {
     public interface IWorkersMasterMiddleware
     {
