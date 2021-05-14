@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GodsEye.RemoteWorkers.Interoperability.Grpc\GodsEye.RemoteWorkers.Interoperability.Grpc.csproj" />
+    <ProjectReference Include="..\GodsEye.Utility.Application.Helpers\GodsEye.Utility.Application.Helpers.csproj" />
+  </ItemGroup>
+
+</Project>
