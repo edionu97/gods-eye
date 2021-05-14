@@ -9,6 +9,8 @@ using GodsEye.Application.Middleware.MessageBroadcaster;
 using GodsEye.Application.Middleware.MessageBroadcaster.Impl;
 using GodsEye.Application.Middleware.WorkersMaster;
 using GodsEye.Application.Middleware.WorkersMaster.Impl;
+using GodsEye.Application.Services.ImageManipulator;
+using GodsEye.Application.Services.ImageManipulator.Impl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.Utility.Application.Config.BaseConfig;
@@ -99,6 +101,10 @@ namespace GodsEye.Application.Api
 
             //add the master middleware
             services.AddSingleton<IWorkersMasterMiddleware, WorkersMasterMiddleware>();
+
+            //add the service
+            services
+                .AddSingleton<IFacialImageManipulatorService, FacialImageManipulatorService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GodsEye.Application.Middleware\GodsEye.Application.Middleware.csproj" />
+    <ProjectReference Include="..\GodsEye.Application.Services\GodsEye.Application.Services.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj" />
   </ItemGroup>
 
