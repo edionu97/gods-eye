@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +12,7 @@ namespace GodsEye.Application.Persistence.Models
         public int UserId { get; set; }
 
         [Required]
-        [JsonProperty("Password")]
+        [JsonPropertyName("password")]
         public string PasswordHash { get; set; }
 
         [Column]

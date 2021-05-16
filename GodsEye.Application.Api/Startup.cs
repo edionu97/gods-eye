@@ -10,8 +10,12 @@ using GodsEye.Application.Middleware.MessageBroadcaster.Impl;
 using GodsEye.Application.Middleware.WorkersMaster;
 using GodsEye.Application.Middleware.WorkersMaster.Impl;
 using GodsEye.Application.Persistence.DatabaseContext;
+using GodsEye.Application.Persistence.Repository;
+using GodsEye.Application.Persistence.Repository.Impl;
 using GodsEye.Application.Services.ImageManipulator;
 using GodsEye.Application.Services.ImageManipulator.Impl;
+using GodsEye.Application.Services.UserService;
+using GodsEye.Application.Services.UserService.Impl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.Utility.Application.Config.BaseConfig;
@@ -113,9 +117,13 @@ namespace GodsEye.Application.Api
 
             //register as scoped (same instance on the same http request)
             //the connection string will be passed to the database context when executing the update-database command
-            services.AddScoped(x => new GodsEyeDatabaseContext(connectionString));
+            services.AddTransient(x => new GodsEyeDatabaseContext(connectionString));
 
+            //add the user repository
+            services.AddTransient<IUserRepository, UserRepository>();
 
+            //register the user service
+            services.AddTransient<IUserService, UserService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
