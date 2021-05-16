@@ -582,4 +582,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+!gods_eye_app/lib
 
