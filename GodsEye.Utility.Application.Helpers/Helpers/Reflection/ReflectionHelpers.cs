@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace GodsEye.Utility.Application.Helpers.Helpers.Reflection
 {
@@ -69,6 +71,38 @@ namespace GodsEye.Utility.Application.Helpers.Helpers.Reflection
 
             //verify types
             return type.BaseType == tType || IsChildOf<T>(type.BaseType);
+        }
+
+        /// <summary>
+        /// This function it is used for getting a property that is annotated with an specific attribute
+        /// </summary>
+        /// <typeparam name="TObject">the object type</typeparam>
+        /// <typeparam name="TAttribute">the attribute type</typeparam>
+        /// <returns>the property or null</returns>
+        public static Task<PropertyInfo> GetPropertyAnnotatedWithAttributeAsync<TObject, TAttribute>()
+        {
+            return Task.Run(() =>
+            {
+                //try to create a new instance of the object
+                var @object = Activator.CreateInstance(typeof(TObject));
+                if (@object == null)
+                {
+                    return null;
+                }
+
+                //iterate properties
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                foreach (var propertyInfo in @object.GetType().GetProperties())
+                {
+                    if (propertyInfo.GetCustomAttributes(true)
+                        .Any(customAttribute => customAttribute.GetType() == typeof(TAttribute)))
+                    {
+                        return propertyInfo;
+                    }
+                }
+
+                return null;
+            });
         }
     }
 }

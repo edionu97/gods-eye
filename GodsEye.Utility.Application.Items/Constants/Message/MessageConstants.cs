@@ -4,6 +4,11 @@ namespace GodsEye.Utility.Application.Items.Constants.Message
 {
     public class MessageConstants
     {
+        public static class Repository
+        {
+            public static string NotFoundMessage => "The object could not be found";
+        }
+
         public static class PathHelpers
         {
             public static string PathNullOrEmptyMessage => "The entered path '{0}' is not valid";

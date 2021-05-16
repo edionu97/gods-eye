@@ -7,6 +7,10 @@ using GodsEye.Application.Middleware.MessageBroadcaster;
 using GodsEye.Application.Middleware.MessageBroadcaster.Impl;
 using GodsEye.Application.Middleware.WorkersMaster;
 using GodsEye.Application.Middleware.WorkersMaster.Impl;
+using GodsEye.Application.Persistence.DatabaseContext;
+using GodsEye.Application.Persistence.Models;
+using GodsEye.Application.Persistence.Repository;
+using GodsEye.Application.Persistence.Repository.Impl;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Impl;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
@@ -87,6 +91,12 @@ namespace ConsoleApp1.Config
                     });
 
                     services.AddSingleton<IMessageBroadcasterMiddleware, MessageBroadcasterMiddleware>();
+
+                    //register as scoped (same instance on the same http request)
+                    //the connection string will be passed to the database context when executing the update-database command
+                    services.AddScoped(x => new GodsEyeDatabaseContext("Data Source=DESKTOP-VQ4KD11;Initial Catalog=GodsEye;Integrated Security=True"));
+
+                    services.AddScoped<IUserRepository, UserRepository>();
 
                 })
                 .Build()

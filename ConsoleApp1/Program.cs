@@ -6,6 +6,8 @@ using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.Application.Middleware;
 using GodsEye.Application.Middleware.MessageBroadcaster;
 using GodsEye.Application.Middleware.WorkersMaster;
+using GodsEye.Application.Persistence.Models;
+using GodsEye.Application.Persistence.Repository;
 using GodsEye.Application.Services.ImageManipulator.Helpers;
 using GodsEye.Application.Services.ImageManipulator.Impl;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,54 +22,72 @@ namespace ConsoleApp1
         public static async Task Main(string[] args)
         {
 
-            var service = new FacialImageManipulatorService();
+            //var service = new FacialImageManipulatorService();
 
-            var img = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\eduard.txt");
+            //var img = await File.ReadAllTextAsync(@"C:\Users\Eduard\Desktop\eduard.txt");
 
-            var sw = JsonSerializerDeserializer<DrawingOptions>.Serialize(new DrawingOptions
-            {
-                LineThickness = 12
-            });
+            //var sw = JsonSerializerDeserializer<DrawingOptions>.Serialize(new DrawingOptions
+            //{
+            //    LineThickness = 12
+            //});
 
-            var i = await service.IdentifyAndDrawRectangleAroundFaceAsync(img, new FaceLocationBoundingBox
-            {
-                TopX = 896,
-                TopY = 332,
-                BottomX = 1278,
-                BottomY = 806
-            },
-                keyPointsLocation: new FaceKeypointsLocation
-                {
-                    LeftEyePoint = new FacePoint
-                    {
-                        X = 1007,
-                        Y = 516
-                    },
-                    MouthLeftPoint = new FacePoint
-                    {
-                        X = 1010,
-                        Y = 700
-                    },
-                    MouthRightPoint = new FacePoint
-                    {
-                        X = 1162,
-                        Y = 699
-                    },
-                    RightEyePoint = new FacePoint
-                    {
-                        X = 1180,
-                        Y = 516
-                    },
-                    NosePoint = new FacePoint
-                    {
-                        X = 1085,
-                        Y = 630
-                    }
-                });
+            //var i = await service.IdentifyAndDrawRectangleAroundFaceAsync(img, new FaceLocationBoundingBox
+            //{
+            //    TopX = 896,
+            //    TopY = 332,
+            //    BottomX = 1278,
+            //    BottomY = 806
+            //},
+            //    keyPointsLocation: new FaceKeypointsLocation
+            //    {
+            //        LeftEyePoint = new FacePoint
+            //        {
+            //            X = 1007,
+            //            Y = 516
+            //        },
+            //        MouthLeftPoint = new FacePoint
+            //        {
+            //            X = 1010,
+            //            Y = 700
+            //        },
+            //        MouthRightPoint = new FacePoint
+            //        {
+            //            X = 1162,
+            //            Y = 699
+            //        },
+            //        RightEyePoint = new FacePoint
+            //        {
+            //            X = 1180,
+            //            Y = 516
+            //        },
+            //        NosePoint = new FacePoint
+            //        {
+            //            X = 1085,
+            //            Y = 630
+            //        }
+            //    });
 
             //get the service provider
             var serviceProvider = Bootstrapper.Load();
 
+
+            var userRepo = serviceProvider.GetService<IUserRepository>();
+
+            var list = await userRepo.GetAllAsync();
+
+
+
+            var u = await userRepo.FindUserByUsernameAndPasswordAsync("da", "ana");
+
+
+            await userRepo.DeleteAsync(u);
+
+
+
+
+
+
+            return;
             //get the message queue
             var workersMaster =
                 serviceProvider

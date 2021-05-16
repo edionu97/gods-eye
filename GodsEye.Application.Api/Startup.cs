@@ -9,12 +9,14 @@ using GodsEye.Application.Middleware.MessageBroadcaster;
 using GodsEye.Application.Middleware.MessageBroadcaster.Impl;
 using GodsEye.Application.Middleware.WorkersMaster;
 using GodsEye.Application.Middleware.WorkersMaster.Impl;
+using GodsEye.Application.Persistence.DatabaseContext;
 using GodsEye.Application.Services.ImageManipulator;
 using GodsEye.Application.Services.ImageManipulator.Impl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.Utility.Application.Config.BaseConfig;
 using GodsEye.Utility.Application.Config.Configuration.Sections.RabbitMq;
+using Microsoft.EntityFrameworkCore;
 using WatsonWebsocket;
 
 namespace GodsEye.Application.Api
@@ -86,7 +88,7 @@ namespace GodsEye.Application.Api
                 var (address, port) = 
                     serviceProvider
                        .GetService<IConfig>()
-                       .Get<WsServerConfig>()
+                       ?.Get<WsServerConfig>()
                     ?? throw new ArgumentException();
 
                 //create the server 
@@ -105,6 +107,15 @@ namespace GodsEye.Application.Api
             //add the service
             services
                 .AddSingleton<IFacialImageManipulatorService, FacialImageManipulatorService>();
+
+            //register the database context
+            var connectionString = Configuration.GetConnectionString("GodsEyeDb");
+
+            //register as scoped (same instance on the same http request)
+            //the connection string will be passed to the database context when executing the update-database command
+            services.AddScoped(x => new GodsEyeDatabaseContext(connectionString));
+
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

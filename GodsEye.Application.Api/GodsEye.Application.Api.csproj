@@ -6,11 +6,16 @@
 
   <ItemGroup>
     <PackageReference Include="EasyNetQ" Version="6.3.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GodsEye.Application.Middleware\GodsEye.Application.Middleware.csproj" />
+    <ProjectReference Include="..\GodsEye.Application.Persistence\GodsEye.Application.Persistence.csproj" />
     <ProjectReference Include="..\GodsEye.Application.Services\GodsEye.Application.Services.csproj" />
     <ProjectReference Include="..\GodsEye.Utility.Application.Config\GodsEye.Utility.Application.Config.csproj" />
   </ItemGroup>
