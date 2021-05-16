@@ -1,9 +1,14 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-
-namespace GodsEye.Utility.Application.Items.Constants.Message
+﻿namespace GodsEye.Utility.Application.Items.Constants.Message
 {
     public class MessageConstants
     {
+        public static class Services
+        {
+            public static string UserNotFoundMessage => "The user could not be found";
+
+            public static string UserFoundMessage => "In database already exists an user with same username";
+        }
+
         public static class Repository
         {
             public static string NotFoundMessage => "The object could not be found";

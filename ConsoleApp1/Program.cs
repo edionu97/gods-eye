@@ -10,6 +10,7 @@ using GodsEye.Application.Persistence.Models;
 using GodsEye.Application.Persistence.Repository;
 using GodsEye.Application.Services.ImageManipulator.Helpers;
 using GodsEye.Application.Services.ImageManipulator.Impl;
+using GodsEye.Application.Services.UserService;
 using Microsoft.Extensions.DependencyInjection;
 using GodsEye.RemoteWorker.Workers.Messages.Responses;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
@@ -71,17 +72,10 @@ namespace ConsoleApp1
             var serviceProvider = Bootstrapper.Load();
 
 
-            var userRepo = serviceProvider.GetService<IUserRepository>();
-
-            var list = await userRepo.GetAllAsync();
+            var userRepo = serviceProvider.GetService<IUserService>();
 
 
-
-            var u = await userRepo.FindUserByUsernameAndPasswordAsync("da", "ana");
-
-
-            await userRepo.DeleteAsync(u);
-
+            var a = await userRepo.CreateAccountAsync("eduard", "onu");
 
 
 
