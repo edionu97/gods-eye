@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/register/component.dart';
+import 'package:gods_eye_app/services/user_service/service.dart';
 import 'package:gods_eye_app/utils/animations/navigation/navigation_animation.dart';
 import 'package:gods_eye_app/utils/components/animated_button/component.dart';
+import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/upper_element/component.dart';
 import 'package:gods_eye_app/utils/components/user_form/component.dart';
 
@@ -14,18 +16,22 @@ class LoginScreen extends StatefulWidget {
 
 /// This represents the state for the login screen
 class _LoginScreenState extends State<LoginScreen> {
+  bool _isButtonEnabled = false;
+
   // controller for username
+  final UserService _userService = UserService();
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+
   final TextEditingController controllerUsername = new TextEditingController();
   final TextEditingController controllerPassword = new TextEditingController();
 
   @override
   void dispose() {
-    //execute the logic of the base class
-    super.dispose();
-
     //dispose the controllers
     controllerUsername.dispose();
     controllerPassword.dispose();
+    //execute the logic of the base class
+    super.dispose();
   }
 
   @override
@@ -46,6 +52,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     UserForm(
                       controllerPassword: controllerPassword,
                       controllerUsername: controllerUsername,
+                      formKey: _formKey,
+                      onFocusMoved: () {
+                        setState(() {
+                          _isButtonEnabled = _formKey.currentState.validate();
+                        });
+                      },
                     ),
                     //the text with the redirect button
                     Align(
@@ -69,9 +81,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             ))),
                     Padding(
                       // the animated button
-                      child: AnimatedButton(
-                          name: "Sign In",
-                          action: () => _loginPressed(context)),
+                      child: Opacity(
+                          opacity: _isButtonEnabled ? 1 : 0.7,
+                          child: AbsorbPointer(
+                              absorbing: !_isButtonEnabled,
+                              child: AnimatedButton(
+                                  name: "Sign In",
+                                  action: () => _loginPressed(context)))),
                       padding: EdgeInsets.only(bottom: 25),
                     )
                   ],
@@ -80,7 +96,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   /// Handle the login action
   /// Calls the service and tries to authenticate the current user
-  void _loginPressed(BuildContext context) {}
+  void _loginPressed(BuildContext context) async {
+    try {
+      //if the fields are null do nothing
+      if (!_formKey.currentState.validate()) {
+        return;
+      }
+      //get the user token
+      final String userToken = await _userService.loginAsync(
+          controllerUsername.text?.trim(), controllerPassword.text?.trim());
+
+
+    } on Exception catch (e) {
+      //get message
+      final message = Modal.extractMessageFromException(e);
+
+      //get the message and report it
+      await Modal.openDialogAsync(
+          context: context, message: message);
+    }
+  }
 
   /// Handle the register button pressed
   /// Redirects to the register page

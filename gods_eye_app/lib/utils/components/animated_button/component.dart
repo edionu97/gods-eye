@@ -18,6 +18,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
   //properties
   Animation<num> _buttonSqueezeAnimation;
   AnimationController _animationController;
+  Function _animationListener;
 
   //override the init state method
   @override
@@ -34,8 +35,24 @@ class _AnimatedButtonState extends State<AnimatedButton>
         CurvedAnimation(
             parent: _animationController, curve: Interval(0.0, 0.150)));
 
+    //set the animation listener
+    _animationListener = () => setState(() {});
+
     //add the listener (just refresh the object)
-    _buttonSqueezeAnimation.addListener(() => setState(() {}));
+    _buttonSqueezeAnimation.addListener(_animationListener);
+  }
+
+  @override
+  void dispose() {
+
+    //remove the listener
+    _buttonSqueezeAnimation.removeListener(_animationListener);
+
+    //dispose the controller
+    _animationController.dispose();
+
+    //dispose the object
+    super.dispose();
   }
 
   @override

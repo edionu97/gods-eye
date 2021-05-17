@@ -4,9 +4,9 @@
     {
         public static class Services
         {
-            public static string UserNotFoundMessage => "The user could not be found";
+            public static string UserNotFoundMessage => "Wrong username or password";
 
-            public static string UserFoundMessage => "In database already exists an user with same username";
+            public static string UserFoundMessage => "User already exists";
         }
 
         public static class Repository

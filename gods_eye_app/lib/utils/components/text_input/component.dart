@@ -29,7 +29,7 @@ class TextInput extends StatelessWidget {
       padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
       child: TextFormField(
         //if the validator is set execute the validation otherwise do nothing
-        validator: (value) => validator != null ? validator(value) : null,
+        validator: (value) => validator != null ? validator(value?.trim()) : null,
         textInputAction: action,
         obscureText: isHidden,
         focusNode: focusNode,
