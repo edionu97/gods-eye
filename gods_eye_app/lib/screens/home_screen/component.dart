@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/components/workers_component/component.dart';
+import 'package:gods_eye_app/utils/components/loader/component.dart';
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Pair<Function, String>> _menuItems = [
     //define the function that creates the element and the title of the page
     Pair((userToken) => RemoteWorkersScreen(userToken), "Remote Workers"),
-    Pair((userToken) => Text("da"), "Inbox Workers"),
+    Pair((userToken) => Center(child: CircularSpinningLoader(),), "Inbox Workers"),
+    Pair((userToken) => Center(child: CircularSpinningLoader(),), "Account Workers")
   ];
 
   //the menu index
