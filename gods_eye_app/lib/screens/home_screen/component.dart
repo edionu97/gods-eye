@@ -18,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Pair<Function, String>> _menuItems = [
     //define the function that creates the element and the title of the page
     Pair((userToken) => RemoteWorkersScreen(userToken), "Remote Workers"),
+    Pair((userToken) => Text("da"), "Inbox Workers"),
   ];
 
   //the menu index
@@ -38,9 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   ///This function it is used for creating the navbar
   Widget _createNavigationBar() {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(50.0)),
-      ),
       child: ClipRRect(
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(80.0), topRight: Radius.circular(80.0)),
@@ -57,9 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icon(Icons.account_circle, size: 30), label: 'Account'),
             ],
             selectedItemColor: Colors.white,
-            elevation: 1.0,
+            elevation: 150,
             unselectedItemColor: Colors.blueGrey[300],
-            backgroundColor: Colors.blueGrey[600],
+            backgroundColor: Colors.blueGrey[700],
             onTap: (index) => setState(() => _currentMenuItemIdx = index)),
       ),
     );
@@ -68,9 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
   /// This function it is used for creating the application bar
   Widget _createAppBar() {
     return AppBar(
-        backgroundColor: Colors.blueGrey[600],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(40),
+          ),
+        ),
+        backgroundColor: Colors.blueGrey[700],
         title: Align(
-          alignment: Alignment.centerLeft,
+          alignment: Alignment.center,
           child: Text(_menuItems[_currentMenuItemIdx].second,
               style: TextStyle(
                   fontWeight: FontWeight.w300,
