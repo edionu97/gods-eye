@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/screens/home_screen/component.dart';
 import 'package:gods_eye_app/services/user_service/service.dart';
+import 'package:gods_eye_app/utils/animations/navigation/navigation_animation.dart';
 import 'package:gods_eye_app/utils/components/animated_button/component.dart';
 import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/upper_element/component.dart';
@@ -109,13 +111,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final String userToken = await _userService.registerAsync(
           controllerUsername.text?.trim(), controllerPassword.text?.trim());
 
-      print(userToken);
+      //navigate to home screen after the successful register
+      Navigator.of(context).push(
+          NavigationAnimation(toPage: () => HomeScreen(userToken: userToken)));
     } on Exception catch (e) {
       //get the message
       final message = Modal.extractMessageFromException(e);
       //get the message and report it
-      await Modal.openDialogAsync(
-          context: context, message: message);
+      await Modal.openDialogAsync(context: context, message: message);
     }
   }
 }
