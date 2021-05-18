@@ -16,13 +16,7 @@ class RemoteWorkersScreen extends StatefulWidget {
 class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
 
   final List<RemoteWorker> _remoteWorkers = [
-    RemoteWorker(),
-    RemoteWorker(),
-    RemoteWorker(),
-    RemoteWorker(),
-    RemoteWorker(),
-    RemoteWorker(),
-    RemoteWorker(),
+    RemoteWorker()
   ];
 
   @override
