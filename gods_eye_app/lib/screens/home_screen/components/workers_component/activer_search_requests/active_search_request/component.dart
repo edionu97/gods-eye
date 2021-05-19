@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:intl/intl.dart';
 
 class ActiveSearchRequest extends StatefulWidget {
+
+  final ActiveSearchRequestModel activeSearchRequestModel;
+
+  //set the active search request model
+  ActiveSearchRequest({@required this.activeSearchRequestModel});
+
   @override
   State<StatefulWidget> createState() => _ActiveSearchRequestState();
 }
@@ -64,8 +71,16 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
   }
 
   Widget _createCardItems(BuildContext context) {
-    var time = DateTime.now();
-    final startedAtDatetime = DateFormat("dd-MM-yyyy (HH:mm)").format(time);
+    //get the value that will be displayed in the ui
+    String startedAtDateTime = "unknown";
+    if (widget.activeSearchRequestModel?.startedAt != null) {
+      startedAtDateTime = DateFormat("dd-MM-yyyy (HH:mm)")
+          .format(widget.activeSearchRequestModel?.startedAt);
+    }
+
+    //get the image
+    var image = widget.activeSearchRequestModel?.image ??
+        Image.asset("unknown.png", fit: BoxFit.fill);
 
     //create the column
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -76,7 +91,7 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
                 topLeft: Radius.circular(5),
                 topRight: Radius.circular(5),
               ),
-              child: Image.asset("eli.png", fit: BoxFit.fill))),
+              child: image)),
       //on bottom put the date
       Container(
           height: 20,
@@ -86,7 +101,7 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
                   bottomLeft: Radius.circular(10),
                   bottomRight: Radius.circular(10))),
           child: Center(
-            child: Text(startedAtDatetime,
+            child: Text(startedAtDateTime,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.normal,

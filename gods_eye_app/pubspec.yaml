@@ -51,6 +51,7 @@ flutter:
   assets:
     - login.png
     - register.png
+    - unknown.png
     - network.png
     - eli.png
 

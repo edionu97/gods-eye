@@ -301,6 +301,9 @@ class _RemoteWorkerState extends State<RemoteWorker>
             title: Text("Your active search requests on selected worker",
                 style: TextStyle(color: Colors.blueGrey[600])),
             //set the box constraints
-            content: ActiveSearchRequests()));
+            content: ActiveSearchRequests(
+              activeSearchRequestModels:
+                  widget.workerModel?.activeSearchRequests ?? [],
+            )));
   }
 }

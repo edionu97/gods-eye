@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/components/workers_component/worker/component.dart';
+import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/services/models/geolocation/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
@@ -27,8 +28,14 @@ class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
               regionCode: "CJ",
               city: "Cluj-Napoca",
               zipCode: "400001"),
-          startedAt: DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now().toUtc()),
-          activeSearchingJobs: 0),
+          startedAt:
+              DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now().toUtc()),
+          activeSearchingJobs: 10,
+          activeSearchRequests: [
+            ActiveSearchRequestModel(
+                startedAt: DateFormat("dd-MM-yyyy HH:mm:ss")
+                    .format(DateTime.now().toUtc()))
+          ]),
     ),
   ];
 
