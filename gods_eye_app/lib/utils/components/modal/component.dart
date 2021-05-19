@@ -1,12 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'dialog/component.dart';
 
 class Modal {
-
   /// This function it is used for extracting a message from exception
-  static String extractMessageFromException(Exception e){
-
+  static String extractMessageFromException(Exception e) {
     //get the regex
     final regex = RegExp(r":(?<message>.*)$");
 
@@ -48,5 +47,25 @@ class Modal {
                     )
                   ]));
         });
+  }
+
+  /// Shows the cupertino dialog
+  static Future showDialogWithNoActionsAsync(BuildContext context,
+      {Widget title, Widget content}) async {
+
+    //treat the null case
+    if(context == null){
+      throw Exception("The context must not be null");
+    }
+
+    //show the cupertino dialog
+    await showDialog(
+        context: context,
+        //build the cupertino box
+        builder: (BuildContext context) => CupertinoAlertDialog(
+            //set the title
+            title: title,
+            //set the box constraints
+            content: content));
   }
 }
