@@ -115,7 +115,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final message = Modal.extractMessageFromException(e);
 
       //get the message and report it
-      await Modal.openDialogAsync(context: context, message: message);
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context, "Authentication error", message);
     }
   }
 

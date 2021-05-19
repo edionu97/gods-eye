@@ -118,7 +118,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       //get the message
       final message = Modal.extractMessageFromException(e);
       //get the message and report it
-      await Modal.openDialogAsync(context: context, message: message);
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context, "Register error", message);
     }
   }
 }

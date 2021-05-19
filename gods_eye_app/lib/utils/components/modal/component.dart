@@ -52,9 +52,8 @@ class Modal {
   /// Shows the cupertino dialog
   static Future showDialogWithNoActionsAsync(BuildContext context,
       {Widget title, Widget content}) async {
-
     //treat the null case
-    if(context == null){
+    if (context == null) {
       throw Exception("The context must not be null");
     }
 
@@ -67,5 +66,36 @@ class Modal {
             title: title,
             //set the box constraints
             content: content));
+  }
+
+  static Future showExceptionalDialogWithNoActionsAsync(
+      BuildContext context, String title, String message) async {
+    //treat the null case
+    if (context == null) {
+      throw Exception("The context must not be null");
+    }
+
+    //show the cupertino dialog
+    await showDialog(
+        context: context,
+        //build the cupertino box
+        builder: (BuildContext context) => CupertinoAlertDialog(
+            //set the title
+            title: Container(
+                child: Align(
+                    alignment: Alignment.center,
+                    child: Text(title ?? "",
+                        style: TextStyle(color: Colors.blueGrey[500])))),
+            //set the box constraints
+            content: Column(children: [
+              Divider(
+                color: Colors.blueGrey,
+              ),
+              Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: Text(message ?? "",
+                      style:
+                          TextStyle(color: Colors.blueGrey[500], fontSize: 16)))
+            ])));
   }
 }
