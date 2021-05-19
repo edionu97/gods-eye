@@ -32,4 +32,39 @@ class RequestHelper {
       return decodedResponse;
     });
   }
+
+  static Future<dynamic> doGetRequestAsync({String requestUrl}) {
+    //define the uri from the request url
+    final Uri url = Uri.parse(requestUrl);
+    //return the future response result
+    return http
+        //initialize the post request
+        .get(url, headers: {"Content-Type": "application/json"})
+        //set the timeout to 2 minutes
+        .timeout(const Duration(seconds: 2))
+        //if any error occurs then send a proper message
+        .catchError((error) =>
+            throw Exception(MessageConstants.couldNotGetAnyResponseMessage))
+        //if no error is encountered just process the request
+        .then((http.Response response) {
+          //try to decode the response
+          try {
+            //decode the response (try to decode)
+            var decodedResponse = json.decode(response.body);
+            //if the status is not 200
+            if (response.statusCode != 200) {
+              throw Exception(decodedResponse["detail"]);
+            }
+            //return the response
+            return decodedResponse;
+
+            //handle the case in which the response could not be parsed
+          } on Exception {
+            return {
+              "responseCode": response.statusCode,
+              "content": response.body
+            };
+          }
+        });
+  }
 }

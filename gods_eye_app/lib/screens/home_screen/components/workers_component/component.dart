@@ -3,6 +3,7 @@ import 'package:gods_eye_app/screens/home_screen/components/workers_component/wo
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/services/models/geolocation/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
+import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 import 'package:intl/intl.dart';
 
@@ -38,6 +39,26 @@ class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
           ]),
     ),
   ];
+
+  @override
+  void initState() {
+    //call the super initialization logic
+    super.initState();
+    //register the observer
+    NotificationService().registerObserver(_onMessage);
+  }
+
+  @override
+  void dispose() {
+    //unregister the observer
+    NotificationService().unregisterObserver(_onMessage);
+    //execute the dispose logic
+    super.dispose();
+  }
+
+  void _onMessage(String message) {
+    print(message);
+  }
 
   @override
   Widget build(BuildContext context) {

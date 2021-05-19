@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/component.dart';
+import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/services/user_service/service.dart';
 import 'package:gods_eye_app/utils/animations/navigation/navigation_animation.dart';
 import 'package:gods_eye_app/utils/components/animated_button/component.dart';
@@ -110,6 +111,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       //get the user token
       final String userToken = await _userService.registerAsync(
           controllerUsername.text?.trim(), controllerPassword.text?.trim());
+
+      //register the user token
+      await NotificationService().registerAsync(userToken);
 
       //navigate to home screen after the successful register
       Navigator.of(context).push(

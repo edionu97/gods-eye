@@ -19,8 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Pair<Function, String>> _menuItems = [
     //define the function that creates the element and the title of the page
     Pair((userToken) => RemoteWorkersScreen(userToken), "Remote Workers"),
-    Pair((userToken) => Center(child: CircularSpinningLoader(),), "Inbox Workers"),
-    Pair((userToken) => Center(child: CircularSpinningLoader(),), "Account Workers")
+    Pair((userToken) => Center(child: CircularSpinningLoader()),
+        "Inbox Workers"),
+    Pair((userToken) => Center(child: CircularSpinningLoader()),
+        "Account Workers")
   ];
 
   //the menu index
