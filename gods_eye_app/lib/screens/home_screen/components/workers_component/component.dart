@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/components/workers_component/worker/component.dart';
+import 'package:gods_eye_app/services/models/geolocation/model.dart';
+import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
+import 'package:intl/intl.dart';
 
 class RemoteWorkersScreen extends StatefulWidget {
   final String userToken;
@@ -13,7 +16,21 @@ class RemoteWorkersScreen extends StatefulWidget {
 
 class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
   //the list with remote workers
-  final List<RemoteWorker> _remoteWorkers = [RemoteWorker()];
+  final List<RemoteWorker> _remoteWorkers = [
+    RemoteWorker(
+      workerModel: RemoteWorkerModel(
+          workerId: "ana are mere",
+          geolocation: GeolocationModel(
+              countryName: "Romania",
+              countryCode: "RO",
+              regionName: "Cluj",
+              regionCode: "CJ",
+              city: "Cluj-Napoca",
+              zipCode: "400001"),
+          startedAt: DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now().toUtc()),
+          activeSearchingJobs: 0),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {

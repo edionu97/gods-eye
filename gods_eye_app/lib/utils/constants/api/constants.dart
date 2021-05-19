@@ -1,6 +1,7 @@
 class ApiConstants {
   // ignore: non_constant_identifier_names
-  static String SERVER_ADDRESS = "http://192.168.1.197:5000/";
+  static String SERVER_ADDRESS = "http://192.168.0.101:5000/";
+  //static String SERVER_ADDRESS = "http://192.168.1.197:5000/";
 
   // ignore: non_constant_identifier_names
   static String LOGIN_API = "api/users/login";

@@ -1,17 +1,25 @@
 import 'dart:convert';
 
 import 'package:crclib/catalog.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/screens/home_screen/components/workers_component/activer_search_requests/component.dart';
 
 class RemoteWorker extends StatefulWidget {
+  //the worker model
+  final RemoteWorkerModel workerModel;
+
+  //construct the worker
+  const RemoteWorker({Key key, @required this.workerModel}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _RemoteWorkerState();
 }
 
 class _RemoteWorkerState extends State<RemoteWorker>
     with TickerProviderStateMixin {
-
   //define the animation controller
   AnimationController _animationController;
   Animation<double> _opacityAnimation;
@@ -47,89 +55,101 @@ class _RemoteWorkerState extends State<RemoteWorker>
     return FadeTransition(
       opacity: _opacityAnimation,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        //create a container and place the card inside
-        child: Container(
-            child: Card(
-          //set the card border
-          shape: RoundedRectangleBorder(
-              side: BorderSide(color: Colors.white70, width: 1),
-              borderRadius: BorderRadius.all(Radius.circular(30))),
-          //put a shadow
-          shadowColor: Colors.blueGrey[700],
-          //set the elevation
-          elevation: 12,
-          //create the elements of the card
-          child: _createCardElements(),
-        )),
-      ),
+          padding: const EdgeInsets.all(8.0),
+          //create a container and place the card inside
+          child: Container(
+              child: Card(
+                  //set the card border
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.white70, width: 1),
+                      borderRadius: BorderRadius.all(Radius.circular(30))),
+                  //put a shadow
+                  shadowColor: Colors.blueGrey[700],
+                  //set the elevation
+                  elevation: 12,
+                  //create the elements of the card
+                  child: _createCardElements(context)))),
     );
   }
 
   ///Create the card element
-  Widget _createCardElements() {
-    //compute the worker id
-    final workerId = Crc16X().convert(utf8.encode('dsdsdsds')).toString();
+  Widget _createCardElements(BuildContext context) {
     //return the column
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        //define the top part of the card
-        Container(
-          height: 35,
-          decoration: BoxDecoration(
-              color: Colors.blueGrey[400],
-              borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30), topRight: Radius.circular(30))),
-          //define the text
-          child: Center(
-            child: Column(
-              children: [
-                //put the title of the card
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Text("Remote worker",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 11,
-                          color: Colors.white)),
-                ),
-                //put the worker id
-                Padding(
-                  padding: const EdgeInsets.all(2.5),
-                  child: Text("CRC SHA of the worker id: $workerId",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 10,
-                          color: Colors.white)),
-                ),
-              ],
+    return InkWell(
+      onTap: () => _onCardClicked(context),
+      customBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          //define the top part of the card
+          Container(
+            height: 35,
+            decoration: BoxDecoration(
+                color: Colors.blueGrey[400],
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30))),
+            //define the text
+            child: Center(
+              child: Column(
+                children: [
+                  //put the title of the card
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text("Remote worker",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal,
+                            fontSize: 11,
+                            color: Colors.white)),
+                  ),
+                  //put the worker id
+                  Padding(
+                    padding: const EdgeInsets.all(2.5),
+                    child: Text(
+                        "CRC SHA of the worker id: ${widget.workerModel?.workerId}",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal,
+                            fontSize: 10,
+                            color: Colors.white)),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        //define the bottom part of the card
-        _createCardBottomElement()
-      ],
+          //define the bottom part of the card
+          _createCardBottomElement()
+        ],
+      ),
     );
   }
 
   ///Create the card bottom element
   Widget _createCardBottomElement() {
-    final runningFor = "02:30 h";
+    //set the location info (assume that the value is unknown)
+    String locationInfo = "Location unknown";
 
-    final activeSearchingJobs = "0";
+    //if the value is not null, set the properties
+    final geo = widget.workerModel?.geolocation;
+    if (geo != null) {
+      locationInfo =
+          "${geo.countryName} (${geo.countryCode}), ${geo.regionName} (${geo.regionCode}), ${geo.city}, ${geo.zipCode}";
+    }
 
-    final locationInfo = "Romania (RO), Cluj (CJ), Cluj-Napoca, 400001";
-
-    var time = DateTime.now();
-    final startedAtDatetime = DateFormat("dd-MM-yyyy HH:mm").format(time);
+    //set the started at date time
+    String startedAtDatetime = "unknown";
+    if (widget.workerModel?.startedAt != null) {
+      startedAtDatetime =
+          DateFormat("MM-yyyy HH:mm").format(widget.workerModel.startedAt);
+    }
 
     //create the child
     return Expanded(
         child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
             //define the widget container
             child: Container(
                 //add the decoration
@@ -139,130 +159,148 @@ class _RemoteWorkerState extends State<RemoteWorker>
                         bottomLeft: Radius.circular(30),
                         bottomRight: Radius.circular(30))),
                 //set the child
-                child: Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      //put the location info
-                      Align(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //put the location info
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(Icons.add_location_alt_outlined,
+                              color: Colors.blueGrey[500], size: 25),
+                          //put the extra details
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 3),
+                              child: Text(locationInfo,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontStyle: FontStyle.normal,
+                                      fontSize: 11,
+                                      color: Colors.blueGrey[300]),
+                                  maxLines: 3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    //put the searching jobs
+                    Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Align(
                           alignment: Alignment.centerLeft,
                           child: Row(
                             children: [
-                              Icon(Icons.add_location_alt_outlined,
+                              Icon(Icons.person_search_outlined,
                                   color: Colors.blueGrey[500], size: 25),
                               //put the extra details
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(left: 3),
-                                  child: Text(locationInfo,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontStyle: FontStyle.normal,
-                                          fontSize: 11,
-                                          color: Colors.blueGrey[300]),
-                                      maxLines: 3),
-                                ),
+                                    padding: const EdgeInsets.only(left: 3),
+                                    child: RichText(
+                                      maxLines: 2,
+                                      text: TextSpan(
+                                        // Note: Styles for TextSpans must be explicitly defined.
+                                        // Child text spans will inherit styles from parent
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontStyle: FontStyle.normal,
+                                            fontSize: 11,
+                                            color: Colors.blueGrey[300]),
+                                        children: <TextSpan>[
+                                          //put with bold the number of jobs
+                                          TextSpan(
+                                              text: widget.workerModel
+                                                      ?.activeSearchingJobs
+                                                      ?.toString() ??
+                                                  "unknown",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                          //put the rest of the text
+                                          TextSpan(
+                                              text:
+                                                  " is the number of active searching jobs")
+                                        ],
+                                      ),
+                                    )),
                               ),
                             ],
                           )),
-                      //put the searching jobs
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              children: [
-                                Icon(Icons.person_search_outlined,
-                                    color: Colors.blueGrey[500], size: 25),
-                                //put the extra details
-                                Expanded(
-                                  child: Padding(
-                                      padding: const EdgeInsets.only(left: 3),
-                                      child: RichText(
-                                        maxLines: 2,
-                                        text: TextSpan(
-                                          // Note: Styles for TextSpans must be explicitly defined.
-                                          // Child text spans will inherit styles from parent
+                    )),
+                    //add the bottom right value
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text("STARTED AT",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.normal,
+                                          fontSize: 11,
+                                          color: Colors.blueGrey[300])),
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2),
+                                      child: Text(startedAtDatetime,
                                           style: TextStyle(
                                               fontWeight: FontWeight.w400,
                                               fontStyle: FontStyle.normal,
-                                              fontSize: 11,
-                                              color: Colors.blueGrey[300]),
-                                          children: <TextSpan>[
-                                            //put with bold the number of jobs
-                                            TextSpan(
-                                                text: activeSearchingJobs,
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            //put the rest of the text
-                                            TextSpan(
-                                                text:
-                                                    " is the number of active searching jobs")
-                                          ],
-                                        ),
-                                      )),
-                                ),
-                              ],
-                            )),
+                                              fontSize: 9,
+                                              color: Colors.blueGrey[300])),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text("RUNNING",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.normal,
+                                          fontSize: 11,
+                                          color: Colors.blueGrey[300])),
+                                  Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Center(
+                                      child: Text(
+                                          widget.workerModel?.runningFor ??
+                                              "unknown",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontStyle: FontStyle.normal,
+                                              fontSize: 9,
+                                              color: Colors.blueGrey[300])),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      //add the bottom right value
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              children: [
-                                Column(
-                                  children: [
-                                    Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text("STARTED AT",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontStyle: FontStyle.normal,
-                                                fontSize: 11,
-                                                color: Colors.blueGrey[300]))),
-                                    Align(
-                                        alignment: Alignment.center,
-                                        child: Text(startedAtDatetime,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                fontStyle: FontStyle.normal,
-                                                fontSize: 11,
-                                                color: Colors.blueGrey[300])))
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 5),
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Text("RUNNING",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  fontSize: 11,
-                                                  color:
-                                                      Colors.blueGrey[300]))),
-                                      Align(
-                                          alignment: Alignment.center,
-                                          child: Text(runningFor,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontStyle: FontStyle.normal,
-                                                  fontSize: 11,
-                                                  color: Colors.blueGrey[300])))
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )),
-                      )
-                    ],
-                  ),
+                    )
+                  ],
                 ))));
+  }
+
+  /// Used to handle the card click event
+  void _onCardClicked(BuildContext context) async {
+    //show the cupertino dialog
+    await showDialog(
+        context: context,
+        //build the cupertino box
+        builder: (BuildContext context) => CupertinoAlertDialog(
+            title: Text("Your active search requests on selected worker",
+                style: TextStyle(color: Colors.blueGrey[600])),
+            //set the box constraints
+            content: ActiveSearchRequests()));
   }
 }
