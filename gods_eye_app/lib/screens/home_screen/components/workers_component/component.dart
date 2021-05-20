@@ -104,8 +104,14 @@ class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
       _dataFromPingInterval.remove(time.tick - 1);
     }
 
-    //send the ping request to all the workers
-    await FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+    //execute the ping call
+    try {
+      //send the ping request to all the workers
+      await FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+    } on Exception {
+      //if any exception encountered, stop the timer
+      time?.cancel();
+    }
   }
 
   /// This function it is used when a new message is received from client

@@ -25,9 +25,7 @@ class RemoteWorkerModel implements IAbstractModel {
   /// Convert the json into dart object
   static RemoteWorkerModel convertFromJson(final dynamic jsonObject) {
     //create the requests
-    final List<ActiveSearchRequestModel> activeRequests = [
-
-    ];
+    final List<ActiveSearchRequestModel> activeRequests = [];
 
     //set the date value
     String dateValue;
@@ -38,22 +36,34 @@ class RemoteWorkerModel implements IAbstractModel {
       //empty
     }
 
+    //if the information about the active search requests
+    if (jsonObject["WorkerInfo"]["RunningJobs"] != null) {
+      //iterate each active search
+      for (var activeSearchRequestJson in jsonObject["WorkerInfo"]
+          ["RunningJobs"]) {
+        //convert the json into the dart object
+        activeRequests.add(
+            ActiveSearchRequestModel.convertFromJson(activeSearchRequestJson));
+      }
+    }
+
     //create the remote worker model
     return RemoteWorkerModel(
         workerHashId: jsonObject["WorkerInfo"]["WorkerId"],
         geolocation:
-        GeolocationModel.convertFromJson(jsonObject["GeoLocation"]),
+            GeolocationModel.convertFromJson(jsonObject["GeoLocation"]),
         startedAt: dateValue,
         activeSearchingJobs: activeRequests.length,
         activeSearchRequests: activeRequests);
   }
 
   /// Constructor
-  RemoteWorkerModel({this.workerHashId,
-    this.geolocation,
-    String startedAt,
-    this.activeSearchRequests,
-    this.activeSearchingJobs}) {
+  RemoteWorkerModel(
+      {this.workerHashId,
+      this.geolocation,
+      String startedAt,
+      this.activeSearchRequests,
+      this.activeSearchingJobs}) {
     _startedAt = startedAt;
   }
 
@@ -89,10 +99,7 @@ class RemoteWorkerModel implements IAbstractModel {
     final utcDate = DateFormat("dd-MM-yyyy HH:mm:ss").parse(_startedAt, true);
 
     //get the difference of dates in minutes
-    final int minutes = DateTime
-        .now()
-        .difference(utcDate.toLocal())
-        .inMinutes;
+    final int minutes = DateTime.now().difference(utcDate.toLocal()).inMinutes;
 
     //get the hours
     final int hours = (minutes / 60).floor();
@@ -101,8 +108,6 @@ class RemoteWorkerModel implements IAbstractModel {
     final int min = minutes - hours * 60;
 
     //get the hours:and minutes
-    return "${hours < 10 ? "0$hours" : hours}:${minutes < 10
-        ? "0$min"
-        : min} h";
+    return "${hours < 10 ? "0$hours" : hours}:${minutes < 10 ? "0$min" : min} h";
   }
 }

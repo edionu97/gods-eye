@@ -11,6 +11,7 @@ using Gods.Eye.Server.Artificial.Intelligence.Messaging;
 using GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo;
 using GodsEye.RemoteWorker.Worker.Remote.StartingInfo;
 using GodsEye.RemoteWorker.Workers.Messages;
+using GodsEye.RemoteWorker.Workers.Messages.Components;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.RemoteWorker.Workers.Messages.Responses;
 using GodsEye.Utility.Application.Items.Geolocation.Model;
@@ -22,15 +23,15 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
 {
     public partial class RemoteWorker
     {
-        private readonly ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)> _currentActiveWorkersForSearching =
-            new ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource)>();
+        private readonly ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource, JobSummary)> _currentActiveWorkersForSearching =
+            new ConcurrentDictionary<string, (Task<SearchForPersonResponse>, CancellationTokenSource, JobSummary)>();
 
         private readonly ConcurrentDictionary<string, IRequestResponseMessage> _cancelRequests
             = new ConcurrentDictionary<string, IRequestResponseMessage>();
 
         private void HandleTheSearchForPersonRequest(
             SearchForPersonMessageRequest messageRequest,
-            SiwInformation information, 
+            SiwInformation information,
             GeolocationInfo cameraGeolocation,
             CancellationToken parentToken)
         {
@@ -107,9 +108,17 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 return;
             }
 
+            //create the job summary
+            var jobSummary = new JobSummary
+            {
+                JobHashId = messageRequest.MessageId,
+                SearchedImage = messageRequest?.MessageContent,
+                SubmittedOn = DateTime.UtcNow
+            };
+
             //register the worker as online
             _currentActiveWorkersForSearching
-                .TryAdd(messageRequest.MessageId, (recognitionTask, cancellationTokenSource));
+                .TryAdd(messageRequest.MessageId, (recognitionTask, cancellationTokenSource, jobSummary));
 
             //handle the case in which the request is not canceled before start
             if (!_cancelRequests.ContainsKey(messageRequest.MessageId))
@@ -151,7 +160,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             }
 
             //unpack the object
-            var (_, cancellationTokenSource) = recognitionDetails;
+            var (_, cancellationTokenSource, _) = recognitionDetails;
 
             //cancel the recognition worker
             try
@@ -174,10 +183,10 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             IRequestResponseMessage requestMessage, GeolocationInfo geolocation)
         {
             //get the id of the workers
-            var workersJobs = new List<string>();
+            var workersJobs = new List<JobSummary>();
 
             //iterate the active workers
-            foreach (var (hashId, (task, _)) in _currentActiveWorkersForSearching)
+            foreach (var (_, (task, _, jobSummary)) in _currentActiveWorkersForSearching)
             {
                 //skip if the task is not running
                 if (task.IsFaulted || task.IsCanceled || task.IsCompleted || task.IsCompletedSuccessfully)
@@ -186,7 +195,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 }
 
                 //add the hash id in the list
-                workersJobs.Add(hashId);
+                workersJobs.Add(jobSummary);
             }
 
             //person potentially found
@@ -197,7 +206,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 {
                     MessageId = requestMessage.MessageId,
                     StartedAt = _startedOnAt,
-                    UserId =  requestMessage.UserId,
+                    UserId = requestMessage.UserId,
                     Geolocation = geolocation,
                     MessageContent = (_workerIdentificationNumber, workersJobs)
                 });

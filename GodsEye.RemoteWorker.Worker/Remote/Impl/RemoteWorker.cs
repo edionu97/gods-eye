@@ -93,7 +93,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         if (_currentActiveWorkersForSearching.ContainsKey(searchForPersonMessage.MessageId))
                         {
                             //get the active task that handles the search for person request
-                            var (task, _) = _currentActiveWorkersForSearching[searchForPersonMessage.MessageId];
+                            var (task, _, _) = _currentActiveWorkersForSearching[searchForPersonMessage.MessageId];
 
                             //if the task is still running 
                             if (!(task.IsFaulted || task.IsCanceled || task.IsCompleted || task.IsCompletedSuccessfully))

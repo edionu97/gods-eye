@@ -30,11 +30,7 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                             WorkerInfo = new
                             {
                                 WorkerId = guid,
-                                ActiveSearchingJobs = new
-                                {
-                                    activeJobs.Count,
-                                    Jobs = activeJobs
-                                }
+                                RunningJobs = activeJobs 
                             },
                             activeWorkerMessageResponse.StartedAt,
                             MessageType = nameof(ActiveWorkerMessageResponse)

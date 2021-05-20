@@ -9,7 +9,28 @@ class ActiveSearchRequestModel {
   //the image base 64
   String _imageBase64;
 
-  ActiveSearchRequestModel({String startedAt, String imageBase64}) {
+  //get the requst hash id
+  final String searchRequestHashId;
+
+  /// Convert the [json] into a dart object instance
+  static ActiveSearchRequestModel convertFromJson(final dynamic jsonObject) {
+    //set the date value
+    String dateValue;
+    try {
+      dateValue = DateFormat("dd-MM-yyyy HH:mm:ss")
+          .format(DateTime.parse(jsonObject["SubmittedOn"]));
+    } on Exception {
+      //empty
+    }
+    //create the model
+    return ActiveSearchRequestModel(
+        startedAt: dateValue,
+        imageBase64: jsonObject["SearchedImage"],
+        searchRequestHashId: jsonObject["JobHashId"]);
+  }
+
+  ActiveSearchRequestModel(
+      {String startedAt, String imageBase64, this.searchRequestHashId}) {
     _startedAt = startedAt;
     _imageBase64 = imageBase64;
   }
@@ -24,7 +45,6 @@ class ActiveSearchRequestModel {
   }
 
   DateTime get startedAt {
-
     //check the string for null or empty
     if (_startedAt == null || _startedAt.isEmpty) {
       return null;
