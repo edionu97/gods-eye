@@ -2,15 +2,16 @@ import 'dart:convert';
 
 import 'package:crclib/catalog.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
+import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/geolocation/model.dart';
 import 'package:intl/intl.dart';
 
-class RemoteWorkerModel {
-  //private field for worker id
-  String _workerId;
-
+class RemoteWorkerModel implements IAbstractModel {
   //started at property
   String _startedAt;
+
+  //worker hash
+  final String workerHashId;
 
   //set the active searching jobs
   final int activeSearchingJobs;
@@ -21,25 +22,49 @@ class RemoteWorkerModel {
   //get the active search requests
   final List<ActiveSearchRequestModel> activeSearchRequests;
 
+  /// Convert the json into dart object
+  static RemoteWorkerModel convertFromJson(final dynamic jsonObject) {
+    //create the requests
+    final List<ActiveSearchRequestModel> activeRequests = [
+
+    ];
+
+    //set the date value
+    String dateValue;
+    try {
+      dateValue = DateFormat("dd-MM-yyyy HH:mm:ss")
+          .format(DateTime.parse(jsonObject["StartedAt"]));
+    } on Exception {
+      //empty
+    }
+
+    //create the remote worker model
+    return RemoteWorkerModel(
+        workerHashId: jsonObject["WorkerInfo"]["WorkerId"],
+        geolocation:
+        GeolocationModel.convertFromJson(jsonObject["GeoLocation"]),
+        startedAt: dateValue,
+        activeSearchingJobs: activeRequests.length,
+        activeSearchRequests: activeRequests);
+  }
+
   /// Constructor
-  RemoteWorkerModel(
-      {String workerId,
-      this.geolocation,
-      String startedAt,
-      this.activeSearchRequests,
-      this.activeSearchingJobs}) {
+  RemoteWorkerModel({this.workerHashId,
+    this.geolocation,
+    String startedAt,
+    this.activeSearchRequests,
+    this.activeSearchingJobs}) {
     _startedAt = startedAt;
-    _workerId = workerId;
   }
 
   String get workerId {
     //check the string for null or empty
-    if (_workerId == null || _workerId.isEmpty) {
+    if (workerHashId == null || workerHashId.isEmpty) {
       return null;
     }
 
     //encode the worker id
-    final encodedWorkerId = utf8.encode(_workerId);
+    final encodedWorkerId = utf8.encode(workerHashId);
 
     //return the crc worker id
     return Crc16X().convert(encodedWorkerId).toString();
@@ -64,7 +89,10 @@ class RemoteWorkerModel {
     final utcDate = DateFormat("dd-MM-yyyy HH:mm:ss").parse(_startedAt, true);
 
     //get the difference of dates in minutes
-    final int minutes = DateTime.now().difference(utcDate.toLocal()).inMinutes;
+    final int minutes = DateTime
+        .now()
+        .difference(utcDate.toLocal())
+        .inMinutes;
 
     //get the hours
     final int hours = (minutes / 60).floor();
@@ -73,6 +101,8 @@ class RemoteWorkerModel {
     final int min = minutes - hours * 60;
 
     //get the hours:and minutes
-    return "${hours < 10 ? "0$hours" : hours}:${minutes < 10 ? "0$min" : min} h";
+    return "${hours < 10 ? "0$hours" : hours}:${minutes < 10
+        ? "0$min"
+        : min} h";
   }
 }

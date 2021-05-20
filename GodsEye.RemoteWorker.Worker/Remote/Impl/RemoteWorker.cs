@@ -18,6 +18,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
         private readonly CancellationTokenSource _parentCancellationTokenSource;
 
         private ILogger _logger;
+        private DateTime _startedOnAt;
         private readonly IBus _messageBus;
         private readonly IJobExecutor _jobExecutor;
         private readonly ILoggerFactory _loggerFactory;
@@ -45,6 +46,9 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
         {
             //get the starting information
             var (cameraIp, cameraPort) = rwStartingInformation.Siw;
+
+            //set the starting on date
+            _startedOnAt = DateTime.UtcNow;
 
             //create the logger
             _logger ??= _loggerFactory.CreateLogger(string.

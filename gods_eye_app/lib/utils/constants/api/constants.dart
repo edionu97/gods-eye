@@ -17,4 +17,8 @@ class ApiConstants {
   // ignore: non_constant_identifier_names
   static String NOTIFICATION_INITIALIZATION_API =
       "api/facial-recognition/initialize";
+
+  // ignore: non_constant_identifier_names
+  static String PING_ACTIVE_WORKERS =
+      "api/facial-recognition/searching/active-workers/all";
 }

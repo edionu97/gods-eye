@@ -2,8 +2,11 @@
 using System.Text;
 using WatsonWebsocket;
 using System.Net.WebSockets;
+using Microsoft.Extensions.Logging;
 using GodsEye.Application.Middleware.MessageBroadcaster.Messages;
 using GodsEye.Utility.Application.Helpers.Helpers.Serializers.JsonSerializer;
+
+using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Ws;
 
 namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
 {
@@ -24,6 +27,9 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
             var messageString = Encoding.UTF8.GetString(e.Data);
             try
             {
+                //log the message
+                _logger?.LogInformation(Constants.MessageFromClientMessage, messageString);
+
                 //deserialized the message
                 var deserializedMessage =
                     JsonSerializerDeserializer<OnlineClientMessage>

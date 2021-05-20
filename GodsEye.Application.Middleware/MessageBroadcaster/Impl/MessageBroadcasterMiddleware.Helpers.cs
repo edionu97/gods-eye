@@ -35,7 +35,9 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                                     activeJobs.Count,
                                     Jobs = activeJobs
                                 }
-                            }
+                            },
+                            activeWorkerMessageResponse.StartedAt,
+                            MessageType = nameof(ActiveWorkerMessageResponse)
                         });
                     }
 
@@ -70,7 +72,8 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                                     facialResult.Gender,
                                     facialResult.Race
                                 }
-                            }
+                            },
+                            MessageType = nameof(PersonFoundMessageResponse)
                         });
                     }
 

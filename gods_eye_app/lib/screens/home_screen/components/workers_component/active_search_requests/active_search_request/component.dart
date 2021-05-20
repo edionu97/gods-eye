@@ -29,7 +29,7 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
         vsync: this, duration: const Duration(milliseconds: 600));
 
     //create the opacity controller
-    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+    _animation = Tween<double>(begin: 0, end: .80).animate(_animationController);
 
     //start the animation
     _animationController.forward();

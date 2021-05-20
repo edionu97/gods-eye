@@ -33,6 +33,8 @@
 
             public static string ClientCouldNotBeGeneratedMessage =>
                 "The client  for ws({0}:{1}) could not be generated\n";
+
+            public static string MessageFromClientMessage => "Received message from client, the message is {0}";
         }
 
         public static class FrameBuffer

@@ -196,6 +196,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 .Publish(new ActiveWorkerMessageResponse
                 {
                     MessageId = requestMessage.MessageId,
+                    StartedAt = _startedOnAt,
                     UserId =  requestMessage.UserId,
                     Geolocation = geolocation,
                     MessageContent = (_workerIdentificationNumber, workersJobs)
