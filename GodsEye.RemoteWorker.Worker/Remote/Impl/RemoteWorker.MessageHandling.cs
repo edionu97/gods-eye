@@ -112,8 +112,9 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             var jobSummary = new JobSummary
             {
                 JobHashId = messageRequest.MessageId,
-                SearchedImage = messageRequest?.MessageContent,
-                SubmittedOn = DateTime.UtcNow
+                SearchedImage = messageRequest.MessageContent,
+                SubmittedOn = DateTime.UtcNow,
+                CreatedByUserId = messageRequest.UserId
             };
 
             //register the worker as online
@@ -183,7 +184,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             IRequestResponseMessage requestMessage, GeolocationInfo geolocation)
         {
             //get the id of the workers
-            var workersJobs = new List<JobSummary>();
+            var jobSummaries = new List<JobSummary>();
 
             //iterate the active workers
             foreach (var (_, (task, _, jobSummary)) in _currentActiveWorkersForSearching)
@@ -194,8 +195,14 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     continue;
                 }
 
+                //skip if the job is not created by the current user
+                if (jobSummary.CreatedByUserId != requestMessage.UserId)
+                {
+                    continue;;
+                }
+
                 //add the hash id in the list
-                workersJobs.Add(jobSummary);
+                jobSummaries.Add(jobSummary);
             }
 
             //person potentially found
@@ -208,7 +215,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                     StartedAt = _startedOnAt,
                     UserId = requestMessage.UserId,
                     Geolocation = geolocation,
-                    MessageContent = (_workerIdentificationNumber, workersJobs)
+                    MessageContent = (_workerIdentificationNumber, jobSummaries)
                 });
         }
     }
