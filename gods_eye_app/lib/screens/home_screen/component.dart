@@ -19,9 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
   //menu items
   List<Pair<Function, String>> _menuItems;
 
-  //the menu index
-  int _currentMenuItemIdx = 0;
   int _newNotifications = 0;
+
+  //the menu index
+  int _currentMenuItemIdx = 1;
 
   @override
   void initState() {

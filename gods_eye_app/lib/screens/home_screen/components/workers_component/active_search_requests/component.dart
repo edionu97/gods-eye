@@ -14,10 +14,10 @@ class ActiveSearchRequests extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => ActiveSearchRequestsState();
+  State<StatefulWidget> createState() => _ActiveSearchRequestsState();
 }
 
-class ActiveSearchRequestsState extends State<ActiveSearchRequests> {
+class _ActiveSearchRequestsState extends State<ActiveSearchRequests> {
   //the request list
   List<ActiveSearchRequest> requests;
 
