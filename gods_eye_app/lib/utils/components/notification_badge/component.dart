@@ -65,7 +65,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
           child: Container(
               padding: EdgeInsets.all(1),
               decoration: BoxDecoration(
-                  color: Colors.blueGrey[400],
+                  color: Colors.blueGrey[500],
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: boxShadowList),
               constraints: BoxConstraints(minWidth: 15, minHeight: 15),
