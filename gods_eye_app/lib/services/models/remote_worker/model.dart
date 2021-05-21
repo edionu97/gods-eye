@@ -108,6 +108,6 @@ class RemoteWorkerModel implements IAbstractModel {
     final int min = minutes - hours * 60;
 
     //get the hours:and minutes
-    return "${hours < 10 ? "0$hours" : hours}:${minutes < 10 ? "0$min" : min} h";
+    return "${hours < 10 ? "0$hours" : hours}:${min < 10 ? "0$min" : min} h";
   }
 }

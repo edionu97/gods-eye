@@ -54,7 +54,8 @@ flutter:
     - register.png
     - unknown.png
     - network.png
-    - eli.png
+    - search_results.png
+    - person_search.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
