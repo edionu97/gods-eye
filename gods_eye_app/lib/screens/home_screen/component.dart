@@ -4,6 +4,8 @@ import 'package:gods_eye_app/utils/components/loader/component.dart';
 import 'package:gods_eye_app/utils/components/notification_badge/component.dart';
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 
+import 'components/person_search_component/component.dart';
+
 class HomeScreen extends StatefulWidget {
   //represents the user token
   final String userToken;
@@ -36,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
           (userToken) => RemoteWorkersScreen(
               userToken, (x) => setState(() => _newNotifications = x)),
           "Remote Workers"),
-      Pair((userToken) => Center(child: CircularSpinningLoader()),
+      Pair((userToken) => PersonSearchScreen(userToken: userToken),
           "Person search"),
       Pair((userToken) => Center(child: CircularSpinningLoader()),
           "Search results"),

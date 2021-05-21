@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/screens/home_screen/common/active_search_request/component.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 
-import 'active_search_request/component.dart';
 
 class ActiveSearchRequests extends StatefulWidget {
   //get the list
