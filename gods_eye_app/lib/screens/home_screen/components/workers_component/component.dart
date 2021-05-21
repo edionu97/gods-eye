@@ -14,8 +14,9 @@ import 'package:intl/intl.dart';
 
 class RemoteWorkersScreen extends StatefulWidget {
   final String userToken;
+  final Function tmp;
 
-  RemoteWorkersScreen(this.userToken);
+  RemoteWorkersScreen(this.userToken, this.tmp);
 
   @override
   State<StatefulWidget> createState() => _RemoteWorkersScreenState();
@@ -89,6 +90,7 @@ class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
 
   /// This method is responsible with the ui update
   void _updateUi(Timer time) async {
+    widget.tmp.call(_remoteWorkersData.length);
     //set the displayed data before ping started
 
     //if in previous state   we have 0 data => there are no available workers
