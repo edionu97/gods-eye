@@ -6,6 +6,7 @@ import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
+import 'package:gods_eye_app/utils/components/bottom_right_button/component.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/top_corner_button/component.dart';
@@ -99,38 +100,8 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
                                     mainAxisSpacing: 10))))))
       ]),
       //create the bottom button
-      _createBottomButton(context)
+      BottomRightButton(onPressed: () => _addButtonClicked(context))
     ]);
-  }
-
-  /// Create the bottom button
-  Widget _createBottomButton(BuildContext context) {
-    //position the button bottom right
-    return Positioned(
-        bottom: 40,
-        right: 30,
-        //wrap the button in a container
-        child: Container(
-            height: 60,
-            width: 60,
-            //set a little opacity
-            child: Opacity(
-                opacity: .95,
-                //create the button
-                child: ElevatedButton(
-                    //set the on pressed function
-                    onPressed: () => _addButtonClicked(context),
-                    //set the button style
-                    style: ElevatedButton.styleFrom(
-                        primary: Colors.blueGrey[400],
-                        shadowColor: Colors.blueGrey[700],
-                        visualDensity: VisualDensity.comfortable,
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        elevation: 20),
-                    //put the icon
-                    child: ImageIcon(AssetImage("new_search.png"))))));
   }
 
   /// In this region all the handlers are defined
