@@ -1,15 +1,14 @@
-import 'dart:convert';
-
-import 'package:auto_animated/auto_animated.dart';
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/common/active_search_request/component.dart';
-import 'package:gods_eye_app/screens/home_screen/components/workers_component/active_search_requests/component.dart';
+import 'package:gods_eye_app/services/facial_recognition/service.dart';
+import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
+import 'package:gods_eye_app/services/models/common/model.dart';
+import 'package:gods_eye_app/services/models/remote_worker/model.dart';
+import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 import 'package:gods_eye_app/utils/components/top_corner_button/component.dart';
-import 'package:gods_eye_app/utils/helpers/conversion/image/convertor.dart';
 import 'package:intl/intl.dart';
-import 'dart:io' as Io;
 
 class PersonSearchScreen extends StatefulWidget {
   final String userToken;
@@ -21,22 +20,36 @@ class PersonSearchScreen extends StatefulWidget {
 }
 
 class _PersonSearchScreenState extends State<PersonSearchScreen> {
-  //the request list
-  List<ActiveSearchRequestModel> _activeSearchRequests = [
-    ActiveSearchRequestModel(
-      startedAt:
-          DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now().toUtc()),
-    )
-  ];
+  final Map<String, ActiveSearchRequestModel> _displayedWorkerRequests = {};
 
   @override
   void initState() {
     //call the super init state logic
     super.initState();
+
+    //register the observer
+    NotificationService().registerObserver(_onNotification);
+
+    //do the initial interface update
+    FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+  }
+
+  @override
+  void dispose() {
+    //unregister the observer
+    NotificationService().unregisterObserver(_onNotification);
+
+    //execute the dispose logic
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    //get the values from the active search request
+    final List<ActiveSearchRequestModel> activeSearchRequests =
+        _displayedWorkerRequests.values.toList();
+
+    //create the stack
     return Stack(clipBehavior: Clip.none, children: [
       //define the column with grid
       Column(children: [
@@ -51,21 +64,22 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
                     //if display the loader only if the list is empty
                     child: CircularSpinningLoader(
                         //if the list is empty, display the spinner
-                        displayLoaderIf: () => _activeSearchRequests.isEmpty,
+                        displayLoaderIf: () => activeSearchRequests.isEmpty,
                         //otherwise display the grid
                         elseDisplay: GridView.builder(
                             clipBehavior: Clip.none,
                             // the number of items from grid is equal with the number of items from list
-                            itemCount: _activeSearchRequests.length,
+                            itemCount: activeSearchRequests.length,
                             //the items are instances of remote workers
                             itemBuilder: (BuildContext context, int index) =>
                                 //create the active search request instance
                                 ActiveSearchRequest(
+                                    extraText: "Running since: ",
                                     //set the data model
                                     activeSearchRequestModel:
-                                        _activeSearchRequests[index],
+                                        activeSearchRequests[index],
                                     //set the font size
-                                    fontSize: 14,
+                                    fontSize: 9.5,
                                     //set the max value of the opacity
                                     opacityValue: 1,
                                     //set the widget that will appear on top
@@ -114,6 +128,51 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
                     child: ImageIcon(AssetImage("new_search.png"))))));
   }
 
+  /// This handler will be called when the [message] it is send
+  /// Keep only the oldest requests
+  void _onNotification(final String message) {
+    //convert the json into an object
+    IAbstractModel convertedObject =
+        MessageParsingService().parseModelFromJson(message);
+
+    //check if the object is the right instance
+    if (!(convertedObject is RemoteWorkerModel)) {
+      return;
+    }
+
+    //get the active search requests for the model
+    final List<ActiveSearchRequestModel> requestsFromWorker =
+        (convertedObject as RemoteWorkerModel).activeSearchRequests;
+
+    //iterate the active requests
+    //and each time keep the older request from all the responses
+    for (var workerRequest in requestsFromWorker) {
+      //get the request id
+      final String reqId = workerRequest.searchRequestHashId;
+
+      //if the value is not in history
+      if (!_displayedWorkerRequests.containsKey(reqId)) {
+        //add it in history
+        _displayedWorkerRequests[reqId] = workerRequest;
+        //continue the flow
+        continue;
+      }
+
+      //get the request items
+      var requestItem = _displayedWorkerRequests[reqId];
+
+      //if the item from the list is newer than the item from message
+      if (requestItem.startedAt.isAfter(workerRequest.startedAt)) {
+        requestItem = workerRequest;
+      }
+
+      //set the item
+      _displayedWorkerRequests[reqId] = requestItem;
+    }
+
+    //set the state
+    setState(() {});
+  }
 
   /// Create the handler for item deletion
   void _deleteButtonClicked(int itemIndex, BuildContext context) {

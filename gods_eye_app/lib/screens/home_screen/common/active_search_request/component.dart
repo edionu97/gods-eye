@@ -8,10 +8,12 @@ class ActiveSearchRequest extends StatefulWidget {
   final double fontSize;
   final double opacityValue;
   final Widget onTopWidget;
+  final String extraText;
 
   //set the active search request model
   ActiveSearchRequest(
       {@required this.activeSearchRequestModel,
+      this.extraText,
       this.onTopWidget,
       this.fontSize = 9,
       this.opacityValue = .8});
@@ -92,8 +94,7 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
         child: Stack(
             clipBehavior: Clip.none,
             //set the children ignoring the null values
-            children:
-                widgetList.where((element) => element != null).toList()));
+            children: widgetList.where((element) => element != null).toList()));
   }
 
   /// Create all the items from card
@@ -103,6 +104,11 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
     if (widget.activeSearchRequestModel?.startedAt != null) {
       startedAtDateTime = DateFormat("dd-MM-yyyy (HH:mm)")
           .format(widget.activeSearchRequestModel?.startedAt);
+    }
+
+    //put the extra message
+    if(widget.extraText != null && widget.extraText.isNotEmpty){
+      startedAtDateTime = "${widget.extraText}$startedAtDateTime";
     }
 
     //get the image
