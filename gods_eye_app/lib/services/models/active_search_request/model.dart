@@ -6,6 +6,8 @@ class ActiveSearchRequestModel {
   //this represents the date time as string
   String _startedAt;
 
+  Image image;
+
   //the image base 64
   final String imageBase64;
 
@@ -31,16 +33,17 @@ class ActiveSearchRequestModel {
 
   ActiveSearchRequestModel(
       {String startedAt, this.imageBase64, this.searchRequestHashId}) {
-    _startedAt = startedAt;
-  }
+    //set the image to null by default
+    image = null;
 
-  Image get image {
-    //check the string for null or empty
-    if (imageBase64 == null || imageBase64.isEmpty) {
-      return null;
+    //convert the image from base 64 into img
+    if (imageBase64 != null && imageBase64.isNotEmpty) {
+      //create the image from base64 string
+      image = ImageConvertor.imageFromBase64String(imageBase64);
     }
-    //create the image from base64 string
-    return ImageConvertor.imageFromBase64String(imageBase64);
+
+    //set the started at
+    _startedAt = startedAt;
   }
 
   DateTime get startedAt {
