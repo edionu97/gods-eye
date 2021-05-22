@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/utils/components/decoration_form/component.dart';
 
 import 'dialog/component.dart';
 
@@ -17,36 +18,6 @@ class Modal {
 
     //return the exception
     return e?.toString();
-  }
-
-  static Future<dynamic> openDialogAsync(
-      {@required BuildContext context,
-      String message,
-      String title = "Error",
-      IconData iconData = Icons.error,
-      Color iconColor = Colors.black}) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return Container(
-              color: Colors.transparent,
-              // container to set color
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      child: DialogCustom(
-                        message: message,
-                        title: title,
-                        icon: Icon(
-                          iconData,
-                          color: iconColor,
-                        ),
-                      ),
-                    )
-                  ]));
-        });
   }
 
   /// Shows the cupertino dialog
@@ -97,5 +68,28 @@ class Modal {
                       style:
                           TextStyle(color: Colors.blueGrey[500], fontSize: 16)))
             ])));
+  }
+
+  static Future showBottomWithActionsDialogAsync(BuildContext context,
+      {List<Widget> actions}) async {
+    //the action list must not be null
+    actions = actions ?? [];
+
+    //define the border radius
+    const border = Radius.circular(30);
+    //display a modal on the bottom of the phone
+    await showModalBottomSheet(
+        //this is used to clip the items
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        //create the border
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(topLeft: border, topRight: border)),
+        //set the context
+        context: context,
+        //set the background color
+        backgroundColor: Colors.blueGrey[800],
+        //the build context
+        builder: (BuildContext context) =>
+            SafeArea(child: Wrap(children: actions)));
   }
 }

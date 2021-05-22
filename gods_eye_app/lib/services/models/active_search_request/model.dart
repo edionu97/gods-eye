@@ -7,9 +7,9 @@ class ActiveSearchRequestModel {
   String _startedAt;
 
   //the image base 64
-  String _imageBase64;
+  final String imageBase64;
 
-  //get the requst hash id
+  //get the request hash id
   final String searchRequestHashId;
 
   /// Convert the [json] into a dart object instance
@@ -30,18 +30,17 @@ class ActiveSearchRequestModel {
   }
 
   ActiveSearchRequestModel(
-      {String startedAt, String imageBase64, this.searchRequestHashId}) {
+      {String startedAt, this.imageBase64, this.searchRequestHashId}) {
     _startedAt = startedAt;
-    _imageBase64 = imageBase64;
   }
 
   Image get image {
     //check the string for null or empty
-    if (_imageBase64 == null || _imageBase64.isEmpty) {
+    if (imageBase64 == null || imageBase64.isEmpty) {
       return null;
     }
     //create the image from base64 string
-    return ImageConvertor.imageFromBase64String(_imageBase64);
+    return ImageConvertor.imageFromBase64String(imageBase64);
   }
 
   DateTime get startedAt {

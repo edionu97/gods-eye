@@ -7,8 +7,9 @@ import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
+import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/top_corner_button/component.dart';
-import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PersonSearchScreen extends StatefulWidget {
   final String userToken;
@@ -20,6 +21,9 @@ class PersonSearchScreen extends StatefulWidget {
 }
 
 class _PersonSearchScreenState extends State<PersonSearchScreen> {
+  //get the image picker
+  final ImagePicker imagePicker = ImagePicker();
+
   final Map<String, ActiveSearchRequestModel> _displayedWorkerRequests = {};
 
   @override
@@ -84,8 +88,9 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
                                     opacityValue: 1,
                                     //set the widget that will appear on top
                                     onTopWidget: TopCornerButton(
-                                        onTap: () => _deleteButtonClicked(
-                                            index, context))),
+                                      onTap: () => _deleteButtonClicked(
+                                          activeSearchRequests[index], context),
+                                    )),
                             //specifies the grid alignment
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
@@ -127,6 +132,9 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
                     //put the icon
                     child: ImageIcon(AssetImage("new_search.png"))))));
   }
+
+  /// In this region all the handlers are defined
+  //#region Handlers
 
   /// This handler will be called when the [message] it is send
   /// Keep only the oldest requests
@@ -174,11 +182,103 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
     setState(() {});
   }
 
+  //#endregion
+
+  /// In this region all the actions are defined
+  //#region Actions
+
   /// Create the handler for item deletion
-  void _deleteButtonClicked(int itemIndex, BuildContext context) {
-    print(itemIndex);
+  void _deleteButtonClicked(
+      ActiveSearchRequestModel clickedRequest, BuildContext context) async {
+    //try to execute the stopping request
+    try {
+      //
+      await FacialRecognitionService().stopActiveSearchRequestAsync(
+          widget.userToken, clickedRequest.imageBase64);
+
+      //set the state
+      setState(() {
+        //remove the item from the list
+        _displayedWorkerRequests.remove(clickedRequest.searchRequestHashId);
+      });
+
+      //do the interface update
+      await FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+
+      //handle the exception
+    } on Exception catch (e) {
+      //get message
+      final message = Modal.extractMessageFromException(e);
+
+      //get the message and report it
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context, "Stopping person searching failed", message);
+    }
   }
 
   /// Define the handler for adding a new search request
-  void _addButtonClicked(BuildContext context) {}
+  void _addButtonClicked(BuildContext context) async {
+    //show the modal with actions
+    await Modal.showBottomWithActionsDialogAsync(context, actions: [
+      //create the first option (upload the image from gallery)
+      ListTile(
+          visualDensity: VisualDensity.compact,
+          leading: Icon(Icons.photo_library_outlined, color: Colors.white70),
+          title: Text('Upload person of interest from gallery',
+              style: TextStyle(
+                  fontWeight: FontWeight.w300,
+                  fontSize: 15,
+                  color: Colors.white70)),
+          onTap: () => _pickAndProcessTheImage(context, ImageSource.gallery)),
+
+      //upload the person using camera
+      ListTile(
+          visualDensity: VisualDensity.compact,
+          leading: Icon(Icons.photo_camera_outlined, color: Colors.white70),
+          title: Text('Upload person of interest from camera',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.white70)),
+          onTap: () => _pickAndProcessTheImage(context, ImageSource.camera))
+    ]);
+  }
+
+  /// This method it is used for image picking. Based on the [imageSource] the image will
+  /// be loaded accordingly and sent to server for starting a new search request
+  /// The ui will be updated
+  void _pickAndProcessTheImage(
+      BuildContext context, ImageSource imageSource) async {
+    //try to pick an image
+    try {
+      //get the image from gallery
+      final PickedFile imagePath =
+          await imagePicker.getImage(source: imageSource, imageQuality: 100);
+
+      //if the image is null then do nothing
+      if (imagePath == null) {
+        return;
+      }
+
+      //await searching for a new person
+      await FacialRecognitionService()
+          .startSearchingForANewPersonAsync(widget.userToken, imagePath.path);
+
+      //go back in activity stack
+      Navigator.of(context).pop();
+
+      //ping all the workers for refreshing the displayed data
+      await FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+
+      //notify the exceptions changes
+    } on Exception catch (e) {
+      //get message
+      final message = Modal.extractMessageFromException(e);
+      //get the message and report it
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context, "Authentication error", message);
+    }
+  }
+
+//#endregion
 }
