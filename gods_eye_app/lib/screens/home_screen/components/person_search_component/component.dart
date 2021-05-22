@@ -1,3 +1,4 @@
+import 'package:auto_animated/auto_animated.dart';
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/common/active_search_request/component.dart';
 import 'package:gods_eye_app/services/facial_recognition/service.dart';
@@ -71,37 +72,41 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
                         //if the list is empty, display the spinner
                         displayLoaderIf: () => activeSearchRequests.isEmpty,
                         //otherwise display the grid
-                        elseDisplay: GridView.builder(
-                            clipBehavior: Clip.none,
-                            // the number of items from grid is equal with the number of items from list
-                            itemCount: activeSearchRequests.length,
-                            //the items are instances of remote workers
-                            itemBuilder: (BuildContext context, int index) =>
-                                //create the active search request instance
-                                ActiveSearchRequest(
-                                    extraText: "Running since: ",
-                                    //set the data model
-                                    activeSearchRequestModel:
-                                        activeSearchRequests[index],
-                                    //set the font size
-                                    fontSize: 9.5,
-                                    //set the max value of the opacity
-                                    opacityValue: 1,
-                                    //set the widget that will appear on top
-                                    onTopWidget: TopCornerButton(
-                                      onTap: () => _deleteButtonClicked(
-                                          activeSearchRequests[index], context),
-                                    )),
-                            //specifies the grid alignment
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10))))))
+                        elseDisplay:
+                            _buildGridWidget(context, activeSearchRequests)))))
       ]),
       //create the bottom button
       BottomRightButton(onPressed: () => _addButtonClicked(context))
     ]);
+  }
+
+  /// Build the grid view
+  Widget _buildGridWidget(BuildContext context,
+      final List<ActiveSearchRequestModel> activeSearchRequests) {
+    //return the grid
+    return GridView.builder(
+        clipBehavior: Clip.none,
+        // the number of items from grid is equal with the number of items from list
+        itemCount: activeSearchRequests.length,
+        //the items are instances of remote workers
+        itemBuilder: (BuildContext context, int index) =>
+            //create the active search request instance
+            ActiveSearchRequest(
+                extraText: "Running since: ",
+                //set the data model
+                activeSearchRequestModel: activeSearchRequests[index],
+                //set the font size
+                fontSize: 9.5,
+                //set the max value of the opacity
+                opacityValue: 1,
+                //set the widget that will appear on top
+                onTopWidget: TopCornerButton(
+                  onTap: () => _deleteButtonClicked(
+                      activeSearchRequests[index], context),
+                )),
+        //specifies the grid alignment
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10));
   }
 
   /// In this region all the handlers are defined
