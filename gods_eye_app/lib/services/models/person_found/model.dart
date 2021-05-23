@@ -6,6 +6,10 @@ import 'package:gods_eye_app/utils/helpers/conversion/image/convertor.dart';
 import 'package:gods_eye_app/utils/helpers/conversion/primitives/convertor.dart';
 
 class PersonFoundMessageModel extends IAbstractModel {
+  //if this is set to true it means that in ui a dot will be displayed on top
+  //indicating that this is a new entry
+  bool isNewToUser = false;
+
   //date when the searching started
   String _searchStartedAt;
 

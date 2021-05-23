@@ -85,6 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
     //convert the abstract worker in specific instance
     var personFoundMessage = convertedObject as PersonFoundMessageModel;
 
+    //the model is new only if the user is not on the notification screen
+    //otherwise it means that he saw it
+    personFoundMessage.isNewToUser = _currentMenuItemIdx != 2;
+
     //add a  new item into database and notify all the observers
     await PersonSearchResponseRepository().addItemAsync(personFoundMessage);
   }
@@ -199,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
   /// This method it is used for navigating from one menu to another
   /// the [toIndex] is the index to which we want to navigate
   void _onNavigate(int toIndex) {
+    //set the state accordingly
     setState(() {
       //reset the value of the notification badge
       _newNotifications = toIndex == 2 ? 0 : _newNotifications;
