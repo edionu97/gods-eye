@@ -37,6 +37,29 @@ class PersonSearchResponseRepository extends FunctionalObservable {
     return await _syncPrimitive.protect(() async => _foundPersons);
   }
 
+  /// This method it is used for getting all the responses grouped by
+  /// their responseId
+  Future<Map<String, List<PersonFoundMessageModel>>>
+      groupItemsBasedOnResponseIdAsync() async {
+
+    //get all the items
+    final Map<String, List<PersonFoundMessageModel>> map = {};
+
+    //iterate the items
+    for (var item in await allItemsAsync()) {
+      //if the item does not exist do nothing
+      if (!map.containsKey(item.responseId)) {
+        map[item.responseId] = [];
+      }
+
+      //add the item in dictionary
+      map[item.responseId].add(item);
+    }
+
+    //return the map
+    return map;
+  }
+
   //clear the repository
   void clearRepository() {
     _foundPersons.clear();
