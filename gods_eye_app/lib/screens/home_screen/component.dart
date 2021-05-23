@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/persistence/search_responses/repo.dart';
 import 'package:gods_eye_app/screens/home_screen/components/workers_component/component.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
@@ -7,7 +8,6 @@ import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 import 'package:gods_eye_app/utils/components/notification_badge/component.dart';
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
-import 'package:mutex/mutex.dart';
 
 import 'components/person_search_component/component.dart';
 
@@ -30,10 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _newNotifications = 0;
 
   //the menu index
-  int _currentMenuItemIdx = 1;
-
-  //create the mutex
-  final Mutex mutex = Mutex();
+  int _currentMenuItemIdx = 0;
 
   @override
   void initState() {
@@ -53,12 +50,19 @@ class _HomeScreenState extends State<HomeScreen> {
           "App settings")
     ];
 
+    //register a new observer
+    PersonSearchResponseRepository().registerObserver(_onItemAdded);
+
     //register the observer
     NotificationService().registerObserver(_onMessage);
   }
 
   @override
   void dispose() {
+    //unregister the observer
+    PersonSearchResponseRepository().unregisterObserver(_onItemAdded);
+    //clear the repository
+    PersonSearchResponseRepository().clearRepository();
     //unregister the observer
     NotificationService().unregisterObserver(_onMessage);
     //on dispose unregister the user
@@ -81,18 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
     //convert the abstract worker in specific instance
     var personFoundMessage = convertedObject as PersonFoundMessageModel;
 
-    //if we are already on the notification page no thing
-    if(_currentMenuItemIdx == 2){
-      return;
-    }
-
-    //increment the number of new notifications
-    await mutex.protect(() async {
-      _newNotifications++;
-    });
-
-    //update the state
-    setState(() {});
+    //add a  new item into database and notify all the observers
+    await PersonSearchResponseRepository().addItemAsync(personFoundMessage);
   }
 
   @override
@@ -210,6 +204,20 @@ class _HomeScreenState extends State<HomeScreen> {
       _newNotifications = toIndex == 2 ? 0 : _newNotifications;
       //set the current menu index
       _currentMenuItemIdx = toIndex;
+    });
+  }
+
+  /// This callback it is used for modifying the value of the badge
+  void _onItemAdded(_){
+    //if we are displaying the notification screen
+    if(_currentMenuItemIdx == 2){
+      //do nothing
+      return;
+    }
+
+    //set the value of the notification badge text
+    setState(() {
+      ++_newNotifications;
     });
   }
 }
