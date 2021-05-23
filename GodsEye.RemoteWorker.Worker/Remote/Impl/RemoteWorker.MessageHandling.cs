@@ -94,7 +94,8 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                         UserId = messageRequest.UserId,
                                         StartTimeUtc = startTime,
                                         EndTimeUtc = endTime,
-                                        FromLocation = cameraGeolocation
+                                        FromLocation = cameraGeolocation,
+                                        SearchedPersonImageBase64 = messageRequest.MessageContent
                                     });
 
                             });

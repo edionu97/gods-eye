@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:gods_eye_app/services/models/common/model.dart';
+import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 
 class MessageParsingService {
-
   //implement the singleton pattern
-  static MessageParsingService _singletonInstance = MessageParsingService._internal();
+  static MessageParsingService _singletonInstance =
+      MessageParsingService._internal();
 
   //declare a private constructor
   MessageParsingService._internal();
@@ -34,8 +35,15 @@ class MessageParsingService {
           //convert the json into the right instance of object
           return RemoteWorkerModel.convertFromJson(decodedJson);
         }
+      //treat the PersonFoundMessageResponse message type
+      case "PersonFoundMessageResponse":
+        {
+          //convert the json into the right instance of the object
+          return PersonFoundMessageModel.convertFromJson(decodedJson);
+        }
     }
 
+    //return null if none of them
     return null;
   }
 }

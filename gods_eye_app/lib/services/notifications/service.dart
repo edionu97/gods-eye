@@ -11,7 +11,7 @@ class NotificationService {
       NotificationService._internal();
 
   //create the observers list
-  final ObserverList<Function> _observers = ObserverList<Function>();
+  final List<Function> _observers = [];
 
   //the on done callback
   Function _onDoneCallback;
@@ -29,6 +29,9 @@ class NotificationService {
 
   /// This method it is used for registering the service to the ws server
   Future registerAsync(final String userId) async {
+    //clear all the observers
+    _observers.clear();
+
     //do the get request for notification initialization
     await RequestHelper.doGetRequestAsync(
         requestUrl:

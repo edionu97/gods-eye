@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/components/workers_component/component.dart';
+import 'package:gods_eye_app/services/messages/service.dart';
+import 'package:gods_eye_app/services/models/common/model.dart';
+import 'package:gods_eye_app/services/models/person_found/model.dart';
+import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 import 'package:gods_eye_app/utils/components/notification_badge/component.dart';
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
+import 'package:mutex/mutex.dart';
 
 import 'components/person_search_component/component.dart';
 
@@ -21,20 +26,25 @@ class _HomeScreenState extends State<HomeScreen> {
   //menu items
   List<Pair<Function, String>> _menuItems;
 
+  //the number of new notifications
   int _newNotifications = 0;
 
   //the menu index
   int _currentMenuItemIdx = 1;
+
+  //create the mutex
+  final Mutex mutex = Mutex();
 
   @override
   void initState() {
     //call the initialisation logic
     super.initState();
 
-    //se the menu items
+    //set the menu items by defining the function that creates the element and the title of the page
     _menuItems = [
-      //define the function that creates the element and the title of the page
+      //create the page for the remote workers
       Pair((userToken) => RemoteWorkersScreen(userToken), "Remote Workers"),
+      //create the page for the person search
       Pair((userToken) => PersonSearchScreen(userToken: userToken),
           "Person search"),
       Pair((userToken) => Center(child: CircularSpinningLoader()),
@@ -42,6 +52,47 @@ class _HomeScreenState extends State<HomeScreen> {
       Pair((userToken) => Center(child: CircularSpinningLoader()),
           "App settings")
     ];
+
+    //register the observer
+    NotificationService().registerObserver(_onMessage);
+  }
+
+  @override
+  void dispose() {
+    //unregister the observer
+    NotificationService().unregisterObserver(_onMessage);
+    //on dispose unregister the user
+    NotificationService().unregisterAsync();
+    //execute the dispose logic
+    super.dispose();
+  }
+
+  /// This function it is used when a new message is received from client
+  /// Treats only the person found message
+  void _onMessage(String message) async {
+    //convert the json into an object
+    IAbstractModel convertedObject = MessageParsingService().parseModelFromJson(message);
+
+    //check if the object is the right instance
+    if (!(convertedObject is PersonFoundMessageModel)) {
+      return;
+    }
+
+    //convert the abstract worker in specific instance
+    var personFoundMessage = convertedObject as PersonFoundMessageModel;
+
+    //if we are already on the notification page no thing
+    if(_currentMenuItemIdx == 2){
+      return;
+    }
+
+    //increment the number of new notifications
+    await mutex.protect(() async {
+      _newNotifications++;
+    });
+
+    //update the state
+    setState(() {});
   }
 
   @override
@@ -107,6 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         displayBadgeIf: () => _newNotifications > 0,
                         //set the badge text
                         badgeText: "$_newNotifications",
+                        //if true the text will be displayed
+                        displayText: true,
                         // the widget that will be displayed as notification
                         mainWidget: ImageIcon(
                             AssetImage("assets/search_results.png"),

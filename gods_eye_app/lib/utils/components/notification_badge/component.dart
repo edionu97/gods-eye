@@ -4,8 +4,13 @@ class NotificationBadge extends StatefulWidget {
   final Function displayBadgeIf;
   final Widget mainWidget;
   final String badgeText;
+  final bool displayText;
 
-  NotificationBadge({this.displayBadgeIf, this.mainWidget, this.badgeText});
+  NotificationBadge(
+      {@required this.displayBadgeIf,
+      @required this.mainWidget,
+      this.badgeText,
+      this.displayText = false});
 
   @override
   State<StatefulWidget> createState() => _NotificationBadgeState();
@@ -70,12 +75,11 @@ class _NotificationBadgeState extends State<NotificationBadge> {
                   boxShadow: boxShadowList),
               constraints: BoxConstraints(minWidth: 15, minHeight: 15),
               child: Center(
-                  child: Text(widget.badgeText ?? "",
+                  child: Text(widget.displayText ? widget.badgeText ?? "" : "",
                       style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold
-                      ),
+                          color: Colors.white70,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center))))
     ]);
   }

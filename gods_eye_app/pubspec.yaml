@@ -35,6 +35,7 @@ dependencies:
   auto_animated: ^3.0.0
   image_picker: ^0.7.5+2
   mime: ^1.0.0
+  mutex: ^3.0.0
 
 dev_dependencies:
   flutter_test:

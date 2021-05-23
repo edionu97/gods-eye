@@ -50,6 +50,7 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                         //serialize the response
                         return JsonSerializerDeserializer<dynamic>.Serialize(new
                         {
+                            ResponseId = searchForPersonResponse.MessageId,
                             SearchStartedAt = searchForPersonResponse.StartTimeUtc,
                             FoundAt = searchForPersonResponse.EndTimeUtc,
                             GeoLocation = searchForPersonResponse.FromLocation,
@@ -68,7 +69,8 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                                     facialResult.Gender,
                                     facialResult.Race
                                 }
-                            },
+                            }, 
+                            SearchedPersonImage = searchForPersonResponse.SearchedPersonImageBase64,
                             MessageType = nameof(PersonFoundMessageResponse)
                         });
                     }

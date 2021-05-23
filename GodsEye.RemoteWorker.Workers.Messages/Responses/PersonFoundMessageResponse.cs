@@ -12,6 +12,7 @@ namespace GodsEye.RemoteWorker.Workers.Messages.Responses
         public DateTime EndTimeUtc { get; set; }
         public bool IsFound { get; set; }
         public GeolocationInfo FromLocation { get; set; }
+        public string SearchedPersonImageBase64 { get; set; }
         public (SearchForPersonResponse, string, FacialAttributeAnalysisResponse) MessageContent { get; set; }
     }
 }
