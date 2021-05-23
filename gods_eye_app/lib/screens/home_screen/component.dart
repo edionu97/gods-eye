@@ -126,12 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 elevation: 10.0,
                 unselectedItemColor: Colors.blueGrey[300],
                 backgroundColor: Colors.blueGrey[700],
-                onTap: (index) => setState(() {
-                      //reset the value of the notification badge
-                      _newNotifications = index == 2 ? 0 : _newNotifications;
-                      //set the current menu index
-                      _currentMenuItemIdx = index;
-                    }))));
+                onTap: _onNavigate)));
   }
 
   /// This function it is used for creating the application bar
@@ -156,4 +151,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         automaticallyImplyLeading: false);
   }
+
+  /// This method it is used for navigating from one menu to another
+  /// the [toIndex] is the index to which we want to navigate
+  void _onNavigate(int toIndex) {
+    setState(() {
+      //reset the value of the notification badge
+      _newNotifications = toIndex == 2 ? 0 : _newNotifications;
+      //set the current menu index
+      _currentMenuItemIdx = toIndex;
+    });
+  }
+
 }
