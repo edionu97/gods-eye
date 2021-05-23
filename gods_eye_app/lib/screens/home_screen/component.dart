@@ -10,6 +10,7 @@ import 'package:gods_eye_app/utils/components/notification_badge/component.dart'
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 
 import 'components/person_search_component/component.dart';
+import 'components/search_results_component/component.dart';
 
 class HomeScreen extends StatefulWidget {
   //represents the user token
@@ -30,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _newNotifications = 0;
 
   //the menu index
-  int _currentMenuItemIdx = 0;
+  int _currentMenuItemIdx = 2;
 
   @override
   void initState() {
@@ -44,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
       //create the page for the person search
       Pair((userToken) => PersonSearchScreen(userToken: userToken),
           "Person search"),
-      Pair((userToken) => Center(child: CircularSpinningLoader()),
+      //create the search results page
+      Pair((userToken) => SearchResultsScreen(userToken: userToken),
           "Search results"),
       Pair((userToken) => Center(child: CircularSpinningLoader()),
           "App settings")
