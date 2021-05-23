@@ -34,10 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //se the menu items
     _menuItems = [
       //define the function that creates the element and the title of the page
-      Pair(
-          (userToken) => RemoteWorkersScreen(
-              userToken, (x) => setState(() => _newNotifications = x)),
-          "Remote Workers"),
+      Pair((userToken) => RemoteWorkersScreen(userToken), "Remote Workers"),
       Pair((userToken) => PersonSearchScreen(userToken: userToken),
           "Person search"),
       Pair((userToken) => Center(child: CircularSpinningLoader()),
@@ -162,5 +159,4 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentMenuItemIdx = toIndex;
     });
   }
-
 }

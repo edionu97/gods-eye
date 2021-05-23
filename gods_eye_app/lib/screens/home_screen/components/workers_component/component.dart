@@ -4,19 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/components/workers_component/worker/component.dart';
 import 'package:gods_eye_app/services/facial_recognition/service.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
-import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
-import 'package:gods_eye_app/services/models/geolocation/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
-import 'package:intl/intl.dart';
 
 class RemoteWorkersScreen extends StatefulWidget {
   final String userToken;
-  final Function tmp;
 
-  RemoteWorkersScreen(this.userToken, this.tmp);
+  RemoteWorkersScreen(this.userToken);
 
   @override
   State<StatefulWidget> createState() => _RemoteWorkersScreenState();
@@ -90,7 +86,6 @@ class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
 
   /// This method is responsible with the ui update
   void _updateUi(Timer time) async {
-    widget.tmp.call(_remoteWorkersData.length);
     //set the displayed data before ping started
 
     //if in previous state   we have 0 data => there are no available workers
