@@ -30,12 +30,16 @@ class _SearchRequestState extends State<SearchRequest>
   AnimationController _animationController;
   Animation<double> _animation;
 
+  //if this is true, the notification bell will be showed
   bool _hasNewNotification = false;
+
+  //if this is true, the spinner will be shown
   bool _isStillSearching = true;
 
   //create the ui update job timer
   Timer _notificationChecker;
 
+  //for each searching job see on what worker it is active
   final Map<String, bool> _jobSummary = {};
 
   @override
