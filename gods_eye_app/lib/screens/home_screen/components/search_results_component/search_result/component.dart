@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/screens/home_screen/components/search_results_component/search_result/search_result_details/component.dart';
 import 'package:gods_eye_app/services/facial_recognition/service.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
@@ -8,6 +9,7 @@ import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
+import 'package:gods_eye_app/utils/animations/navigation/navigation_animation.dart';
 import 'package:gods_eye_app/utils/components/animated_opacity_widget/component.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 
@@ -41,6 +43,8 @@ class _SearchRequestState extends State<SearchRequest>
 
   //for each searching job see on what worker it is active
   final Map<String, bool> _jobSummary = {};
+
+  final UniqueKey _key = UniqueKey();
 
   @override
   void initState() {
@@ -107,29 +111,26 @@ class _SearchRequestState extends State<SearchRequest>
 
     //children
     final List<Widget> children = [
-      //make the card clickable
-      InkWell(
-        //set a custom border
-        customBorder: RoundedRectangleBorder(borderRadius: borderRadius),
-        //set the handler for on card clicked
-        onTap: () => _onCardClicked(context),
-        //create the card
-        child: Card(
-            //set the card border
-            shape: RoundedRectangleBorder(borderRadius: borderRadius),
-            //put a shadow
-            shadowColor: Colors.blueGrey[600],
-            //set the elevation
-            elevation: 10,
-            //create the elements of the card
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                    child: ClipRRect(borderRadius: borderRadius, child: image))
-              ],
-            )),
-      ),
+      //create the card
+      Card(
+          //set the card border
+          shape: RoundedRectangleBorder(borderRadius: borderRadius),
+          //put a shadow
+          shadowColor: Colors.blueGrey[600],
+          //set the elevation
+          elevation: 10,
+          //create the elements of the card
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                  child: ClipRRect(
+                      borderRadius: borderRadius,
+                      child: GestureDetector(
+                          onTap: () => _onCardClicked(context, image),
+                          child: image)))
+            ],
+          )),
       //create the top right badge
       _hasNewNotification
           ? _createTopRightNotificationBadge(borderRadius)
@@ -145,9 +146,12 @@ class _SearchRequestState extends State<SearchRequest>
     ];
 
     //create the stack
-    return Stack(
-        clipBehavior: Clip.none,
-        children: children.where((element) => element != null).toList());
+    return Hero(
+      tag: _key,
+      child: Stack(
+          clipBehavior: Clip.none,
+          children: children.where((element) => element != null).toList()),
+    );
   }
 
   /// This function it is used for creating the top button
@@ -194,12 +198,22 @@ class _SearchRequestState extends State<SearchRequest>
   }
 
   /// Handle the card clicked event
-  void _onCardClicked(BuildContext context) {
-    //clear the notification
-    setState(() {
-      //clear the notification
-      //widget.responses?.forEach((element) => element.isNewToUser = false);
-    });
+  void _onCardClicked(BuildContext context, final Image image) {
+    //push the new page (the details page)
+    Navigator.of(context).push(
+        //create a new page route builder
+        PageRouteBuilder(
+            //set the transition duration
+            transitionDuration: Duration(milliseconds: 1500),
+            //create the page
+            pageBuilder: (_, __, ___) => StateRequestDetails(
+                  tag: _key,
+                  searchRequestImage: image,
+                ),
+            //set the transition builder
+            transitionsBuilder: (_, animation, __, child) => Align(
+                  child: FadeTransition(opacity: animation, child: child),
+                )));
   }
 
   /// Change the status of the spinning bar
