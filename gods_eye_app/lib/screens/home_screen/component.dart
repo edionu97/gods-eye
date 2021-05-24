@@ -87,9 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
     //convert the abstract worker in specific instance
     var personFoundMessage = convertedObject as PersonFoundMessageModel;
 
-    //the model is new only if the user is not on the notification screen
+    //the model is new the first time it entered into the system
     //otherwise it means that he saw it
-    personFoundMessage.isNewToUser = _currentMenuItemIdx != 2;
+    personFoundMessage.isNewToUser = true;
 
     //add a  new item into database and notify all the observers
     await PersonSearchResponseRepository().addItemAsync(personFoundMessage);

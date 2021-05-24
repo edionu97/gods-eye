@@ -194,7 +194,7 @@ class _SearchRequestState extends State<SearchRequest>
     //clear the notification
     setState(() {
       //clear the notification
-      widget.responses?.forEach((element) => element.isNewToUser = false);
+      //widget.responses?.forEach((element) => element.isNewToUser = false);
     });
   }
 
