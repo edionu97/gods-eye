@@ -50,6 +50,9 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             //destruct the camera ip and port
             var (cameraIp, cameraPort) = information;
 
+            //save the date when the search was initialized
+            var initializationTime = DateTime.UtcNow;
+
             //create a new recognition task
             var recognitionTask = facialAnalysisWorkerInstance
                 .StartSearchingForPersonAsync(
@@ -58,7 +61,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                         FrameBuffer = _streamingImageWorker.FrameBuffer,
                         StatisticsInformation = (cameraIp, cameraPort),
                         SearchedPersonBase64Img = messageRequest.MessageContent,
-                        OnBufferProcessed = (response, startTime, endTime) =>
+                        OnBufferProcessed = (response, _, endTime) =>
                         {
                             //unpack the object
                             var (detectionInfo, frameInfo) = response;
@@ -88,11 +91,12 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                     // ReSharper disable once MethodHasAsyncOverload
                                     .Publish(new PersonFoundMessageResponse
                                     {
+                                        FindByWorkerId = _workerIdentificationNumber,
                                         IsFound = true,
                                         MessageContent = (detectionInfo, frameInfo, analysisResponse),
                                         MessageId = messageRequest.MessageId,
                                         UserId = messageRequest.UserId,
-                                        StartTimeUtc = startTime,
+                                        StartTimeUtc = initializationTime,
                                         EndTimeUtc = endTime,
                                         FromLocation = cameraGeolocation,
                                         SearchedPersonImageBase64 = messageRequest.MessageContent
@@ -114,7 +118,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
             {
                 JobHashId = messageRequest.MessageId,
                 SearchedImage = messageRequest.MessageContent,
-                SubmittedOn = DateTime.UtcNow,
+                SubmittedOn = initializationTime,
                 CreatedByUserId = messageRequest.UserId
             };
 

@@ -9,8 +9,8 @@ class PersonSearchRequestDetails extends StatefulWidget {
   //declare the fields that are required for this component
   final String userToken;
   final Image searchRequestImage;
-  final List<PersonFoundMessageModel> personFoundResponses;
   final Object heroTag;
+  final List<PersonFoundMessageModel> personFoundResponses;
 
   const PersonSearchRequestDetails(
       {Key key,
@@ -27,23 +27,28 @@ class PersonSearchRequestDetails extends StatefulWidget {
 
 class _StatePersonSearchRequestDetailsState
     extends State<PersonSearchRequestDetails> {
-  final List<PersonFoundMessageModel> _responses = [];
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
 
-    for (var a in widget.personFoundResponses) {
-      _responses.add(a);
-      _responses.add(a);
-      _responses.add(a);
-      _responses.add(a);
-      _responses.add(a);
-      _responses.add(a);
-      _responses.add(a);
-    }
-
-    setState(() {});
+    //call async method for sorting the values
+    (
+        () async {
+          //sort the responses by date descending
+          setState(() {
+            widget.personFoundResponses.sort((x, y){
+              //null dates are in front
+              if(x.foundAt == null || y.foundAt == null){
+                return -1;
+              }
+              //compare dates descending
+              return y.foundAt.compareTo(x.foundAt);
+            });
+          });
+        }
+    )();
+    
   }
 
   @override
@@ -64,7 +69,7 @@ class _StatePersonSearchRequestDetailsState
   /// The [context] represents the build context
   Widget _buildGridWidget(BuildContext context) {
     //create a list of response ids
-    final availableResponses = _responses ?? [];
+    final availableResponses = widget.personFoundResponses ?? [];
     //return the gridview
     return SliverToBoxAdapter(
         //create the grid

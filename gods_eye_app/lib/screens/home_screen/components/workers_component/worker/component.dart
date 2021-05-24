@@ -6,11 +6,32 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 class RemoteWorker extends StatefulWidget {
+  final Widget middleWidget;
+
+  final String bottomRightValue;
+
+  final String cardTitle;
+
+  final String useBottomLeftLabel;
+
+  final String bottomRightLabel;
+
   //the worker model
   final RemoteWorkerModel workerModel;
 
+  final Function onCardClicked;
+
   //construct the worker
-  const RemoteWorker({Key key, @required this.workerModel}) : super(key: key);
+  const RemoteWorker(
+      {Key key,
+      @required this.workerModel,
+      this.cardTitle,
+      this.useBottomLeftLabel,
+      this.bottomRightLabel,
+      this.bottomRightValue,
+      this.onCardClicked,
+      this.middleWidget})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _RemoteWorkerState();
@@ -99,7 +120,7 @@ class _RemoteWorkerState extends State<RemoteWorker>
           //put the title of the card
           Padding(
               padding: const EdgeInsets.only(top: 5),
-              child: Text("Remote worker",
+              child: Text(widget.cardTitle ?? "Remote worker",
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontStyle: FontStyle.normal,
@@ -174,49 +195,52 @@ class _RemoteWorkerState extends State<RemoteWorker>
                       ])),
                       //put the searching jobs
                       Expanded(
-                          child: Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Row(children: [
-                                    Icon(Icons.person_search_outlined,
-                                        color: Colors.blueGrey[500], size: 25),
-                                    //put the extra details
-                                    Expanded(
-                                        child: Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 3),
-                                            child: RichText(
-                                                maxLines: 2,
-                                                text: TextSpan(
-                                                    // Note: Styles for TextSpans must be explicitly defined.
-                                                    // Child text spans will inherit styles from parent
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontStyle:
-                                                            FontStyle.normal,
-                                                        fontSize: 11,
-                                                        color: Colors
-                                                            .blueGrey[300]),
-                                                    children: <TextSpan>[
-                                                      //put with bold the number of jobs
-                                                      TextSpan(
-                                                          text: widget
-                                                                  .workerModel
-                                                                  ?.activeSearchingJobs
-                                                                  ?.toString() ??
-                                                              "unknown",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                      //put the rest of the text
-                                                      TextSpan(
-                                                          text:
-                                                              " is the number of active searching jobs")
-                                                    ]))))
-                                  ])))),
+                          child: widget.middleWidget == null
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 5),
+                                  child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Row(children: [
+                                        Icon(Icons.person_search_outlined,
+                                            color: Colors.blueGrey[500],
+                                            size: 25),
+                                        //put the extra details
+                                        Expanded(
+                                            child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 3),
+                                                child: RichText(
+                                                    maxLines: 2,
+                                                    text: TextSpan(
+                                                        // Note: Styles for TextSpans must be explicitly defined.
+                                                        // Child text spans will inherit styles from parent
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontStyle: FontStyle
+                                                                .normal,
+                                                            fontSize: 11,
+                                                            color: Colors
+                                                                .blueGrey[300]),
+                                                        children: <TextSpan>[
+                                                          //put with bold the number of jobs
+                                                          TextSpan(
+                                                              text: widget
+                                                                      .workerModel
+                                                                      ?.activeSearchingJobs
+                                                                      ?.toString() ??
+                                                                  "unknown",
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                          //put the rest of the text
+                                                          TextSpan(
+                                                              text:
+                                                                  " is the number of active searching jobs")
+                                                        ]))))
+                                      ])))
+                              : widget.middleWidget),
                       //add the bottom right value
                       Expanded(
                           child: Padding(
@@ -224,7 +248,10 @@ class _RemoteWorkerState extends State<RemoteWorker>
                               child: Row(children: [
                                 Expanded(
                                     child: Column(children: [
-                                  Text("STARTED AT",
+                                  Text(
+                                      widget.useBottomLeftLabel
+                                              ?.toUpperCase() ??
+                                          "STARTED AT",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontStyle: FontStyle.normal,
@@ -243,7 +270,10 @@ class _RemoteWorkerState extends State<RemoteWorker>
                                 ])),
                                 Expanded(
                                     child: Column(children: [
-                                  Text("RUNNING",
+                                  Text(
+                                      widget.bottomRightLabel
+                                              ?.toUpperCase() ??
+                                          "RUNNING",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontStyle: FontStyle.normal,
@@ -253,7 +283,9 @@ class _RemoteWorkerState extends State<RemoteWorker>
                                       padding: const EdgeInsets.all(2),
                                       child: Center(
                                           child: Text(
-                                              widget.workerModel?.runningFor ??
+                                              widget.bottomRightValue ??
+                                                  widget.workerModel
+                                                      ?.runningFor ??
                                                   "unknown",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w400,
@@ -268,6 +300,12 @@ class _RemoteWorkerState extends State<RemoteWorker>
 
   /// Used to handle the card click event
   void _onCardClickedAsync(BuildContext context) async {
+    //handle the on card clicked
+    if (widget.onCardClicked != null) {
+      widget.onCardClicked();
+      return;
+    }
+
     //open the modal
     await Modal.showDialogWithNoActionsAsync(context,
         title: Text("Your active search requests on selected worker",

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crclib/catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/geolocation/model.dart';
@@ -19,6 +22,9 @@ class PersonFoundMessageModel extends IAbstractModel {
   //the image of the searched person
   Image searchedPersonImage;
 
+  //the id of the worker that found the request
+  final String findByWorkerId;
+
   //the response id (the same as job search id)
   final String responseId;
 
@@ -35,6 +41,7 @@ class PersonFoundMessageModel extends IAbstractModel {
   static PersonFoundMessageModel convertFromJson(final dynamic json) {
     //return the new instance of the object
     return PersonFoundMessageModel(
+        findByWorkerId: json['FindByWorkerId'],
         responseId: json['ResponseId'],
         searchStartedAt:
             PrimitivesConvertor.convertResponseDateToExpectedFormat(
@@ -52,7 +59,8 @@ class PersonFoundMessageModel extends IAbstractModel {
       String personFoundAt,
       this.geoLocation,
       this.searchResult,
-      this.searchedPersonImageString}) {
+      this.searchedPersonImageString,
+      this.findByWorkerId}) {
 
     //convert the image from base 64 into img
     searchedPersonImage = null;

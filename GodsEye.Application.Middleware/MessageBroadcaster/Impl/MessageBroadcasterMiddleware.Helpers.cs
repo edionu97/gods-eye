@@ -50,6 +50,7 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                         //serialize the response
                         return JsonSerializerDeserializer<dynamic>.Serialize(new
                         {
+                            FindByWorkerId = searchForPersonResponse.FindByWorkerId.ToString() ,
                             ResponseId = searchForPersonResponse.MessageId,
                             SearchStartedAt = searchForPersonResponse.StartTimeUtc,
                             FoundAt = searchForPersonResponse.EndTimeUtc,
