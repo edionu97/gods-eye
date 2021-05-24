@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class AnimatedOpacityWidget extends StatefulWidget {
+class AnimatedSizeWidget extends StatefulWidget {
   final Duration duration;
   final Widget widget;
   final bool startVisible;
 
-  const AnimatedOpacityWidget(
+  const AnimatedSizeWidget(
       {Key key,
       @required this.widget,
       this.startVisible = false,
@@ -13,10 +13,10 @@ class AnimatedOpacityWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _AnimatedOpacityWidgetState createState() => _AnimatedOpacityWidgetState();
+  _AnimatedSizeWidgetState createState() => _AnimatedSizeWidgetState();
 }
 
-class _AnimatedOpacityWidgetState extends State<AnimatedOpacityWidget>
+class _AnimatedSizeWidgetState extends State<AnimatedSizeWidget>
     with SingleTickerProviderStateMixin {
   //define the animation controller
   AnimationController _animationController;
@@ -53,6 +53,6 @@ class _AnimatedOpacityWidgetState extends State<AnimatedOpacityWidget>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(opacity: _animation, child: widget.widget);
+    return ScaleTransition(scale: _animation, child: widget.widget);
   }
 }

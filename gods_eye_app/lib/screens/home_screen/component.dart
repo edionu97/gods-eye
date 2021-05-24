@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //unregister the observer
     PersonSearchResponseRepository().unregisterObserver(_onItemAdded);
     //clear the repository
-    PersonSearchResponseRepository().clearRepository();
+    //PersonSearchResponseRepository().clearRepository();
     //unregister the observer
     NotificationService().unregisterObserver(_onMessage);
     //on dispose unregister the user

@@ -9,7 +9,6 @@ import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
-import 'package:gods_eye_app/utils/animations/navigation/navigation_animation.dart';
 import 'package:gods_eye_app/utils/components/animated_opacity_widget/component.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 
@@ -44,7 +43,8 @@ class _SearchRequestState extends State<SearchRequest>
   //for each searching job see on what worker it is active
   final Map<String, bool> _jobSummary = {};
 
-  final UniqueKey _key = UniqueKey();
+  //generate an unique key
+  final UniqueKey _heroUniqueKey = UniqueKey();
 
   @override
   void initState() {
@@ -127,7 +127,7 @@ class _SearchRequestState extends State<SearchRequest>
                   child: ClipRRect(
                       borderRadius: borderRadius,
                       child: GestureDetector(
-                          onTap: () => _onCardClicked(context, image),
+                          onTap: () => _onSearchResultClicked(context, image),
                           child: image)))
             ],
           )),
@@ -147,7 +147,7 @@ class _SearchRequestState extends State<SearchRequest>
 
     //create the stack
     return Hero(
-      tag: _key,
+      tag: _heroUniqueKey,
       child: Stack(
           clipBehavior: Clip.none,
           children: children.where((element) => element != null).toList()),
@@ -197,8 +197,8 @@ class _SearchRequestState extends State<SearchRequest>
             ));
   }
 
-  /// Handle the card clicked event
-  void _onCardClicked(BuildContext context, final Image image) {
+  /// Handle the search result click event
+  void _onSearchResultClicked(BuildContext context, final Image image) {
     //push the new page (the details page)
     Navigator.of(context).push(
         //create a new page route builder
@@ -206,9 +206,11 @@ class _SearchRequestState extends State<SearchRequest>
             //set the transition duration
             transitionDuration: Duration(milliseconds: 1500),
             //create the page
-            pageBuilder: (_, __, ___) => StateRequestDetails(
-                  tag: _key,
+            pageBuilder: (_, __, ___) => PersonSearchRequestDetails(
+                  userToken: widget.userToken,
                   searchRequestImage: image,
+                  heroTag: _heroUniqueKey,
+                  personFoundResponses: widget.responses,
                 ),
             //set the transition builder
             transitionsBuilder: (_, animation, __, child) => Align(
