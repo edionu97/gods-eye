@@ -6,10 +6,15 @@ class CircularSpinningLoader extends StatefulWidget {
   //property fields
   final Function displayLoaderIf;
   final Widget elseDisplay;
+  final Color spinningDotsColor;
+  final Color centerDotColor;
 
   //display the spinning loader
   CircularSpinningLoader(
-      {this.displayLoaderIf, this.elseDisplay});
+      {this.displayLoaderIf,
+      this.elseDisplay,
+      this.spinningDotsColor,
+      this.centerDotColor});
 
   @override
   _CircularSpinningLoaderState createState() => _CircularSpinningLoaderState();
@@ -86,6 +91,11 @@ class _CircularSpinningLoaderState extends State<CircularSpinningLoader>
     final double _dotRadius = 5.5;
     final double _radianStep = 4;
 
+    //compute the color values
+    final Color centerDotColor = widget.centerDotColor ?? Colors.blueGrey[400];
+    final Color spinningDotsColor =
+        widget.spinningDotsColor ?? Colors.blueGrey[600];
+
     //return the loader
     return Container(
         width: 150,
@@ -95,7 +105,7 @@ class _CircularSpinningLoaderState extends State<CircularSpinningLoader>
           Center(
             child: Dot(
               radius: 10,
-              color: Colors.blueGrey[400],
+              color: centerDotColor,
             ),
           ),
           RotationTransition(
@@ -104,42 +114,42 @@ class _CircularSpinningLoaderState extends State<CircularSpinningLoader>
                 Transform.translate(
                   offset: Offset(cos(pi / _radianStep) * _radius,
                       sin(pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 ),
                 Transform.translate(
                   offset: Offset(cos(2 * pi / _radianStep) * _radius,
                       sin(2 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 ),
                 Transform.translate(
                   offset: Offset(cos(3 * pi / _radianStep) * _radius,
                       sin(3 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 ),
                 Transform.translate(
                   offset: Offset(cos(4 * pi / _radianStep) * _radius,
                       sin(4 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 ),
                 Transform.translate(
                   offset: Offset(cos(5 * pi / _radianStep) * _radius,
                       sin(5 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 ),
                 Transform.translate(
                   offset: Offset(cos(6 * pi / _radianStep) * _radius,
                       sin(6 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 ),
                 Transform.translate(
                   offset: Offset(cos(7 * pi / _radianStep) * _radius,
                       sin(7 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 ),
                 Transform.translate(
                   offset: Offset(cos(8 * pi / _radianStep) * _radius,
                       sin(8 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: Colors.blueGrey[600]),
+                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
                 )
               ]))
         ])));
