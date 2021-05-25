@@ -117,9 +117,9 @@ class _StatePersonSearchRequestDetailsState
                       icon: Icon(Icons.notifications_off_outlined, size: 28),
                       label: 'Mark all as seen'),
                 ],
-                selectedItemColor: Colors.white,
+                selectedItemColor: Colors.white70,
                 elevation: 10.0,
-                unselectedItemColor: Colors.white,
+                unselectedItemColor: Colors.white70,
                 backgroundColor: Colors.blueGrey[700],
                 onTap: (i) => _onOptionClicked(i, context))));
   }
@@ -151,6 +151,7 @@ class _StatePersonSearchRequestDetailsState
                           //it will check to see if the bell icon can be removed
                           removeNotificationBellAction: () => setState(() {}),
                           foundPersonInfo: availableResponses[index],
+                          userToken: widget.userToken
                         ),
                         availableResponses[index].isNewToUser
                             ? _createTopCornerItem(

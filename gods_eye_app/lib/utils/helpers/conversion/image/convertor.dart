@@ -17,7 +17,7 @@ class ImageConvertor {
 
       //return the base64
       return Image.memory(base64Decode(base64WithoutFormat),
-          fit: BoxFit.fill, filterQuality: FilterQuality.high);
+          fit: BoxFit.cover, filterQuality: FilterQuality.high);
     } on Exception {
       //on exception return null
       return null;

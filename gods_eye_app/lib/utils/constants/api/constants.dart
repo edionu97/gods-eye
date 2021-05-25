@@ -27,4 +27,10 @@ class ApiConstants {
 
   // ignore: non_constant_identifier_names
   static String START_SEARCH_REQUEST = "api/facial-recognition/searching/start";
+
+  // ignore: non_constant_identifier_names
+  static String IMAGE_RESIZE = "api/drawing/facial-image/resize";
+
+  // ignore: non_constant_identifier_names
+  static String HIGHLIGHT_ROI = "api/drawing/facial-image/roi";
 }
