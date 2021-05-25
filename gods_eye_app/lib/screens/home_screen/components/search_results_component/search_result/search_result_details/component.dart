@@ -142,21 +142,22 @@ class _StatePersonSearchRequestDetailsState
                 // the number of items from grid is equal with the number of items from list
                 itemCount: availableResponses.length,
                 //the items are instances of remote workers
-                itemBuilder: (BuildContext context, int index) {
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      SearchResultDetail(
-                        removeNotificationBellAction: () => setState((){}),
-                        foundPersonInfo: availableResponses[index],
-                      ),
-                      availableResponses[index].isNewToUser
-                          ? _createTopCornerItem(
-                              BorderRadius.circular(20), index)
-                          : null
-                    ].where((element) => element != null).toList(),
-                  );
-                },
+                //put items in a stack so we can display badge on top
+                itemBuilder: (BuildContext context, int index) => Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        SearchResultDetail(
+                          //this function will be called on the card is clicked
+                          //it will check to see if the bell icon can be removed
+                          removeNotificationBellAction: () => setState(() {}),
+                          foundPersonInfo: availableResponses[index],
+                        ),
+                        availableResponses[index].isNewToUser
+                            ? _createTopCornerItem(
+                                BorderRadius.circular(20), index)
+                            : null
+                      ].where((element) => element != null).toList(),
+                    ),
                 //specifies the grid alignment
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
