@@ -7,8 +7,12 @@ import 'package:intl/intl.dart';
 
 class SearchResultDetail extends StatefulWidget {
   final PersonFoundMessageModel foundPersonInfo;
+  final Function removeNotificationBellAction;
 
-  const SearchResultDetail({Key key, @required this.foundPersonInfo})
+  const SearchResultDetail(
+      {Key key,
+      @required this.foundPersonInfo,
+      this.removeNotificationBellAction})
       : super(key: key);
 
   @override
@@ -50,16 +54,16 @@ class _SearchResultDetailState extends State<SearchResultDetail>
   Widget build(BuildContext context) {
     //get the start at date
     String startedAt;
-    if(widget.foundPersonInfo?.startedAt != null){
+    if (widget.foundPersonInfo?.startedAt != null) {
       startedAt = DateFormat("dd-MM-yyyy HH:mm:ss")
           .format(widget.foundPersonInfo?.startedAt?.toUtc());
     }
 
     //get the found at date
     String foundAt;
-    if(widget.foundPersonInfo?.foundAt != null){
-      foundAt = DateFormat("MM-yyyy HH:mm")
-          .format(widget.foundPersonInfo?.foundAt);
+    if (widget.foundPersonInfo?.foundAt != null) {
+      foundAt =
+          DateFormat("MM-yyyy HH:mm").format(widget.foundPersonInfo?.foundAt);
     }
 
     // adapted the remote worker component
@@ -70,7 +74,11 @@ class _SearchResultDetailState extends State<SearchResultDetail>
           child: Text("Here"),
         ),
         bottomRightValue: foundAt,
-        onCardClicked: (){
+        onCardClicked: () {
+          widget.foundPersonInfo.isNewToUser =
+              !widget.foundPersonInfo.isNewToUser;
+          //call the parent callback
+          widget.removeNotificationBellAction?.call();
           print("da");
         },
         workerModel: RemoteWorkerModel(
