@@ -70,9 +70,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
     return RemoteWorker(
         bottomRightLabel: "FOUND AT",
         cardTitle: "Face match",
-        middleWidget: Center(
-          child: Text("Here"),
-        ),
+        middleWidget: _createMiddleWidget(),
         bottomRightValue: foundAt,
         onCardClicked: () {
           widget.foundPersonInfo.isNewToUser =
@@ -85,5 +83,25 @@ class _SearchResultDetailState extends State<SearchResultDetail>
             workerHashId: widget.foundPersonInfo?.findByWorkerId,
             geolocation: widget.foundPersonInfo?.geoLocation,
             startedAt: startedAt));
+  }
+
+  Widget _createMiddleWidget() {
+    return Align(
+        alignment: Alignment.center,
+        child: Row(children: [
+          ImageIcon(AssetImage("assets/preview.png"),
+              color: Colors.blueGrey[600], size: 25),
+          Expanded(
+            child: Padding(
+                padding: const EdgeInsets.only(left: 3),
+                child: Text("Click anywhere for seeing the face result",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 11,
+                          color: Colors.blueGrey[300])),
+              ),
+          )
+        ]));
   }
 }
