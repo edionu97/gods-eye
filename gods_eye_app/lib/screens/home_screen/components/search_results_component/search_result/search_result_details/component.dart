@@ -161,7 +161,7 @@ class _StatePersonSearchRequestDetailsState
                 //put items in a stack so we can display badge on top
                 itemBuilder: (BuildContext context, int index) => AnimatedOpacity(
                   duration: const Duration(milliseconds: 600),
-                  opacity: availableResponses[index].isHidden ? .5 : 1,
+                  opacity: availableResponses[index].isHidden ? .6 : 1,
                   child: Stack(
                         clipBehavior: Clip.none,
                         children: [

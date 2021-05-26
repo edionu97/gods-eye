@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _newNotifications = 0;
 
   //the menu index
-  int _currentMenuItemIdx = 2;
+  int _currentMenuItemIdx = 0;
 
   @override
   void initState() {
@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //unregister the observer
     PersonSearchResponseRepository().unregisterObserver(_onItemAdded);
     //clear the repository
-    //PersonSearchResponseRepository().clearRepository();
+    PersonSearchResponseRepository().clearRepository();
     //unregister the observer
     NotificationService().unregisterObserver(_onMessage);
     //on dispose unregister the user
@@ -167,10 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     //set the label of the badge
                     label: 'Search results',
                   ),
-                  //the application settings menu entry
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.settings, size: 28),
-                      label: 'App settings')
+                  // //the application settings menu entry
+                  // BottomNavigationBarItem(
+                  //     icon: Icon(Icons.settings, size: 28),
+                  //     label: 'App settings')
                 ],
                 selectedItemColor: Colors.white,
                 elevation: 10.0,
