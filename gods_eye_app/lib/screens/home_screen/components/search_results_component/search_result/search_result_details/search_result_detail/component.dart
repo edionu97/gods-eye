@@ -65,6 +65,11 @@ class _SearchResultDetailState extends State<SearchResultDetail>
           DateFormat("MM-yyyy HH:mm").format(widget.foundPersonInfo?.foundAt);
     }
 
+    final RemoteWorkerModel remoteWorkerModel = RemoteWorkerModel(
+        workerHashId: widget.foundPersonInfo?.findByWorkerId,
+        geolocation: widget.foundPersonInfo?.geoLocation,
+        startedAt: startedAt);
+
     //wrap it in a hero
     return RemoteWorker(
         bottomRightLabel: "FOUND AT",
@@ -76,12 +81,9 @@ class _SearchResultDetailState extends State<SearchResultDetail>
           //call the parent callback
           widget.removeNotificationBellAction?.call();
           //handle the click event
-          _onFaceMatchClicked(context);
+          _onFaceMatchClicked(context, remoteWorkerModel);
         },
-        workerModel: RemoteWorkerModel(
-            workerHashId: widget.foundPersonInfo?.findByWorkerId,
-            geolocation: widget.foundPersonInfo?.geoLocation,
-            startedAt: startedAt));
+        workerModel: remoteWorkerModel);
   }
 
   /// Create the middle of the card item
@@ -114,7 +116,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
         ]));
   }
 
-  void _onFaceMatchClicked(BuildContext context) {
+  void _onFaceMatchClicked(BuildContext context, RemoteWorkerModel remoteWorkerModel) {
     //push the new page (the details page)
     Navigator.of(context).push(
       //create a new page route builder
@@ -123,6 +125,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
             transitionDuration: Duration(milliseconds: 1500),
             //create the page
             pageBuilder: (_, __, ___) => FaceMatchDetails(
+              remoteWorkerModel: remoteWorkerModel,
               userToken: widget.userToken,
               foundPersonDetails: widget.foundPersonInfo,
               heroKey: _heroKey,

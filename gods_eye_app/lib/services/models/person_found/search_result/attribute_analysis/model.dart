@@ -10,7 +10,7 @@ class AttributeAnalysisModel {
       age: json["Age"],
       emotion: json["Emotion"],
       gender: json["Gender"],
-      race: json["Emotion"]
+      race: json["Race"]
     );
   }
 

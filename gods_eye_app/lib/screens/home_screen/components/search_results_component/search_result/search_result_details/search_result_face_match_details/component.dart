@@ -1,19 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gods_eye_app/screens/home_screen/components/search_results_component/search_result/search_result_details/search_result_detail/component.dart';
+import 'package:gods_eye_app/screens/home_screen/components/workers_component/worker/component.dart';
 import 'package:gods_eye_app/services/drawing/service.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/models/person_found/search_result/model.dart';
+import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/utils/components/modal/component.dart';
+import 'package:gods_eye_app/utils/components/rounded_card/component.dart';
 
 class FaceMatchDetails extends StatefulWidget {
   final Object heroKey;
   final String userToken;
   final PersonFoundMessageModel foundPersonDetails;
+  final RemoteWorkerModel remoteWorkerModel;
 
   const FaceMatchDetails(
       {Key key,
       @required this.foundPersonDetails,
+      this.remoteWorkerModel,
       this.userToken,
       this.heroKey})
       : super(key: key);
@@ -71,10 +77,14 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
         //in the body place all the children
         body: Column(children: [
           //create the image part
-          _createImagePart()
+          _createImagePart(),
+
+          //create the details part
+          _createDetailsPart()
         ]));
   }
 
+  /// Create the image part with all the logic
   Widget _createImagePart() {
     //set the border radius
     final borderRadius = BorderRadius.all(Radius.circular(30));
@@ -107,6 +117,203 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
                                 child: FadeTransition(
                                     opacity: _animation,
                                     child: _displayedImage)))))));
+  }
+
+  Widget _createDetailsPart() {
+    var locationInfo = "unknown";
+    final geo = widget.foundPersonDetails?.geoLocation;
+    if (geo != null) {
+      locationInfo = "${geo.countryName} (${geo.countryCode}), "
+          "${geo.regionName} (${geo.regionCode}), "
+          "${geo.city}, ${geo.zipCode}";
+    }
+
+    var latitudeInfo = "unknown";
+    if (geo != null) {
+      latitudeInfo = geo.latitude?.toString() ?? latitudeInfo;
+    }
+
+    var longitude = "unknown";
+    if (geo != null) {
+      longitude = geo.longitude?.toString() ?? longitude;
+    }
+
+    //get the attribute analysis
+    var attributeAnalysis =
+        widget.foundPersonDetails?.searchResult?.attributeAnalysis;
+
+    var age = "unknown";
+    if (attributeAnalysis != null) {
+      age = attributeAnalysis.age?.toString() ?? age;
+    }
+
+    var race = "unknown";
+    if (attributeAnalysis != null) {
+      race = attributeAnalysis.race?.toString() ?? race;
+    }
+
+    var emotion = "unknown";
+    if (attributeAnalysis != null) {
+      emotion = attributeAnalysis.emotion?.toString() ?? emotion;
+    }
+
+    var gender = "unknown";
+    if (attributeAnalysis != null) {
+      gender = attributeAnalysis.gender?.toString() ?? gender;
+      gender = gender.toLowerCase();
+    }
+
+    //put in an expanded to use all the available space
+    return Expanded(
+      //create a column
+      child: Center(
+        //put the items in a row
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+          children: [
+            //create the first card for the geolocation
+            _createRoundedCard(
+                width: 160,
+                height: 180,
+                cardTitle: "Geolocation",
+                cardSubtitle: "Person location info",
+                children: [
+                  //create card row (location)
+                  _createCardRow(
+                      image: ImageIcon(AssetImage("assets/location.png"),
+                          color: Colors.blueGrey[600], size: 25),
+                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                      displayedValue: locationInfo),
+                  //latitude
+                  _createCardRow(
+                      image: ImageIcon(AssetImage("assets/latitude.png"),
+                          color: Colors.blueGrey[300], size: 25),
+                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                      displayedValue:
+                          "The value for latitude is $latitudeInfo degrees"),
+                  //longitude
+                  _createCardRow(
+                      image: ImageIcon(AssetImage("assets/longitude.png"),
+                          color: Colors.blueGrey[400], size: 25),
+                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                      displayedValue:
+                          "The value for longitude is $longitude degrees")
+                ]),
+            _createRoundedCard(
+                cardTitle: "Facial recognition",
+                cardSubtitle: "Facial attribute analysis",
+                width: 160,
+                height: 180,
+                children: [
+                  _createCardRow(
+                      image: ImageIcon(AssetImage("assets/age.png"),
+                          color: Colors.blueGrey[500], size: 25),
+                      padding: const EdgeInsets.only(left: 10, top: 8.0),
+                      displayedValue: "Predicted age is $age"),
+                  _createCardRow(
+                      image: Icon(Icons.person_outlined,
+                          color: Colors.blueGrey[200], size: 24),
+                      displayedValue: "Predicted race is $race"),
+                  _createCardRow(
+                      image: ImageIcon(AssetImage("assets/emotion.png"),
+                          color: Colors.blueGrey[500], size: 25),
+                      displayedValue: "Predicted emotion is $emotion"),
+                  _createCardRow(
+                      image: ImageIcon(AssetImage("assets/sex.png"),
+                          color: Colors.blueGrey[300], size: 24),
+                      displayedValue: "Predicted gender is $gender")
+                ]),
+            //
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _createRoundedCard(
+      {@required final List<Widget> children,
+      final String cardTitle,
+      final String cardSubtitle,
+      final double height = 150,
+      final double width = 150}) {
+    //create the text style
+    final TextStyle textStyleHigh = TextStyle(
+        fontWeight: FontWeight.w400,
+        fontStyle: FontStyle.normal,
+        fontSize: 11,
+        color: Colors.white);
+
+    //create the text style
+    final TextStyle textStyleMid = TextStyle(
+        fontWeight: FontWeight.w400,
+        fontStyle: FontStyle.normal,
+        fontSize: 10,
+        color: Colors.white);
+
+    //define the box decoration
+    final BoxDecoration decoration = BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)));
+
+    //create the first card for the geolocation
+    return RoundedCorneredCard(
+      titleBackgroundColor: Colors.blueGrey[500],
+      //set the elevation
+      elevation: 4,
+      //specify the height
+      height: height,
+      //specify the width
+      width: width,
+      //put the widgets that are defining the card title
+      cardTitleChildren: [
+        //put the title of the card
+        Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(cardTitle ?? "", style: textStyleHigh)),
+        //put the other information
+        Padding(
+            padding: const EdgeInsets.all(2),
+            child: Text(cardSubtitle ?? "", style: textStyleMid))
+      ],
+      children: [
+        //ensure we distribute the space evenly
+        Expanded(
+            //create a container
+            child: Container(
+                //put the decoration
+                decoration: decoration,
+                child: Column(children: children)))
+      ],
+    );
+  }
+
+  Widget _createCardRow(
+      {@required final Widget image,
+      @required final String displayedValue,
+      final EdgeInsetsGeometry padding}) {
+    //set the text style
+    final TextStyle labelTextStyle = TextStyle(
+        fontWeight: FontWeight.w400,
+        fontStyle: FontStyle.normal,
+        fontSize: 12,
+        color: Colors.blueGrey[300]);
+
+    //create padding and the row elements
+    return Padding(
+        padding: padding ?? const EdgeInsets.only(left: 8.0, top: 8.0),
+        //each icon should be placed in a row
+        child: Row(children: [
+          image,
+          Expanded(
+              child: Padding(
+                  padding: const EdgeInsets.only(left: 3),
+                  child: Text(displayedValue,
+                      overflow: TextOverflow.ellipsis,
+                      style: labelTextStyle,
+                      maxLines: 3)))
+        ]));
   }
 
   ///This function it is used for creating the navbar

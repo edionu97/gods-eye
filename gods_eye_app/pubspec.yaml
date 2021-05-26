@@ -68,6 +68,12 @@ flutter:
     - face-detection_off.png
     - eye-scanner.png
     - face-recognition.png
+    - latitude.png
+    - longitude.png
+    - age.png
+    - emotion.png
+    - sex.png
+    - location.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
