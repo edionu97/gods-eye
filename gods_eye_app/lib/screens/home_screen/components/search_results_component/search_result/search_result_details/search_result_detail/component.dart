@@ -97,8 +97,12 @@ class _SearchResultDetailState extends State<SearchResultDetail>
             tag: _heroKey,
             child: Material(
               elevation: 0,
-              child: ImageIcon(AssetImage("assets/preview.png"),
-                  color: Colors.blueGrey[600], size: 25),
+              color: Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 1.0),
+                child: Icon(Icons.visibility_outlined,
+                    color: Colors.blueGrey[500], size: 24),
+              ),
             ),
           ),
           //make the text to grow to occupy all the free space

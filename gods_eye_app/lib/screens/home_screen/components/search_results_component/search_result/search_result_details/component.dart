@@ -31,6 +31,8 @@ class _StatePersonSearchRequestDetailsState
     extends State<PersonSearchRequestDetails> {
   int _currentSelectedItemIdx = 0;
 
+  bool _isHideMode = false;
+
   @override
   void initState() {
     super.initState();
@@ -110,12 +112,16 @@ class _StatePersonSearchRequestDetailsState
                   // the network menu entry
                   BottomNavigationBarItem(
                       icon: ImageIcon(AssetImage("assets/search_results.png"),
-                          size: 28),
+                          size: 25),
                       label: 'Go back'),
                   // the network menu entry
                   BottomNavigationBarItem(
                       icon: Icon(Icons.notifications_off_outlined, size: 28),
                       label: 'Mark all as seen'),
+                  // the network menu entry
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.visibility_outlined, size: 28),
+                      label: 'Modify visibility'),
                 ],
                 selectedItemColor: Colors.white70,
                 elevation: 10.0,
@@ -127,7 +133,17 @@ class _StatePersonSearchRequestDetailsState
   /// The [context] represents the build context
   Widget _buildGridWidget(BuildContext context) {
     //create a list of response ids
-    final availableResponses = widget.personFoundResponses ?? [];
+    //display only the responses that are not hidden
+    final availableResponses = (widget.personFoundResponses ?? [])
+       // .where((model) => !model.isHidden || _isHideMode)
+        .toList();
+
+    if(availableResponses.isEmpty){
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: CircularSpinningLoader(),
+      );
+    }
 
     //return the gridview
     return SliverToBoxAdapter(
@@ -143,22 +159,25 @@ class _StatePersonSearchRequestDetailsState
                 itemCount: availableResponses.length,
                 //the items are instances of remote workers
                 //put items in a stack so we can display badge on top
-                itemBuilder: (BuildContext context, int index) => Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        SearchResultDetail(
-                          //this function will be called on the card is clicked
-                          //it will check to see if the bell icon can be removed
-                          removeNotificationBellAction: () => setState(() {}),
-                          foundPersonInfo: availableResponses[index],
-                          userToken: widget.userToken
-                        ),
-                        availableResponses[index].isNewToUser
-                            ? _createTopCornerItem(
-                                BorderRadius.circular(20), index)
-                            : null
-                      ].where((element) => element != null).toList(),
-                    ),
+                itemBuilder: (BuildContext context, int index) => AnimatedOpacity(
+                  duration: const Duration(milliseconds: 600),
+                  opacity: availableResponses[index].isHidden ? .5 : 1,
+                  child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          SearchResultDetail(
+                              //this function will be called on the card is clicked
+                              //it will check to see if the bell icon can be removed
+                              removeNotificationBellAction: () => setState(() {}),
+                              foundPersonInfo: availableResponses[index],
+                              userToken: widget.userToken),
+                          availableResponses[index].isNewToUser || _isHideMode
+                              ? _createTopCornerItem(BorderRadius.circular(20),
+                                  availableResponses[index])
+                              : null
+                        ].where((element) => element != null).toList(),
+                      ),
+                ),
                 //specifies the grid alignment
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -168,8 +187,13 @@ class _StatePersonSearchRequestDetailsState
 
   /// This function it is used for creating the top button
   /// The border radius defines the shape of the top button
-  Widget _createTopCornerItem(BorderRadius borderRadius, int index) {
-    return //define the top bell icon
+  Widget _createTopCornerItem(
+      BorderRadius borderRadius, PersonFoundMessageModel model) {
+    //check if the card has displayed on top the bell or the hide/view icons
+    var isHideEnabled = !model.isNewToUser && _isHideMode;
+    //create the proper top item
+    return
+        //define the top bell icon
         Positioned(
             right: 2,
             top: -3,
@@ -177,36 +201,55 @@ class _StatePersonSearchRequestDetailsState
             child: AnimatedOpacityWidget(
               duration: const Duration(milliseconds: 1000),
               //if start visible
-              widget: Card(
-                  //set the elevation
-                  elevation: 1,
-                  //create the white color
-                  color: Colors.white,
-                  //set the shape
-                  shape: RoundedRectangleBorder(borderRadius: borderRadius),
-                  //create container
-                  child: Container(
-                      width: 25,
-                      height: 25,
-                      //set the box decoration
-                      decoration: BoxDecoration(borderRadius: borderRadius),
-                      //position the icon in center
-                      child: Center(
-                          //create a new container
-                          child: Container(
-                              width: 22,
-                              height: 22,
-                              //create the same border
-                              decoration: BoxDecoration(
-                                  borderRadius: borderRadius,
-                                  color: Colors.white10),
-                              //in center place the image
-                              child: Center(
-                                  child: ImageIcon(
-                                      AssetImage("assets/bell.png"),
-                                      color: Colors.blueGrey[600],
-                                      size: 17)))))),
+              widget: GestureDetector(
+                //enable the icon tap only if we are in hidden mode
+                onTap: _isHideMode ? () => _onHideChanged(model) : null,
+                //create the card
+                child: Card(
+                    //set the elevation
+                    elevation: 1,
+                    //create the white color
+                    color: Colors.white,
+                    //set the shape
+                    shape: RoundedRectangleBorder(borderRadius: borderRadius),
+                    //create container
+                    child: Container(
+                        width: 25,
+                        height: 25,
+                        //set the box decoration
+                        decoration: BoxDecoration(borderRadius: borderRadius),
+                        //position the icon in center
+                        child: Center(
+                            //create a new container
+                            child: Container(
+                                width: 22,
+                                height: 22,
+                                //create the same border
+                                decoration: BoxDecoration(
+                                    borderRadius: borderRadius,
+                                    color: Colors.white10),
+                                //in center place the image
+                                child: Center(
+                                    child: _getTopRightIcon(
+                                        isHideEnabled, model)))))),
+              ),
             ));
+  }
+
+  Widget _getTopRightIcon(bool isHideEnabled, PersonFoundMessageModel model) {
+    //it the hide mode is not enabled, display the bell icon if
+    if (!isHideEnabled) {
+      return ImageIcon(AssetImage("assets/bell.png"),
+          color: Colors.blueGrey[600], size: 17);
+    }
+
+    //if the model is hidden display the visibility on
+    if (!model.isHidden) {
+      return Icon(Icons.visibility, color: Colors.blueGrey[600], size: 17);
+    }
+
+    //otherwise display the visibility off
+    return Icon(Icons.visibility_outlined, color: Colors.blueGrey[600], size: 17);
   }
 
   /// Handle the event user option clicked on the [index] on [context]
@@ -226,6 +269,8 @@ class _StatePersonSearchRequestDetailsState
         {
           //set the state
           setState(() {
+            //the hide mode must be reset on the user clicks on the card
+            _isHideMode = false;
             //clear the notifications
             for (PersonFoundMessageModel personFoundResponse
                 in widget.personFoundResponses ?? []) {
@@ -234,6 +279,21 @@ class _StatePersonSearchRequestDetailsState
           });
           return;
         }
+      case 2:
+        {
+          //enable/disable hide mode
+          setState(() {
+            _isHideMode = !_isHideMode;
+          });
+        }
     }
+  }
+
+  /// This method it is executed when the hide action is clicked
+  void _onHideChanged(final PersonFoundMessageModel model) {
+    //this will change the state of the model (from hidden to visible and vice vesa)
+    setState(() {
+      model.isHidden = !model.isHidden;
+    });
   }
 }

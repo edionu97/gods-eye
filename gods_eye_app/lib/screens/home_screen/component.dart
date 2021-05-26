@@ -167,10 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     //set the label of the badge
                     label: 'Search results',
                   ),
-                  // //the application settings menu entry
-                  // BottomNavigationBarItem(
-                  //     icon: Icon(Icons.settings, size: 28),
-                  //     label: 'App settings')
+                  //the application settings menu entry
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.settings, size: 28),
+                      label: 'App settings')
                 ],
                 selectedItemColor: Colors.white,
                 elevation: 10.0,

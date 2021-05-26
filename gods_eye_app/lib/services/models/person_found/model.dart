@@ -13,6 +13,9 @@ class PersonFoundMessageModel extends IAbstractModel {
   //indicating that this is a new entry
   bool isNewToUser = false;
 
+  //if this is true it means that the search result will not be displayed
+  bool isHidden = false;
+
   //date when the searching started
   String _searchStartedAt;
 
