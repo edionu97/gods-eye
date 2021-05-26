@@ -53,6 +53,14 @@ class DrawingService {
       FacialKeyPointsModel facialKeyPointsModel}) async {
     //define the payload
     final dynamic payload = {
+      "drawingOptions": {
+        "lineThickness": 1,
+        "color": {
+          "red": 245,
+          "green": 245,
+          "blue": 245
+        }
+      },
       "imageBase64": base64Image,
       "boundingBox": {
         "topX": bndBox.topX,
