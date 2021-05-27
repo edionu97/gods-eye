@@ -122,6 +122,8 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.Impl
                         logger.LogCritical(Constants.TheWorkerWillStopMessage);
                     }
 
+                    //call the failure callback
+                    startingInformation.OnFailure?.Invoke(e);
                     throw;
                 }
                 finally

@@ -15,6 +15,7 @@ using GodsEye.RemoteWorker.Workers.Messages.Components;
 using GodsEye.RemoteWorker.Workers.Messages.Requests;
 using GodsEye.RemoteWorker.Workers.Messages.Responses;
 using GodsEye.Utility.Application.Items.Geolocation.Model;
+using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
 using Constants = GodsEye.Utility.Application.Items.Constants.Message.MessageConstants.Workers;
@@ -103,6 +104,41 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                                     });
 
                             });
+                        },
+                        OnFailure = (failureCause) =>
+                        {
+                            //create the failure message
+                            var failureMessage = new ActiveWorkerFailedMessageResponse
+                            {
+                                UserId = messageRequest.UserId,
+                                MessageId = messageRequest.MessageId,
+                                FailureSummary = new FailureSummary
+                                {
+                                    ExceptionType = failureCause?.GetType().Name,
+                                    FailureDetails = failureCause?.Message,
+                                    Status = failureCause?.Message
+                                }
+                            };
+
+                            //if the failure cause id rpc exception
+                            //extract the exact messages from the exception
+                            if (failureCause is RpcException rpcException)
+                            {
+                                //get the exception status
+                                var status = rpcException.Status;
+
+                                //set the status
+                                failureMessage.FailureSummary.Status = status.StatusCode.ToString();
+
+                                //set the details
+                                failureMessage.FailureSummary.FailureDetails = status.Detail;
+                            }
+                                 
+                            //send the failure message to the invoker of this request
+                            _messageBus.PubSub
+                                // ReSharper disable once MethodSupportsCancellation
+                                // ReSharper disable once MethodHasAsyncOverload
+                                .Publish(failureMessage);
                         }
                     },
                     cancellationTokenSource.Token);
@@ -203,7 +239,7 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                 //skip if the job is not created by the current user
                 if (jobSummary.CreatedByUserId != requestMessage.UserId)
                 {
-                    continue;;
+                    continue; ;
                 }
 
                 //add the hash id in the list

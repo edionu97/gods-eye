@@ -17,6 +17,11 @@ namespace GodsEye.RemoteWorker.Worker.FacialAnalysis.StartingInfo
         /// </summary>
         public Action<(SearchForPersonResponse, string), DateTime, DateTime> OnBufferProcessed { get; set; }
 
+        /// <summary>
+        /// This callback will be called when the worker will fail
+        /// </summary>
+        public Action<Exception> OnFailure { get; set; }
+
         public void Deconstruct(
             out IFrameBuffer frameBuffer, 
             out string searchedPersonBase64Img, 

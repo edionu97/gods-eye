@@ -47,6 +47,12 @@ namespace GodsEye.Application.Middleware.WorkersMaster.Impl
                 .SubscribeAsync<PersonFoundMessageResponse>(
                     StringConstants.SlaveToMasterBusQueueName,
                     async m => await OnMessageCallback(m));
+
+            //register for the active worker failed message response
+            await _messageBus.PubSub
+                .SubscribeAsync<ActiveWorkerFailedMessageResponse>(
+                    StringConstants.SlaveToMasterBusQueueName,
+                    async m => await OnMessageCallback(m));
         }
 
         public async Task PingWorkersAsync(string userId)

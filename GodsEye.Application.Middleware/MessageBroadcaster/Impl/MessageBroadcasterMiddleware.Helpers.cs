@@ -75,6 +75,22 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                             MessageType = nameof(PersonFoundMessageResponse)
                         });
                     }
+                
+                //handle the active worker failed message response
+                case ActiveWorkerFailedMessageResponse activeWorkerFailedMessageResponse:
+                {
+                    //get the failure summary
+                    var failureSummary = activeWorkerFailedMessageResponse.FailureSummary;
+
+                    //create the failure response
+                    return JsonSerializerDeserializer<dynamic>.Serialize(new
+                    {
+                        failureSummary?.Status,
+                        failureSummary?.FailureDetails,
+                        failureSummary?.ExceptionType,
+                        MessageType = nameof(ActiveWorkerFailedMessageResponse)
+                    });
+                }
 
                 default:
                     throw new ArgumentException(message.GetType().FullName);
