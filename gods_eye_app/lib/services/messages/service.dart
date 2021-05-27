@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gods_eye_app/services/models/common/model.dart';
+import 'package:gods_eye_app/services/models/failure/model.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 
@@ -40,6 +41,11 @@ class MessageParsingService {
         {
           //convert the json into the right instance of the object
           return PersonFoundMessageModel.convertFromJson(decodedJson);
+        }
+      //treat the failure message
+      case "ActiveWorkerFailedMessageResponse":
+        {
+          return ActiveWorkerFailedMessage.createFromJson(decodedJson);
         }
     }
 

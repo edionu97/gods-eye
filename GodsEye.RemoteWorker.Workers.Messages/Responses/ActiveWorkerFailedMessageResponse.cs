@@ -8,5 +8,6 @@ namespace GodsEye.RemoteWorker.Workers.Messages.Responses
         public string MessageId { get; set; }
         public string UserId { get; set; }
         public FailureSummary FailureSummary { get; set; }
+        public JobSummary FailedJobDetails { get; set; }
     }
 }

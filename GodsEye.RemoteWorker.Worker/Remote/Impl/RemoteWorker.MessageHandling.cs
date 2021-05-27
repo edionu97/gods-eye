@@ -111,12 +111,18 @@ namespace GodsEye.RemoteWorker.Worker.Remote.Impl
                             var failureMessage = new ActiveWorkerFailedMessageResponse
                             {
                                 UserId = messageRequest.UserId,
-                                MessageId = messageRequest.MessageId,
                                 FailureSummary = new FailureSummary
                                 {
                                     ExceptionType = failureCause?.GetType().Name,
                                     FailureDetails = failureCause?.Message,
                                     Status = failureCause?.Message
+                                },
+                                FailedJobDetails = new JobSummary
+                                {
+                                    JobHashId = messageRequest.MessageId,
+                                    SearchedImage = messageRequest.MessageContent,
+                                    SubmittedOn = initializationTime,
+                                    CreatedByUserId = messageRequest.UserId
                                 }
                             };
 

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:intl/intl.dart';
@@ -133,6 +135,7 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
                   bottomRight: Radius.circular(10))),
           child: Center(
               child: Text(startedAtDateTime,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontStyle: FontStyle.normal,

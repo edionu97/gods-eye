@@ -82,12 +82,14 @@ namespace GodsEye.Application.Middleware.MessageBroadcaster.Impl
                     //get the failure summary
                     var failureSummary = activeWorkerFailedMessageResponse.FailureSummary;
 
+
                     //create the failure response
                     return JsonSerializerDeserializer<dynamic>.Serialize(new
                     {
                         failureSummary?.Status,
                         failureSummary?.FailureDetails,
                         failureSummary?.ExceptionType,
+                        activeWorkerFailedMessageResponse.FailedJobDetails,
                         MessageType = nameof(ActiveWorkerFailedMessageResponse)
                     });
                 }

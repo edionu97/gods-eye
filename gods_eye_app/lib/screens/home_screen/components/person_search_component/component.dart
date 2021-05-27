@@ -5,6 +5,7 @@ import 'package:gods_eye_app/services/facial_recognition/service.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
+import 'package:gods_eye_app/services/models/failure/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/bottom_right_button/component.dart';
@@ -118,6 +119,18 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
     //convert the json into an object
     IAbstractModel convertedObject =
         MessageParsingService().parseModelFromJson(message);
+
+    //treat the failure case
+    if (convertedObject is ActiveWorkerFailedMessage) {
+      //do the interface update
+      //set the state
+      setState(() {
+        //remove the item from the list
+        _displayedWorkerRequests
+            .remove(convertedObject.failedSearchReq?.searchRequestHashId);
+      });
+      return;
+    }
 
     //check if the object is the right instance
     if (!(convertedObject is RemoteWorkerModel)) {

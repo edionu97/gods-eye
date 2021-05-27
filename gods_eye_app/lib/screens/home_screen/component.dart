@@ -1,14 +1,19 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/persistence/search_responses/repo.dart';
 import 'package:gods_eye_app/screens/home_screen/components/workers_component/component.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
+import 'package:gods_eye_app/services/models/failure/model.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
+import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/notification_badge/component.dart';
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
+import 'package:intl/intl.dart';
 
+import 'common/active_search_request/component.dart';
 import 'components/person_search_component/component.dart';
 import 'components/search_results_component/component.dart';
 
@@ -77,7 +82,16 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Treats only the person found message
   void _onMessage(String message) async {
     //convert the json into an object
-    IAbstractModel convertedObject = MessageParsingService().parseModelFromJson(message);
+    IAbstractModel convertedObject =
+        MessageParsingService().parseModelFromJson(message);
+
+    //treat the case when the response is a error response
+    //some notification
+    if (convertedObject is ActiveWorkerFailedMessage) {
+      //handle the error message
+      await _onErrorMessageEncountered(context, convertedObject);
+      return;
+    }
 
     //check if the object is the right instance
     if (!(convertedObject is PersonFoundMessageModel)) {
@@ -215,9 +229,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// This callback it is used for modifying the value of the badge
-  void _onItemAdded(_){
+  void _onItemAdded(_) {
     //if we are displaying the notification screen
-    if(_currentMenuItemIdx == 2){
+    if (_currentMenuItemIdx == 2) {
       //do nothing
       return;
     }
@@ -226,5 +240,37 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       ++_newNotifications;
     });
+  }
+
+  /// Handle the error message that are pushed from server
+  Future _onErrorMessageEncountered(
+      BuildContext context, ActiveWorkerFailedMessage errorMessage) async {
+    //try to display the camera
+    try {
+      var date = "unspecified", time = "unspecified";
+
+      //if date and time are not null
+      if (errorMessage.failedSearchReq?.startedAt != null) {
+        //get the date
+        date = DateFormat("dd MMM yyyy")
+            .format(errorMessage.failedSearchReq.startedAt);
+        //get the time
+        time = DateFormat("hh:mm:ss")
+            .format(errorMessage.failedSearchReq.startedAt);
+      }
+
+      //get the dialog message
+      var dialogMessage =
+          "Error processing the request created on $date at $time";
+      if (errorMessage.status == "Cancelled") {
+        dialogMessage = "Cancelled request created on $date at $time";
+      }
+
+      //show the modal
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context, dialogMessage, errorMessage.details);
+    } on Exception {
+      //ignore
+    }
   }
 }
