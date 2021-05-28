@@ -36,8 +36,12 @@ class SearchResultModel {
     //convert the image from base 64 into img
     foundImage = null;
     if (foundImageString != null && foundImageString.isNotEmpty) {
+      //get the image and the format
+      var imageAndFormat =
+          ImageConvertor.imageFromBase64String(foundImageString);
+
       //create the image from base64 string
-      foundImage = ImageConvertor.imageFromBase64String(foundImageString);
+      foundImage = imageAndFormat.first;
     }
   }
 }

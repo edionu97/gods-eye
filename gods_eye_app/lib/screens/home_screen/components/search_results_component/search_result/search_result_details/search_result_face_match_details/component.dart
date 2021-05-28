@@ -1,25 +1,27 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:gods_eye_app/screens/home_screen/components/search_results_component/search_result/search_result_details/search_result_detail/component.dart';
-import 'package:gods_eye_app/screens/home_screen/components/workers_component/worker/component.dart';
+import 'package:folder_file_saver/folder_file_saver.dart';
 import 'package:gods_eye_app/services/drawing/service.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/models/person_found/search_result/model.dart';
-import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/rounded_card/component.dart';
+import 'package:ext_storage/ext_storage.dart';
+import 'package:path/path.dart' as p;
 
 class FaceMatchDetails extends StatefulWidget {
   final Object heroKey;
   final String userToken;
   final PersonFoundMessageModel foundPersonDetails;
-  final RemoteWorkerModel remoteWorkerModel;
 
   const FaceMatchDetails(
       {Key key,
       @required this.foundPersonDetails,
-      this.remoteWorkerModel,
       this.userToken,
       this.heroKey})
       : super(key: key);
@@ -30,7 +32,7 @@ class FaceMatchDetails extends StatefulWidget {
 
 class _FaceMatchDetailsState extends State<FaceMatchDetails>
     with SingleTickerProviderStateMixin {
-  Widget _displayedImage;
+  Image _displayedImage;
   int _currentSelectedItemIdx = 3;
 
   //define the animation controller
@@ -78,7 +80,6 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
         body: Column(children: [
           //create the image part
           _createImagePart(),
-
           //create the details part
           _createDetailsPart()
         ]));
@@ -92,31 +93,53 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
     //create the hero
     return Hero(
         tag: widget.heroKey,
+        //add a padding
         child: Padding(
             padding: const EdgeInsets.all(8.0),
+            //wrap everything in a material widget
             child: Material(
+                //establish the shadow color
                 shadowColor: Colors.blueGrey[700],
+                //establish the color
                 color: Colors.grey[50],
+                //create the border
                 shape: RoundedRectangleBorder(borderRadius: borderRadius),
+                //set the elevation
                 elevation: 5,
+                //add the padding
                 child: Padding(
                     padding: const EdgeInsets.all(.2),
+                    //create container
                     child: Container(
                         height: 400,
                         color: Colors.transparent,
                         width: MediaQuery.of(context).size.width,
-                        child: _displayedImage == null || _isNothingDisplayed
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                backgroundColor: Colors.transparent,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.blueGrey[600]),
-                              ))
-                            : ClipRRect(
-                                borderRadius: borderRadius,
-                                child: FadeTransition(
-                                    opacity: _animation,
-                                    child: _displayedImage)))))));
+                        child: _createImage(borderRadius, context))))));
+  }
+
+  Widget _createImage(
+      final BorderRadius borderRadius, final BuildContext context) {
+    //if the image is null or there is nothing to display
+    return _displayedImage == null || _isNothingDisplayed
+        //display the progress bar
+        ? Center(
+            child: CircularProgressIndicator(
+            backgroundColor: Colors.transparent,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blueGrey[600]),
+          ))
+        //otherwise display the image clipped
+        : ClipRRect(
+            borderRadius: borderRadius,
+            //put a new transition
+            child: FadeTransition(
+                opacity: _animation,
+                //wrap in a gesture detector
+                child: GestureDetector(
+                    //download the image
+                    onLongPress: () =>
+                        _saveImageToDownloadsFolderAsync(context),
+                    //display the image
+                    child: _displayedImage)));
   }
 
   Widget _createDetailsPart() {
@@ -170,7 +193,6 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
         //put the items in a row
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
           children: [
             //create the first card for the geolocation
             _createRoundedCard(
@@ -183,20 +205,23 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
                   _createCardRow(
                       image: ImageIcon(AssetImage("assets/location.png"),
                           color: Colors.blueGrey[600], size: 25),
-                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8.0, right: 8.0),
                       displayedValue: locationInfo),
                   //latitude
                   _createCardRow(
                       image: ImageIcon(AssetImage("assets/latitude.png"),
                           color: Colors.blueGrey[300], size: 25),
-                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8.0, right: 8.0),
                       displayedValue:
                           "The value for latitude is $latitudeInfo degrees"),
                   //longitude
                   _createCardRow(
                       image: ImageIcon(AssetImage("assets/longitude.png"),
                           color: Colors.blueGrey[400], size: 25),
-                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8.0, right: 8.0),
                       displayedValue:
                           "The value for longitude is $longitude degrees")
                 ]),
@@ -489,4 +514,120 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
     //otherwise return null
     return null;
   }
+
+  /// This method will be called when top image is long pressed
+  void _saveImageToDownloadsFolderAsync(final BuildContext context) async {
+    //ensure that we have an image displayed
+    if (_displayedImage == null) {
+      return;
+    }
+
+    //try to execute the saving of the file
+    try {
+      //if the app does not have the required permissions do nothing
+      if (!(await _hasWriteStoragePermissionsAsync(context))) {
+        return;
+      }
+
+      //create the image file
+      var imageFile = await _createImageFileAsync(widget.foundPersonDetails);
+
+      //get the found image string
+      var foundImageBase64 = widget
+          ?.foundPersonDetails?.searchResult?.foundImageString
+          ?.split(',')
+          ?.last;
+
+      //treat the message
+      if (foundImageBase64 == null || foundImageBase64.isEmpty) {
+        throw Exception(
+            "The image may be broken, since the value for it is null");
+      }
+
+      //encode the image and save it into the file
+      await imageFile.writeAsBytes(base64Decode(foundImageBase64));
+
+      //display the success message
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context,
+          "Success",
+          "Image saved successfully."
+              " The file can be found into the "
+              "downloads/gods_eye/${widget.foundPersonDetails?.responseId} folder");
+
+      //treat any exception that occurs
+    } on Exception catch (e) {
+      //get the exception message
+      final String message = Modal.extractMessageFromException(e);
+      //display the message
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context, "Error encountered", message);
+    }
+  }
+
+  /// This function ensures that the application has the storage permissions enabled
+  /// Otherwise it will open the settings and a dialog will be displayed on [context]
+  static Future<bool> _hasWriteStoragePermissionsAsync(
+      final BuildContext context) async {
+    // if return 0 permission is PERMISSION_GRANTED
+    // if return 1 permission is PERMISSION_IS_DENIED
+    // if return 2 permission is PERMISSION_IS_DENIED with click don't ask again
+    final hasRequiredPermissions = await FolderFileSaver.requestPermission();
+
+    //check if result
+    if (hasRequiredPermissions != 0) {
+      //display the modal
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context,
+          "Storage permission required",
+          "The file could not "
+              "be saved because the app does not have storage permission enabled."
+              "Open settings and enable the permission, and after that try again");
+
+      //get the settings
+      await FolderFileSaver.openSetting;
+    }
+    //return the value of the permissions
+    return await FolderFileSaver.requestPermission() == 0;
+  }
+
+  /// This function it is used for creating the file in which the image will be saved
+  /// The image is obtained by looking at the value of [foundPersonDetails].searchResult.foundImageString
+  static Future<File> _createImageFileAsync(
+      final PersonFoundMessageModel foundPersonDetails) async {
+    //get the regex
+    final regex = RegExp(r"^data:image/(?<imageType>.*);base64$");
+
+    //get the image streaming format
+    final imageStreamingType = foundPersonDetails?.imageFormat;
+
+    //check if the
+    if (!regex.hasMatch(imageStreamingType)) {
+      throw Exception("The image format is unknown");
+    }
+
+    //get the with that name
+    var imageType =
+        regex.firstMatch(imageStreamingType).namedGroup("imageType");
+
+    //get the documents directory
+    final documentsPath = await ExtStorage.getExternalStoragePublicDirectory(
+        ExtStorage.DIRECTORY_DOWNLOADS);
+
+    //get the file path
+    final filePath = p.join(
+        documentsPath,
+        "gods_eye",
+        foundPersonDetails?.responseId ?? "",
+        "${DateTime.now().ticks}.$imageType");
+
+    //create the file and all the directories to it
+    return await File(filePath).create(recursive: true);
+  }
+}
+
+/// This extension method it is used for computing the ticks
+const _epochTicks = 621355968000000000;
+extension TicksOnDateTime on DateTime {
+  int get ticks => this.microsecondsSinceEpoch * 10 + _epochTicks;
 }

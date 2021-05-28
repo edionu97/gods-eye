@@ -129,7 +129,6 @@ class _SearchResultDetailState extends State<SearchResultDetail>
             transitionDuration: Duration(milliseconds: 1500),
             //create the page
             pageBuilder: (_, __, ___) => FaceMatchDetails(
-              remoteWorkerModel: remoteWorkerModel,
               userToken: widget.userToken,
               foundPersonDetails: widget.foundPersonInfo,
               heroKey: _heroKey,

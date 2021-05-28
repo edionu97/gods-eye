@@ -38,8 +38,11 @@ class ActiveSearchRequestModel {
 
     //convert the image from base 64 into img
     if (imageBase64 != null && imageBase64.isNotEmpty) {
+      //get the image and the format
+      var imageAndFormat = ImageConvertor.imageFromBase64String(imageBase64);
+
       //create the image from base64 string
-      image = ImageConvertor.imageFromBase64String(imageBase64);
+      image = imageAndFormat.first;
     }
 
     //set the started at

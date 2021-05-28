@@ -21,7 +21,7 @@ class ActiveWorkerFailedMessage implements IAbstractModel {
       case "Cancelled":
         {
           details =
-              "The request was submitted successfully to the service, but it was canceled by user. If there are any results, the should be in the search results menu.";
+              "The request was submitted successfully to the service, but it was canceled by user. If there are any results, they should be in the search results menu.";
           break;
         }
       //treat the unknown case

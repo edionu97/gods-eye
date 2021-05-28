@@ -38,8 +38,12 @@ class DrawingService {
           "toHeight": height
         });
 
+    //get the image and the format
+    var imageAndFormat =
+    ImageConvertor.imageFromBase64String(response['image']);
+
     //return the image instance
-    return ImageConvertor.imageFromBase64String(response['image']);
+    return imageAndFormat.first;
   }
 
   /// This method it is used for drawing the bounding boxes around the face
@@ -55,11 +59,7 @@ class DrawingService {
     final dynamic payload = {
       "drawingOptions": {
         "lineThickness": 1,
-        "color": {
-          "red": 245,
-          "green": 245,
-          "blue": 245
-        }
+        "color": {"red": 245, "green": 245, "blue": 245}
       },
       "imageBase64": base64Image,
       "boundingBox": {
@@ -71,11 +71,11 @@ class DrawingService {
     };
 
     //include in payload the facial results model
-    if(facialKeyPointsModel != null) {
+    if (facialKeyPointsModel != null) {
       payload["faceKeypointsLocation"] = {
         "rightEyePoint": {
           "x": facialKeyPointsModel.rightEyePoint?.x,
-          "y":  facialKeyPointsModel.rightEyePoint?.y
+          "y": facialKeyPointsModel.rightEyePoint?.y
         },
         "leftEyePoint": {
           "x": facialKeyPointsModel.leftEyePoint?.x,
@@ -114,7 +114,11 @@ class DrawingService {
       );
     }
 
+    //get the image and the format
+    var imageAndFormat =
+        ImageConvertor.imageFromBase64String(response['image']);
+
     //convert and save the image
-    return ImageConvertor.imageFromBase64String(response['image']);
+    return imageAndFormat.first;
   }
 }

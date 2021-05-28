@@ -25,6 +25,9 @@ class PersonFoundMessageModel extends IAbstractModel {
   //the image of the searched person
   Image searchedPersonImage;
 
+  //the format of the image
+  String imageFormat;
+
   //the id of the worker that found the request
   final String findByWorkerId;
 
@@ -64,14 +67,19 @@ class PersonFoundMessageModel extends IAbstractModel {
       this.searchResult,
       this.searchedPersonImageString,
       this.findByWorkerId}) {
-
     //convert the image from base 64 into img
     searchedPersonImage = null;
     if (searchedPersonImageString != null &&
         searchedPersonImageString.isNotEmpty) {
-      //create the image from base64 string
-      searchedPersonImage =
+      //get the image and the format
+      var imageAndFormat =
           ImageConvertor.imageFromBase64String(searchedPersonImageString);
+
+      //create the image from base64 string
+      searchedPersonImage = imageAndFormat.first;
+
+      //get the image and its format
+      imageFormat = imageAndFormat.second;
     }
 
     _searchStartedAt = searchStartedAt;
