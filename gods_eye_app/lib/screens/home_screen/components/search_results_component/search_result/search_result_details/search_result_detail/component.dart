@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/screens/home_screen/components/network_screen_component/components/remote_worker.dart';
 import 'package:gods_eye_app/screens/home_screen/components/search_results_component/search_result/search_result_details/search_result_face_match_details/component.dart';
-import 'package:gods_eye_app/screens/home_screen/components/workers_component/worker/component.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:intl/intl.dart';
@@ -71,7 +71,7 @@ class _SearchResultDetailState extends State<SearchResultDetail>
         startedAt: startedAt);
 
     //wrap it in a hero
-    return RemoteWorker(
+    return RemoteWorkerWidget(
         bottomRightLabel: "FOUND AT",
         cardTitle: "Face match",
         middleWidget: _createMiddleWidget(),

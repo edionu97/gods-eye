@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:gods_eye_app/utils/constants/api/constants.dart';
 import 'package:gods_eye_app/utils/helpers/requests/helper.dart';
 import 'package:web_socket_channel/io.dart';

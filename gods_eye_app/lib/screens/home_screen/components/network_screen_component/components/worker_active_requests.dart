@@ -3,21 +3,22 @@ import 'package:gods_eye_app/screens/home_screen/common/active_search_request/co
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 
-
-class ActiveSearchRequests extends StatefulWidget {
+/// This component it is displayed when the user clicks on one remote worker
+/// that is displayed in the HomeScreen -> Network
+class WorkerActiveRequestsWidget extends StatefulWidget {
   //get the list
   final List<ActiveSearchRequestModel> activeSearchRequestModels;
 
   //set the value of the list
-  const ActiveSearchRequests(
+  const WorkerActiveRequestsWidget(
       {Key key, @required this.activeSearchRequestModels})
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ActiveSearchRequestsState();
+  State<StatefulWidget> createState() => _WorkerActiveRequestsWidgetState();
 }
 
-class _ActiveSearchRequestsState extends State<ActiveSearchRequests> {
+class _WorkerActiveRequestsWidgetState extends State<WorkerActiveRequestsWidget> {
   //the request list
   List<ActiveSearchRequest> requests;
 

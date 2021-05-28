@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:gods_eye_app/screens/home_screen/components/workers_component/worker/component.dart';
 import 'package:gods_eye_app/services/facial_recognition/service.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
+
+import 'components/remote_worker.dart';
 
 class RemoteWorkersScreen extends StatefulWidget {
   final String userToken;
@@ -73,7 +74,7 @@ class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
                           itemCount: _remoteWorkersData.length,
                           //the items are instances of remote workers
                           itemBuilder: (BuildContext context, int index) =>
-                              RemoteWorker(
+                              RemoteWorkerWidget(
                                   workerModel: _remoteWorkersData[index]),
                           //specifies the grid alignment
                           gridDelegate:

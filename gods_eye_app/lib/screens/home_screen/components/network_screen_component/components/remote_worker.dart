@@ -1,32 +1,41 @@
 import 'package:flutter/cupertino.dart';
-import 'package:gods_eye_app/screens/home_screen/components/workers_component/active_search_requests/component.dart';
+import 'package:gods_eye_app/screens/home_screen/components/network_screen_component/components/worker_active_requests.dart';
 import 'package:gods_eye_app/services/models/remote_worker/model.dart';
 import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
-class RemoteWorker extends StatefulWidget {
+/// This component it is used to display the info about the remote workers
+/// Used on HomeScreen -> Network -> Remote Workers page
+class RemoteWorkerWidget extends StatefulWidget {
+
+  // this is the widget that is displayed in the middle of the
   final Widget middleWidget;
 
+  //the value that is set in the bottom right of the card
   final String bottomRightValue;
 
+  //the card title
   final String cardTitle;
 
-  final String useBottomLeftLabel;
+  //the label of the left value
+  final String bottomLeftLabel;
 
+  //the label of the right value
   final String bottomRightLabel;
 
-  //the worker model
+  //the worker model data
   final RemoteWorkerModel workerModel;
 
+  //the callback executed when the card is clicked
   final Function onCardClicked;
 
   //construct the worker
-  const RemoteWorker(
+  const RemoteWorkerWidget(
       {Key key,
       @required this.workerModel,
       this.cardTitle,
-      this.useBottomLeftLabel,
+      this.bottomLeftLabel,
       this.bottomRightLabel,
       this.bottomRightValue,
       this.onCardClicked,
@@ -34,10 +43,10 @@ class RemoteWorker extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _RemoteWorkerState();
+  State<StatefulWidget> createState() => _RemoteWorkerWidgetState();
 }
 
-class _RemoteWorkerState extends State<RemoteWorker>
+class _RemoteWorkerWidgetState extends State<RemoteWorkerWidget>
     with TickerProviderStateMixin {
   //define the animation controller
   AnimationController _animationController;
@@ -249,7 +258,7 @@ class _RemoteWorkerState extends State<RemoteWorker>
                                 Expanded(
                                     child: Column(children: [
                                   Text(
-                                      widget.useBottomLeftLabel
+                                      widget.bottomLeftLabel
                                               ?.toUpperCase() ??
                                           "STARTED AT",
                                       style: TextStyle(
@@ -310,7 +319,7 @@ class _RemoteWorkerState extends State<RemoteWorker>
     await Modal.showDialogWithNoActionsAsync(context,
         title: Text("Your active search requests on selected worker",
             style: TextStyle(color: Colors.blueGrey[600])),
-        content: ActiveSearchRequests(
+        content: WorkerActiveRequestsWidget(
             activeSearchRequestModels:
                 widget.workerModel?.activeSearchRequests ?? []));
   }

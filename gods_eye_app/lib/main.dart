@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gods_eye_app/screens/login/component.dart';
+import 'package:gods_eye_app/screens/login/screen.dart';
 
 /// This represents the app screen
 class AppScreen extends StatelessWidget {

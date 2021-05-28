@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gods_eye_app/utils/components/decoration_form/component.dart';
 
-import 'dialog/component.dart';
 
 class Modal {
   /// This function it is used for extracting a message from exception

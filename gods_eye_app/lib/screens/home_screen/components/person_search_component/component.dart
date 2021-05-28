@@ -1,4 +1,3 @@
-import 'package:auto_animated/auto_animated.dart';
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/screens/home_screen/common/active_search_request/component.dart';
 import 'package:gods_eye_app/services/facial_recognition/service.dart';

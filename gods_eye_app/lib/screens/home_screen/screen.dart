@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/persistence/search_responses/repo.dart';
-import 'package:gods_eye_app/screens/home_screen/components/workers_component/component.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/common/model.dart';
 import 'package:gods_eye_app/services/models/failure/model.dart';
@@ -13,7 +12,7 @@ import 'package:gods_eye_app/utils/components/notification_badge/component.dart'
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 import 'package:intl/intl.dart';
 
-import 'common/active_search_request/component.dart';
+import 'components/network_screen_component/network_screen_component.dart';
 import 'components/person_search_component/component.dart';
 import 'components/search_results_component/component.dart';
 

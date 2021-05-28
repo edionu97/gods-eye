@@ -27,7 +27,6 @@ class _UserFormState extends State<UserForm> {
   final List<FocusNode> _focusNodes = [];
   final Map<int, MapEntry<bool, Function>> _lastFocusState = Map();
 
-  Function _focusChangedListener;
 
   @override
   void initState() {

@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/services/models/person_found/search_result/facial_detection_details_bnd_box/model.dart';
