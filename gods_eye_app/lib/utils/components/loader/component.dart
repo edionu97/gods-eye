@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:gods_eye_app/utils/components/animated_opacity_widget/component.dart';
+import 'package:gods_eye_app/utils/components/animated_size_widget/component.dart';
 
 class CircularSpinningLoader extends StatefulWidget {
   //property fields
@@ -96,63 +98,69 @@ class _CircularSpinningLoaderState extends State<CircularSpinningLoader>
     final Color spinningDotsColor =
         widget.spinningDotsColor ?? Colors.blueGrey[600];
 
-    //return the loader
-    return Container(
-        width: 150,
-        height: 150,
-        child: Center(
-            child: Stack(children: <Widget>[
-          Center(
-            child: Dot(
-              radius: 10,
-              color: centerDotColor,
-            ),
-          ),
-          RotationTransition(
-              turns: _animationRotation,
-              child: Stack(children: <Widget>[
-                Transform.translate(
-                  offset: Offset(cos(pi / _radianStep) * _radius,
-                      sin(pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
+    //wrap the widget in an animated size one
+    return AnimatedSizeWidget(
+      //also add opacity animation
+      widget: AnimatedOpacityWidget(
+        //create the widget
+        widget: Container(
+            width: 150,
+            height: 150,
+            child: Center(
+                child: Stack(children: <Widget>[
+              Center(
+                child: Dot(
+                  radius: 10,
+                  color: centerDotColor,
                 ),
-                Transform.translate(
-                  offset: Offset(cos(2 * pi / _radianStep) * _radius,
-                      sin(2 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
-                ),
-                Transform.translate(
-                  offset: Offset(cos(3 * pi / _radianStep) * _radius,
-                      sin(3 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
-                ),
-                Transform.translate(
-                  offset: Offset(cos(4 * pi / _radianStep) * _radius,
-                      sin(4 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
-                ),
-                Transform.translate(
-                  offset: Offset(cos(5 * pi / _radianStep) * _radius,
-                      sin(5 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
-                ),
-                Transform.translate(
-                  offset: Offset(cos(6 * pi / _radianStep) * _radius,
-                      sin(6 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
-                ),
-                Transform.translate(
-                  offset: Offset(cos(7 * pi / _radianStep) * _radius,
-                      sin(7 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
-                ),
-                Transform.translate(
-                  offset: Offset(cos(8 * pi / _radianStep) * _radius,
-                      sin(8 * pi / _radianStep) * _radius),
-                  child: Dot(radius: _dotRadius, color: spinningDotsColor),
-                )
-              ]))
-        ])));
+              ),
+              RotationTransition(
+                  turns: _animationRotation,
+                  child: Stack(children: <Widget>[
+                    Transform.translate(
+                      offset: Offset(cos(pi / _radianStep) * _radius,
+                          sin(pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    ),
+                    Transform.translate(
+                      offset: Offset(cos(2 * pi / _radianStep) * _radius,
+                          sin(2 * pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    ),
+                    Transform.translate(
+                      offset: Offset(cos(3 * pi / _radianStep) * _radius,
+                          sin(3 * pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    ),
+                    Transform.translate(
+                      offset: Offset(cos(4 * pi / _radianStep) * _radius,
+                          sin(4 * pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    ),
+                    Transform.translate(
+                      offset: Offset(cos(5 * pi / _radianStep) * _radius,
+                          sin(5 * pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    ),
+                    Transform.translate(
+                      offset: Offset(cos(6 * pi / _radianStep) * _radius,
+                          sin(6 * pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    ),
+                    Transform.translate(
+                      offset: Offset(cos(7 * pi / _radianStep) * _radius,
+                          sin(7 * pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    ),
+                    Transform.translate(
+                      offset: Offset(cos(8 * pi / _radianStep) * _radius,
+                          sin(8 * pi / _radianStep) * _radius),
+                      child: Dot(radius: _dotRadius, color: spinningDotsColor),
+                    )
+                  ]))
+            ]))),
+      ),
+    );
   }
 
   void _animationControllerListener() {
