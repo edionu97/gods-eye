@@ -6,6 +6,7 @@ import 'package:gods_eye_app/services/models/person_found/search_result/facial_d
 import 'package:gods_eye_app/services/models/person_found/search_result/facial_detection_details_face_keypoints/model.dart';
 import 'package:gods_eye_app/utils/constants/api/constants.dart';
 import 'package:gods_eye_app/utils/helpers/conversion/image/convertor.dart';
+import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 import 'package:gods_eye_app/utils/helpers/requests/helper.dart';
 
 class DrawingService {
@@ -21,7 +22,7 @@ class DrawingService {
   }
 
   /// Resize the [base64Image] to [width]x[height]
-  Future<Image> resizeImageAsync({
+  Future<Pair<Image, String>> resizeImageAsync({
     @required String userToken,
     @required String base64Image,
     @required int width,
@@ -43,11 +44,11 @@ class DrawingService {
     ImageConvertor.imageFromBase64String(response['image']);
 
     //return the image instance
-    return imageAndFormat.first;
+    return Pair(imageAndFormat.first, response['image']);
   }
 
   /// This method it is used for drawing the bounding boxes around the face
-  Future<Image> drawFaceBoundingBoxAsync(
+  Future<Pair<Image, String>> drawFaceBoundingBoxAsync(
       {@required String userToken,
       @required String base64Image,
       @required FaceBoundingBoxModel bndBox,
@@ -119,6 +120,6 @@ class DrawingService {
         ImageConvertor.imageFromBase64String(response['image']);
 
     //convert and save the image
-    return imageAndFormat.first;
+    return Pair(imageAndFormat.first, response['image']);
   }
 }

@@ -12,6 +12,7 @@ import 'package:gods_eye_app/services/models/person_found/search_result/model.da
 import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/rounded_card/component.dart';
 import 'package:ext_storage/ext_storage.dart';
+import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 import 'package:path/path.dart' as p;
 
 class FaceMatchDetails extends StatefulWidget {
@@ -33,6 +34,7 @@ class FaceMatchDetails extends StatefulWidget {
 class _FaceMatchDetailsState extends State<FaceMatchDetails>
     with SingleTickerProviderStateMixin {
   Image _displayedImage;
+  String _displayedImageB64;
   int _currentSelectedItemIdx = 3;
 
   //define the animation controller
@@ -42,7 +44,7 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
   //this is true only when nothing is displayed
   bool _isNothingDisplayed = false;
 
-  final Map<int, Image> _cachedImage = {};
+  final Map<int, Pair<Image, String>> _cachedImage = {};
 
   @override
   void initState() {
@@ -446,7 +448,8 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
 
     //set the state after the response
     setState(() {
-      _displayedImage = _cachedImage[index];
+      _displayedImage = _cachedImage[index].first;
+      _displayedImageB64 = _cachedImage[index].second;
     });
 
     //forward the controller
@@ -455,7 +458,7 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
 
   /// This method it is used for altering the image
   /// it will modify the image (resize or draw over it)
-  Future<Image> _alterImageUsingServiceAsync(int index) async {
+  Future<Pair<Image, String>> _alterImageUsingServiceAsync(int index) async {
     //get the search result model
     final SearchResultModel searchResultModel =
         widget.foundPersonDetails?.searchResult;
@@ -508,7 +511,8 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
           context, "Drawing failed", message);
 
       //return the image from the model
-      return searchResultModel.foundImage;
+      return Pair(
+          searchResultModel.foundImage, searchResultModel.foundImageString);
     }
 
     //otherwise return null
@@ -533,8 +537,7 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
       var imageFile = await _createImageFileAsync(widget.foundPersonDetails);
 
       //get the found image string
-      var foundImageBase64 = widget
-          ?.foundPersonDetails?.searchResult?.foundImageString
+      var foundImageBase64 = _displayedImageB64
           ?.split(',')
           ?.last;
 
@@ -628,6 +631,7 @@ class _FaceMatchDetailsState extends State<FaceMatchDetails>
 
 /// This extension method it is used for computing the ticks
 const _epochTicks = 621355968000000000;
+
 extension TicksOnDateTime on DateTime {
   int get ticks => this.microsecondsSinceEpoch * 10 + _epochTicks;
 }
