@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gods_eye_app/screens/login/screen.dart';
+import 'package:gods_eye_app/screens/login/login_screen.dart';
 
 /// This represents the app screen
 class AppScreen extends StatelessWidget {
@@ -8,7 +8,7 @@ class AppScreen extends StatelessWidget {
     return MaterialApp(
       home: Container(
         child: Scaffold(
-          body: LoginScreen(),
+          body: LoginScreenWidget(),
         ),
       ),
     );

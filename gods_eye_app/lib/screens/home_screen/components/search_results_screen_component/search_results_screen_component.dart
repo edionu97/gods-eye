@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/persistence/search_responses/repo.dart';
-import 'package:gods_eye_app/screens/home_screen/components/search_results_component/search_result/component.dart';
 import 'package:gods_eye_app/services/models/person_found/model.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 
-class SearchResultsScreen extends StatefulWidget {
+import 'component/possible_search_result_component/possible_search_result_component.dart';
+
+/// This component it is used on HomeScreen => Search Results
+class SearchResultsScreenWidget extends StatefulWidget {
   // define the user token
   final String userToken;
 
   //construct the object
-  const SearchResultsScreen({this.userToken});
+  const SearchResultsScreenWidget({this.userToken});
 
   @override
-  State<StatefulWidget> createState() => _SearchResultsScreenState();
+  State<StatefulWidget> createState() => _SearchResultsScreenWidgetState();
 }
 
-class _SearchResultsScreenState extends State<SearchResultsScreen> {
+class _SearchResultsScreenWidgetState extends State<SearchResultsScreenWidget> {
   //define the person search repository
   final PersonSearchResponseRepository _personSearchResponseRepository =
       PersonSearchResponseRepository();
@@ -88,7 +90,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           //get the responses from the current key index
           var responses = _searchIdToSearchResponses[responseIds[index]];
           //create the widget
-          return SearchRequest(
+          return PossibleSearchResultWidget(
               userToken: widget.userToken, responses: responses);
         },
         //specifies the grid alignment

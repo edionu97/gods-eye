@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:gods_eye_app/screens/home_screen/components/search_results_component/search_result/search_result_details/component.dart';
 import 'package:gods_eye_app/services/facial_recognition/service.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
@@ -12,20 +11,25 @@ import 'package:gods_eye_app/services/notifications/service.dart';
 import 'package:gods_eye_app/utils/components/animated_opacity_widget/component.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 
-class SearchRequest extends StatefulWidget {
+import 'component/possible_search_result_details_screen_component/possible_search_result_details_screen_component.dart';
+
+
+/// This widget it is used for displaying the results
+/// HomeScreen => Search Results => displayed data
+class PossibleSearchResultWidget extends StatefulWidget {
   //declare the fields that are required for this component
   final String userToken;
   final List<PersonFoundMessageModel> responses;
 
   //set the values
-  const SearchRequest({Key key, this.userToken, this.responses})
+  const PossibleSearchResultWidget({Key key, this.userToken, this.responses})
       : super(key: key);
 
   @override
-  _SearchRequestState createState() => _SearchRequestState();
+  _PossibleSearchResultWidgetState createState() => _PossibleSearchResultWidgetState();
 }
 
-class _SearchRequestState extends State<SearchRequest>
+class _PossibleSearchResultWidgetState extends State<PossibleSearchResultWidget>
     with TickerProviderStateMixin {
   //define the animation controller
   AnimationController _animationController;
@@ -206,7 +210,7 @@ class _SearchRequestState extends State<SearchRequest>
             //set the transition duration
             transitionDuration: Duration(milliseconds: 1500),
             //create the page
-            pageBuilder: (_, __, ___) => PersonSearchRequestDetails(
+            pageBuilder: (_, __, ___) => PossibleSearchResultDetailsScreenWidget(
                   userToken: widget.userToken,
                   searchRequestImage: image,
                   heroTag: _heroUniqueKey,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gods_eye_app/screens/home_screen/common/active_search_request/component.dart';
+import 'package:gods_eye_app/screens/home_screen/common/active_search_request_component/active_search_request_component.dart';
 import 'package:gods_eye_app/services/facial_recognition/service.dart';
 import 'package:gods_eye_app/services/messages/service.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
@@ -13,16 +13,17 @@ import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/top_corner_button/component.dart';
 import 'package:image_picker/image_picker.dart';
 
-class PersonSearchScreen extends StatefulWidget {
+/// This component is displayed on the HomeScreen => Person search
+class PersonSearchScreenWidget extends StatefulWidget {
   final String userToken;
 
-  const PersonSearchScreen({this.userToken});
+  const PersonSearchScreenWidget({this.userToken});
 
   @override
-  State<StatefulWidget> createState() => _PersonSearchScreenState();
+  State<StatefulWidget> createState() => _PersonSearchScreenWidgetState();
 }
 
-class _PersonSearchScreenState extends State<PersonSearchScreen> {
+class _PersonSearchScreenWidgetState extends State<PersonSearchScreenWidget> {
   //get the image picker
   final ImagePicker imagePicker = ImagePicker();
 
@@ -91,7 +92,7 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
         //the items are instances of remote workers
         itemBuilder: (BuildContext context, int index) =>
             //create the active search request instance
-            ActiveSearchRequest(
+            ActiveSearchRequestWidget(
                 extraText: "Running since: ",
                 //set the data model
                 activeSearchRequestModel: activeSearchRequests[index],
@@ -264,7 +265,7 @@ class _PersonSearchScreenState extends State<PersonSearchScreen> {
       final message = Modal.extractMessageFromException(e);
       //get the message and report it
       await Modal.showExceptionalDialogWithNoActionsAsync(
-          context, "Authentication error", message);
+          context, "Image upload failed", message);
     }
   }
 

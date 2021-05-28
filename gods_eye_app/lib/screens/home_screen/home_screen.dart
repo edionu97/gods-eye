@@ -11,23 +11,23 @@ import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/notification_badge/component.dart';
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 import 'package:intl/intl.dart';
-
 import 'components/network_screen_component/network_screen_component.dart';
-import 'components/person_search_component/component.dart';
-import 'components/search_results_component/component.dart';
+import 'components/person_search_screen_component/person_search_screen_component.dart';
+import 'components/search_results_screen_component/search_results_screen_component.dart';
 
-class HomeScreen extends StatefulWidget {
+/// Create the home screen
+class HomeScreenWidget extends StatefulWidget {
   //represents the user token
   final String userToken;
 
   //constructs the object
-  HomeScreen({this.userToken});
+  HomeScreenWidget({this.userToken});
 
   @override
-  State<StatefulWidget> createState() => _HomeScreenState();
+  State<StatefulWidget> createState() => _HomeScreenWidgetState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   //menu items
   List<Pair<Function, String>> _menuItems;
 
@@ -45,12 +45,12 @@ class _HomeScreenState extends State<HomeScreen> {
     //set the menu items by defining the function that creates the element and the title of the page
     _menuItems = [
       //create the page for the remote workers
-      Pair((userToken) => RemoteWorkersScreen(userToken), "Remote Workers"),
+      Pair((userToken) => RemoteWorkersScreenWidget(userToken), "Remote Workers"),
       //create the page for the person search
-      Pair((userToken) => PersonSearchScreen(userToken: userToken),
+      Pair((userToken) => PersonSearchScreenWidget(userToken: userToken),
           "Person search"),
       //create the search results page
-      Pair((userToken) => SearchResultsScreen(userToken: userToken),
+      Pair((userToken) => SearchResultsScreenWidget(userToken: userToken),
           "Search results"),
       Pair((userToken) => Center(child: CircularSpinningLoader()),
           "App settings")

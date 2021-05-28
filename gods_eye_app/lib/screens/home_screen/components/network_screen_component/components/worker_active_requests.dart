@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gods_eye_app/screens/home_screen/common/active_search_request/component.dart';
+import 'package:gods_eye_app/screens/home_screen/common/active_search_request_component/active_search_request_component.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:gods_eye_app/utils/components/loader/component.dart';
 
@@ -20,7 +20,7 @@ class WorkerActiveRequestsWidget extends StatefulWidget {
 
 class _WorkerActiveRequestsWidgetState extends State<WorkerActiveRequestsWidget> {
   //the request list
-  List<ActiveSearchRequest> requests;
+  List<ActiveSearchRequestWidget> requests;
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _WorkerActiveRequestsWidgetState extends State<WorkerActiveRequestsWidget>
     //iterate the models and populate the requests
     requests = [];
     for (var model in widget.activeSearchRequestModels ?? []) {
-      requests.add(ActiveSearchRequest(activeSearchRequestModel: model));
+      requests.add(ActiveSearchRequestWidget(activeSearchRequestModel: model));
     }
 
     //set the state

@@ -10,16 +10,17 @@ import 'package:gods_eye_app/utils/components/loader/component.dart';
 
 import 'components/remote_worker.dart';
 
-class RemoteWorkersScreen extends StatefulWidget {
+/// This screen it is displayed on the HomeScreen => Network
+class RemoteWorkersScreenWidget extends StatefulWidget {
   final String userToken;
 
-  RemoteWorkersScreen(this.userToken);
+  RemoteWorkersScreenWidget(this.userToken);
 
   @override
-  State<StatefulWidget> createState() => _RemoteWorkersScreenState();
+  State<StatefulWidget> createState() => _RemoteWorkersScreenWidgetState();
 }
 
-class _RemoteWorkersScreenState extends State<RemoteWorkersScreen> {
+class _RemoteWorkersScreenWidgetState extends State<RemoteWorkersScreenWidget> {
   //the list with remote workers
   final List<RemoteWorkerModel> _remoteWorkersData = [];
 

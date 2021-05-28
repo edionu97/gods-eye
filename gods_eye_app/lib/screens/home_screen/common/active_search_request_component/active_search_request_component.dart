@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:gods_eye_app/services/models/active_search_request/model.dart';
 import 'package:intl/intl.dart';
 
-class ActiveSearchRequest extends StatefulWidget {
+/// This is a component used in both (on remote worker click + on person search screen)
+class ActiveSearchRequestWidget extends StatefulWidget {
   final ActiveSearchRequestModel activeSearchRequestModel;
 
   final double fontSize;
@@ -13,7 +14,7 @@ class ActiveSearchRequest extends StatefulWidget {
   final String extraText;
 
   //set the active search request model
-  ActiveSearchRequest(
+  ActiveSearchRequestWidget(
       {@required this.activeSearchRequestModel,
       this.extraText,
       this.onTopWidget,
@@ -21,10 +22,10 @@ class ActiveSearchRequest extends StatefulWidget {
       this.opacityValue = .8});
 
   @override
-  State<StatefulWidget> createState() => _ActiveSearchRequestState();
+  State<StatefulWidget> createState() => _ActiveSearchRequestWidgetState();
 }
 
-class _ActiveSearchRequestState extends State<ActiveSearchRequest>
+class _ActiveSearchRequestWidgetState extends State<ActiveSearchRequestWidget>
     with TickerProviderStateMixin {
   //define the animation controller
   AnimationController _animationController;
@@ -109,7 +110,7 @@ class _ActiveSearchRequestState extends State<ActiveSearchRequest>
     }
 
     //put the extra message
-    if(widget.extraText != null && widget.extraText.isNotEmpty){
+    if (widget.extraText != null && widget.extraText.isNotEmpty) {
       startedAtDateTime = "${widget.extraText}$startedAtDateTime";
     }
 
