@@ -57,14 +57,13 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
       //when the connection is done, this message will be displayed
       await Modal.showExceptionalDialogWithNoActionsAsync(
           context,
-          "The notification service has been stopped",
-          "The connection with the server was lost and due to that the notification"
-              " service was stopped. This means that you will receive no other notifications"
-              " until you close the current session and log in again in the application. "
-              "However you can see the current session results in the Search Results screen, "
-              "if there were any. Log in again in the application to stop seeing this. "
+          "Lost connection with app service",
+          "The connection with the server was lost and the notification"
+              " service is stopped. This means that you will no longer receive notifications"
+              " until you close the current session and log in again. "
+              "However you can see the current session results in the Search Results screen. "
               "Also keep in mind that data you see on the app may not be accurate, "
-              "since it may reflect the actual state of the system");
+              "since it not reflects the actual state of the system");
 
       //update the ui accordingly
       setState(() {});
