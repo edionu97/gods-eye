@@ -42,7 +42,9 @@ class _RemoteWorkersScreenWidgetState extends State<RemoteWorkersScreenWidget> {
     NotificationService().registerObserver(_onMessage);
 
     //do the initial interface update
-    FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+    FacialRecognitionService()
+        .pingAllWorkersAsync(widget.userToken)
+        .onError((error, stackTrace) => {});
   }
 
   @override

@@ -13,7 +13,6 @@ import 'package:gods_eye_app/utils/components/loader/component.dart';
 
 import 'component/possible_search_result_details_screen_component/possible_search_result_details_screen_component.dart';
 
-
 /// This widget it is used for displaying the results
 /// HomeScreen => Search Results => displayed data
 class PossibleSearchResultWidget extends StatefulWidget {
@@ -26,7 +25,8 @@ class PossibleSearchResultWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _PossibleSearchResultWidgetState createState() => _PossibleSearchResultWidgetState();
+  _PossibleSearchResultWidgetState createState() =>
+      _PossibleSearchResultWidgetState();
 }
 
 class _PossibleSearchResultWidgetState extends State<PossibleSearchResultWidget>
@@ -81,7 +81,9 @@ class _PossibleSearchResultWidgetState extends State<PossibleSearchResultWidget>
     NotificationService().registerObserver(_onNotification);
 
     //do the initial interface update
-    FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+    FacialRecognitionService()
+        .pingAllWorkersAsync(widget.userToken)
+        .onError((error, stackTrace) => {});
   }
 
   @override
@@ -210,7 +212,8 @@ class _PossibleSearchResultWidgetState extends State<PossibleSearchResultWidget>
             //set the transition duration
             transitionDuration: Duration(milliseconds: 1500),
             //create the page
-            pageBuilder: (_, __, ___) => PossibleSearchResultDetailsScreenWidget(
+            pageBuilder: (_, __, ___) =>
+                PossibleSearchResultDetailsScreenWidget(
                   userToken: widget.userToken,
                   searchRequestImage: image,
                   heroTag: _heroUniqueKey,

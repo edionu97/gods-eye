@@ -512,7 +512,7 @@ class _PossibleFaceMatchDetailsWidgetState
 
       //get the message and report it
       await Modal.showExceptionalDialogWithNoActionsAsync(
-          context, "Drawing failed", message);
+          context, "Image altering operation failed", message);
 
       //return the image from the model
       return Pair(

@@ -38,7 +38,9 @@ class _PersonSearchScreenWidgetState extends State<PersonSearchScreenWidget> {
     NotificationService().registerObserver(_onNotification);
 
     //do the initial interface update
-    FacialRecognitionService().pingAllWorkersAsync(widget.userToken);
+    FacialRecognitionService()
+        .pingAllWorkersAsync(widget.userToken)
+        .onError((error, stackTrace) => {});
   }
 
   @override

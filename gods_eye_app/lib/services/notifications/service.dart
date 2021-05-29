@@ -15,6 +15,8 @@ class NotificationService {
   //the on done callback
   Function _onDoneCallback;
 
+  bool isConnectionActive;
+
   //get the ws channel
   IOWebSocketChannel _webSocketChannel;
 
@@ -28,6 +30,9 @@ class NotificationService {
 
   /// This method it is used for registering the service to the ws server
   Future registerAsync(final String userId) async {
+    //mark the connection as active
+    isConnectionActive = true;
+
     //clear all the observers
     _observers.clear();
 
@@ -50,6 +55,8 @@ class NotificationService {
         onError: (error) => print("Error $error"),
         //handle the on done
         onDone: () async {
+          //mark the connection as inactive
+          isConnectionActive = false;
           //print the message
           print("Client $userId disconnected from the server");
           //call the on done callback

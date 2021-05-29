@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gods_eye_app/persistence/search_responses/repo.dart';
@@ -11,6 +13,7 @@ import 'package:gods_eye_app/utils/components/modal/component.dart';
 import 'package:gods_eye_app/utils/components/notification_badge/component.dart';
 import 'package:gods_eye_app/utils/helpers/objects/pair/object.dart';
 import 'package:intl/intl.dart';
+import 'package:pausable_timer/pausable_timer.dart';
 import 'components/network_screen_component/network_screen_component.dart';
 import 'components/person_search_screen_component/person_search_screen_component.dart';
 import 'components/search_results_screen_component/search_results_screen_component.dart';
@@ -37,15 +40,54 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   //the menu index
   int _currentMenuItemIdx = 0;
 
+  PausableTimer _connectionLostReminderJob;
+
   @override
   void initState() {
     //call the initialisation logic
     super.initState();
 
+    //define a future that will be executed when the connection is closed
+    var showErrorMessage = () async {
+      //if the state is unmounted do nothing
+      if (!mounted) {
+        return;
+      }
+
+      //when the connection is done, this message will be displayed
+      await Modal.showExceptionalDialogWithNoActionsAsync(
+          context,
+          "The notification service has been stopped",
+          "The connection with the server was lost and due to that the notification"
+              " service was stopped. This means that you will receive no other notifications"
+              " until you close the current session and log in again in the application. "
+              "However you can see the current session results in the Search Results screen, "
+              "if there were any. Log in again in the application to stop seeing this. "
+              "Also keep in mind that data you see on the app may not be accurate, "
+              "since it may reflect the actual state of the system");
+
+      //update the ui accordingly
+      setState(() {});
+    };
+
+    //set the connection lost reminder
+    _connectionLostReminderJob =
+        PausableTimer(const Duration(seconds: 10), () async {
+      //display the error
+      await showErrorMessage();
+
+      //reset the timer
+      _connectionLostReminderJob?.reset();
+
+      //start again
+      _connectionLostReminderJob?.start();
+    });
+
     //set the menu items by defining the function that creates the element and the title of the page
     _menuItems = [
       //create the page for the remote workers
-      Pair((userToken) => RemoteWorkersScreenWidget(userToken), "Remote Workers"),
+      Pair((userToken) => RemoteWorkersScreenWidget(userToken),
+          "Remote Workers"),
       //create the page for the person search
       Pair((userToken) => PersonSearchScreenWidget(userToken: userToken),
           "Person search"),
@@ -61,10 +103,20 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
 
     //register the observer
     NotificationService().registerObserver(_onMessage);
+
+    //set on done callback
+    NotificationService().setOnDoneCallback(() async {
+      //display the message
+      await showErrorMessage();
+      //start the reminder
+      _connectionLostReminderJob?.start();
+    });
   }
 
   @override
   void dispose() {
+    //stop the connection lost reminder is started
+    _connectionLostReminderJob?.cancel();
     //unregister the observer
     PersonSearchResponseRepository().unregisterObserver(_onItemAdded);
     //clear the repository
@@ -110,14 +162,27 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
+    //get the value of the opacity
+    final double opacityValue =
+        NotificationService().isConnectionActive ? 1 : .7;
+
+    //set the animation duration
+    final Duration animationDuration = const Duration(seconds: 1);
+
     //create the page
     return Scaffold(
         //add the app bar
         appBar: _createAppBar(),
         //add the bottom navigation bar
-        bottomNavigationBar: _createNavigationBar(),
+        bottomNavigationBar: AnimatedOpacity(
+            opacity: opacityValue,
+            duration: animationDuration,
+            child: _createNavigationBar()),
         //set the body
-        body: _menuItems[_currentMenuItemIdx].first(widget.userToken));
+        body: AnimatedOpacity(
+            duration: animationDuration,
+            opacity: opacityValue,
+            child: _menuItems[_currentMenuItemIdx].first(widget.userToken)));
   }
 
   ///This function it is used for creating the navbar
@@ -199,7 +264,9 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
         shadowColor: Colors.blueGrey[700],
-        backgroundColor: Colors.blueGrey[700],
+        backgroundColor: NotificationService().isConnectionActive
+            ? Colors.blueGrey[700]
+            : Colors.blueGrey[700],
         title: Align(
           alignment: Alignment.center,
           child: Opacity(
