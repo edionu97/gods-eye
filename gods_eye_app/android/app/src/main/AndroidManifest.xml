@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="gods_eye_app"
+        android:label="God's Eye"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"

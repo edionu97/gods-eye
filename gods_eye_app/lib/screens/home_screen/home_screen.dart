@@ -254,7 +254,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
         date = DateFormat("dd MMM yyyy")
             .format(errorMessage.failedSearchReq.startedAt);
         //get the time
-        time = DateFormat("hh:mm:ss")
+        time = DateFormat("HH:mm:ss")
             .format(errorMessage.failedSearchReq.startedAt);
       }
 
