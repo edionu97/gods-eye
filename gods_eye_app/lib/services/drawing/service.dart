@@ -57,8 +57,8 @@ class DrawingService {
     //define the payload
     final dynamic payload = {
       "drawingOptions": {
-        "lineThickness": 1,
-        "color": {"red": 245, "green": 245, "blue": 245}
+        "lineThickness": 2,
+        "color": {"red": 119, "green": 192, "blue": 99}
       },
       "imageBase64": base64Image,
       "boundingBox": {

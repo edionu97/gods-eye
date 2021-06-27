@@ -1,6 +1,6 @@
 class ApiConstants {
   // ignore: non_constant_identifier_names
-  static String _SERVER_IP_ADDRESS = "192.168.1.200";
+  static String _SERVER_IP_ADDRESS = "192.168.1.195";
 
   // ignore: non_constant_identifier_names
   static String SERVER_ADDRESS = "http://$_SERVER_IP_ADDRESS:5000/";
